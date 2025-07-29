@@ -1,0 +1,280 @@
+{% extends "base.html" %}
+{% load custom_filters %}
+
+{% block title %}Customer Dashboard{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #1e1e1e;
+        color: #fff;
+    }
+    .dashboard-header {
+        background-color: #2a2a2a;
+        padding: 15px;
+        border-radius: 8px;
+    }
+    .stat-box {
+        background-color: #333;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        color: #fff;
+        font-size: 18px;
+        font-weight: bold;
+    }
+    .table-container {
+        margin-top: 20px;
+        overflow-x: auto;
+        max-width: 100%;
+    }
+    .diamond-table {
+        color: #fff;
+        background-color: #1e1e1e;
+        border-collapse: separate;
+        border-spacing: 0 5px;
+        width: 100%;
+        border-radius: 15px;
+    }
+    .diamond-table th, .diamond-table td {
+        padding: 12px;
+        text-align: center;
+        background-color: #2a2a2a;
+    }
+    .diamond-table th {
+        background-color: #333;
+        position: sticky;
+        top: 0;
+        z-index: 2;
+    }
+    .table thead th {
+        white-space: nowrap;
+    } 
+    .equal-button {
+        min-width: 100px;
+        height: 36px;
+        white-space: nowrap;
+    }
+</style>
+
+<!-- Stats Boxes -->
+<div class="row g-3 dashboard-header mb-4">
+    <div class="col-md-4">
+        <div class="stat-box">
+            Total Stock<br>
+            {{ total_stock }}
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-box">
+            Total Carat<br>
+            {{ total_carat }}
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-box">
+            Total Amount<br>
+            ₹ {{ total_amount }}
+        </div>
+    </div>
+</div>
+<div class="d-flex flex-wrap justify-content-end gap-2 mb-3">
+    <div class="dropdown">
+        <button class="btn btn-sm btn-outline-light dropdown-toggle equal-button" type="button" id="sortDropdownButton" data-bs-toggle="dropdown" aria-expanded="false">
+            Sort
+        </button>
+        <ul class="dropdown-menu dropdown-menu-dark text-small" aria-labelledby="sortDropdownButton">
+            <li class="dropdown-header">Price</li>
+            <li><a class="dropdown-item" href="{{ request.get_full_path|add_sort:'price_asc' }}">Low-to-high</a></li>
+            <li><a class="dropdown-item" href="{{ request.get_full_path|add_sort:'price_desc' }}">High-to-Low</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li class="dropdown-header">Carat</li>
+            <li><a class="dropdown-item" href="{{ request.get_full_path|add_sort:'carat_asc' }}">Low-to-high</a></li>
+            <li><a class="dropdown-item" href="{{ request.get_full_path|add_sort:'carat_desc' }}">High-to-Low</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li class="dropdown-header">Color</li>
+            <li><a class="dropdown-item" href="{{ request.get_full_path|add_sort:'color_asc' }}">Low-to-high</a></li>
+            <li><a class="dropdown-item" href="{{ request.get_full_path|add_sort:'color_desc' }}">High-to-Low</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li class="dropdown-header">Clarity</li>
+            <li><a class="dropdown-item" href="{{ request.get_full_path|add_sort:'clarity_asc' }}">Low-to-high</a></li>
+            <li><a class="dropdown-item" href="{{ request.get_full_path|add_sort:'clarity_desc' }}">High-to-Low</a></li>
+        </ul>
+    </div>
+
+    <button class="btn btn-sm btn-outline-light equal-button" type="button" onclick="toggleFilterOverlay()">Filter</button>
+</div>
+
+<div class="table-container">
+    <table class="diamond-table table-bordered w-100">
+        <thead>
+            <tr>
+                <th>No.</th>
+                <th>Type</th>
+                <th>Stock ID</th>
+                <th>Report #</th>
+                <th>Lab</th>
+                <th>Shape</th>
+                <th>Carat</th>
+                <th>Color</th>
+                <th>Clarity</th>
+                <th>Rap Rate</th>
+                <th>Dis %</th>
+                <th>Price/Carat</th>
+                <th>Total Amount</th>
+                <th>Cut</th>
+                <th>Polish</th>
+                <th>Symmetry</th>
+                <th>Fluorescence</th>
+                <th>Length</th>
+                <th>Width</th>
+                <th>Height</th>
+                <th>Measurements</th>
+                <th>Table %</th>
+                <th>Depth %</th>
+                <th>Crown Angle</th>
+                <th>Crown Height %</th>
+                <th>Pavilion Angle</th>
+                <th>Pavilion Depth</th>
+                <th>Ratio</th>
+                <th>360° Video</th>
+                <th>Photo</th>
+                <th>PDF</th>
+                <th>BGM</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for diamond in diamonds %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ diamond.types }}</td>
+                <td>{{ diamond.stock_id }}</td>
+                <td>{{ diamond.report_number }}</td>
+                <td>{{ diamond.lab }}</td>
+                <td>{{ diamond.get_shape_display }}</td>
+                <td>{{ diamond.carat }}</td>
+                <td>{{ diamond.get_color_display }}</td>
+                <td>{{ diamond.clarity }}</td>
+                <td>{{ diamond.rap_rate }}</td>
+                <td>{{ diamond.discount_percentage }}</td>
+                <td>{{ diamond.price_per_carat }}</td>
+                <td>{{ diamond.total_amount }}</td>
+                <td>{{ diamond.get_cut_display }}</td>
+                <td>{{ diamond.get_polish_display }}</td>
+                <td>{{ diamond.get_symmetry_display }}</td>
+                <td>{{ diamond.fluorescence }}</td>
+                <td>{{ diamond.length }}</td>
+                <td>{{ diamond.width }}</td>
+                <td>{{ diamond.height }}</td>
+                <td>{{ diamond.measurements }}</td>
+                <td>{{ diamond.table_percentage }}</td>
+                <td>{{ diamond.depth_percentage }}</td>
+                <td>{{ diamond.crown_angle }}</td>
+                <td>{{ diamond.crown_height_percentage }}</td>
+                <td>{{ diamond.pavilion_angle }}</td>
+                <td>{{ diamond.pavilion_depth }}</td>
+                <td>{{ diamond.ratio }}</td>
+                <td>
+                    {% if diamond.video_360 %}
+                    <a href="{{ diamond.video_360 }}" target="_blank">Video</a>
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>
+                    {% if diamond.photo %}
+                    <a href="{{ diamond.photo }}" target="_blank">Image</a>
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>
+                    {% if diamond.pdf %}
+                    <a href="{{ diamond.pdf }}" target="_blank">PDF</a>
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>{{ diamond.bgm }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<!-- Pagination Controls -->
+<nav aria-label="Diamond pagination" class="mt-4">
+<ul class="pagination justify-content-center">
+    {% if page_obj.has_previous %}
+    <li class="page-item">
+        <a class="page-link" href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">&laquo; First</a>
+    </li>
+    <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">‹ Prev</a>
+    </li>
+    {% else %}
+    <li class="page-item disabled"><span class="page-link">‹ Prev</span></li>
+    {% endif %}
+
+    <li class="page-item active">
+    <span class="page-link">{{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+    </li>
+
+    {% if page_obj.has_next %}
+    <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Next ›</a>
+    </li>
+    <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Last &raquo;</a>
+    </li>
+    {% else %}
+    <li class="page-item disabled"><span class="page-link">Next ›</span></li>
+    {% endif %}
+</ul>
+</nav>
+
+<!-- Filter Overlay -->
+<div id="filterOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#111; color:#fff; z-index:9999; overflow-y:auto; padding:30px;">
+    <h4 class="text-white">Filter Options</h4>
+    <form method="get" id="filterForm">
+        <div class="row">
+
+            <!-- Min/Max Carat -->
+            <div class="col-md-6 mb-3">
+                <label>Min Carat</label>
+                <input type="text" name="min_carat" class="form-control" value="{{ request.GET.min_carat }}">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label>Max Carat</label>
+                <input type="text" name="max_carat" class="form-control" value="{{ request.GET.max_carat }}">
+            </div>
+
+            {% for title, options, name in filter_groups %}
+                <div class="col-md-4 mb-3">
+                    <label>{{ title }}</label>
+                    <div style="max-height: 200px; overflow-y: auto;">
+                        {% for code, label in options %}
+                            <div>
+                                <input type="checkbox" name="{{ name }}" value="{{ code }}"
+                                    {% if code in active_filters|get_item:name %}checked{% endif %}>
+                                <label>{{ label }}</label>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+
+        <div class="d-flex gap-3 mt-4">
+            <a href="{% url 'customer:dashboard' %}" class="btn btn-outline-light">Clear Filters</a>
+            <button type="button" class="btn btn-outline-light" onclick="toggleFilterOverlay()">Cancel</button>
+            <button type="submit" class="btn btn-light">OK</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    function toggleFilterOverlay() {
+    const overlay = document.getElementById('filterOverlay');
+    overlay.style.display = (overlay.style.display === 'none' || overlay.style.display === '') ? 'block' : 'none';
+}
+</script>
+{% endblock %}

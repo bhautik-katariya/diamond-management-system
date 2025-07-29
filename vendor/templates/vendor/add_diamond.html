@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}Add Diamond{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Add Diamond</h2>
+
+<div class="mb-5">
+    <form method="post" enctype="multipart/form-data" id="diamond-form">
+        {% csrf_token %}
+
+        <!-- JSON file upload -->
+        <div class="mb-3">
+            <label for="json-upload" class="form-label">Import JSON to Auto-Fill Form</label>
+            <input type="file" id="json-upload" class="form-control" accept=".json">
+        </div>
+
+        {{ form.as_p }}
+
+        <button type="submit" class="btn btn-primary">Submit Diamond</button>
+    </form>
+</div>
+
+<script>
+document.getElementById('json-upload').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        try {
+            const data = JSON.parse(event.target.result);
+            const diamond = Array.isArray(data) ? data[0] : data; // support both single object or array
+
+            // Filling form by matching keys
+            for (const key in diamond) {
+                const field = document.querySelector(`[name="${key}"]`);
+                if (field) {
+                    field.value = diamond[key];
+                }
+            }
+        } catch (err) {
+            alert('Invalid JSON format');
+        }
+    };
+
+    reader.readAsText(file);
+});
+</script>
+{% endblock %}

@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% block title %}Your Diamonds{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Your Diamonds</h2>
+
+{% if diamonds %}
+<div style="overflow-x: auto;">
+    <table class="table table-striped table-bordered table-hover">
+    <thead class="table-dark">
+        <tr>
+            <th>Stock ID</th>
+            <th>Report #</th>
+            <th>Type</th>
+            <th>Lab</th>
+            <th>Shape</th>
+            <th>Carat</th>
+            <th>Color</th>
+            <th>Clarity</th>
+            <th>Rap Rate</th>
+            <th>Dis%</th>
+            <th>Price/Carat</th>
+            <th>Total Amount</th>
+            <th>Cut</th>
+            <th>Polish</th>
+            <th>Symmetry</th>
+            <th>Fluorescence</th>
+            <th>Length</th>
+            <th>Width</th>
+            <th>Height</th>
+            <th>Measurements</th>
+            <th>Table%</th>
+            <th>Depth%</th>
+            <th>Crown Angle</th>
+            <th>Crown Height%</th>
+            <th>Pavilion Angle</th>
+            <th>Pavilion Depth</th>
+            <th>Ratio</th>
+            <th>360° Video</th>
+            <th>Photo</th>
+            <th>PDF</th>
+            <th>BGM</th>
+            <th>Edit</th>
+            <th>Delete</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for diamond in diamonds %}
+        <tr>
+            <td>{{ diamond.stock_id }}</td>
+            <td>{{ diamond.report_number }}</td>
+            <td>{{ diamond.types }}</td>
+            <td>{{ diamond.lab }}</td>
+            <td>{{ diamond.get_shape_display }}</td>
+            <td>{{ diamond.carat }}</td>
+            <td>{{ diamond.get_color_display }}</td>
+            <td>{{ diamond.get_clarity_display }}</td>
+            <td>{{ diamond.rap_rate }}</td>
+            <td>{{ diamond.discount_percentage }}</td>
+            <td>{{ diamond.price_per_carat }}</td>
+            <td>{{ diamond.total_amount }}</td>
+            <td>{{ diamond.get_cut_display }}</td>
+            <td>{{ diamond.get_polish_display }}</td>
+            <td>{{ diamond.get_symmetry_display }}</td>
+            <td>{{ diamond.fluorescence }}</td>
+            <td>{{ diamond.length }}</td>
+            <td>{{ diamond.width }}</td>
+            <td>{{ diamond.height }}</td>
+            <td>{{ diamond.measurements }}</td>
+            <td>{{ diamond.table_percentage }}</td>
+            <td>{{ diamond.depth_percentage }}</td>
+            <td>{{ diamond.crown_angle }}</td>
+            <td>{{ diamond.crown_height_percentage }}</td>
+            <td>{{ diamond.pavilion_angle }}</td>
+            <td>{{ diamond.pavilion_depth }}</td>
+            <td>{{ diamond.ratio }}</td>
+            <td>{% if diamond.video_360 %}<a href="{{ diamond.video_360 }}" target="_blank">Video</a>{% else %}-{% endif %}</td>
+            <td>{% if diamond.photo %}<a href="{{ diamond.photo }}" target="_blank">Image</a>{% else %}-{% endif %}</td>
+            <td>{% if diamond.pdf %}<a href="{{ diamond.pdf }}" target="_blank">PDF</a>{% else %}-{% endif %}</td>
+            <td>{{ diamond.bgm }}</td>
+            <td>
+                <a href="{% url 'vendor:edit_diamond' diamond.sr_no %}" class="btn btn-secondary btn-sm">Edit</a>
+            </td> 
+            <td>
+                <button class="btn btn-sm btn-danger" onclick="showConfirm(this)" data-url="{% url 'vendor:delete_diamond' diamond.sr_no %}">
+                    Delete
+                </button>
+                <span class="d-none ms-2" data-confirm-box>
+                    <span class="text-danger fw-bold">Confirm?</span>
+                    <a href="#" class="btn btn-sm btn-outline-danger" onclick="confirmDelete(this)">Yes</a>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="cancelDelete(this)">Cancel</button>
+                </span>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+{% else %}
+<p class="text-muted">You have not added any diamonds yet.</p>
+{% endif %}
+
+<script>
+    function showConfirm(button) {
+        const confirmBox = button.nextElementSibling;
+        confirmBox.classList.remove('d-none');
+        button.style.display = 'none';
+    }
+
+    function cancelDelete(button) {
+        const confirmBox = button.parentElement;
+        const deleteBtn = confirmBox.previousElementSibling;
+        confirmBox.classList.add('d-none');
+        deleteBtn.style.display = 'inline-block';
+    }
+
+    function confirmDelete(button) {
+        const confirmBox = button.parentElement;
+        const deleteUrl = confirmBox.previousElementSibling.getAttribute('data-url');
+        window.location.href = deleteUrl;
+    }
+</script>
+{% endblock %}
