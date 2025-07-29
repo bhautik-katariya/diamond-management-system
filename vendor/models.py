@@ -111,7 +111,7 @@ class Diamond(models.Model):
     carat = models.DecimalField(max_digits=10, decimal_places=2, blank=False, null=False)
     color = models.CharField(max_length=10, blank=False, null=False, choices=COLOUR)
     clarity = models.CharField(max_length=10, blank=False, null=False, choices=CLARITY)
-    rap_rate = models.IntegerField(unique=True, blank=False, null=False)
+    rap_rate = models.IntegerField(blank=False, null=False)
     discount_percentage = models.DecimalField(max_digits=6, decimal_places=2, blank=False, null=False)
     price_per_carat = models.DecimalField(max_digits=12, decimal_places=2, blank=False, null=False)
     total_amount = models.DecimalField(max_digits=15, decimal_places=2, blank=False, null=False)
