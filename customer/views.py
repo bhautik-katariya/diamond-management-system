@@ -99,3 +99,8 @@ def dashboard(request):
     }
 
     return render(request, 'customer/dashboard.html', context)
+
+def diamond_detail(request, sr_no):
+    from django.shortcuts import get_object_or_404
+    diamond = get_object_or_404(Diamond, sr_no=sr_no)
+    return render(request, 'customer/diamond_detail.html', {'diamond': diamond})

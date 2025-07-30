@@ -5,4 +5,5 @@ from .views import *
 
 urlpatterns = [
     path('', dashboard, name='dashboard'),
+    path('diamond/<int:sr_no>/', diamond_detail, name='diamond_detail'),
 ]

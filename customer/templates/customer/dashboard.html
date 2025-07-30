@@ -142,6 +142,7 @@
                 <th>Photo</th>
                 <th>PDF</th>
                 <th>BGM</th>
+                <th>View</th>
             </tr>
         </thead>
         <tbody>
@@ -198,6 +199,9 @@
                     {% endif %}
                 </td>
                 <td>{{ diamond.bgm }}</td>
+                <td>
+                    <a href="{% url 'customer:diamond_detail' diamond.sr_no %}" class="btn btn-primary btn-sm">View</a>
+                </td>
             </tr>
             {% endfor %}
         </tbody>

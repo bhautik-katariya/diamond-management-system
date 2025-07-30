@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}Diamond Details{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        {% comment %} #2a4d8f {% endcomment %}
+        <h1 class="text-center mb-4" style="color:black; font-weight:bold; text-decoration:underline;">Diamond {{ diamond.stock_id }}</h1>
+        <!-- Diamond Details Table -->
+        <div class="col-md-5">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header text-center" style="background:#f8f9fa; font-weight:500; font-size:1.5rem; color:black;">Details</div>
+                <div class="card-body p-0">
+                    <table class="table table-bordered mb-0">
+                        <tbody>
+                            <tr><th>Stock Id</th><td>{{ diamond.stock_id }}</td><th>Shape</th><td>{{ diamond.get_shape_display }}</td></tr>
+                            <tr><th>Carat</th><td>{{ diamond.carat }}</td><th>Color</th><td>{{ diamond.get_color_display }}</td></tr>
+                            <tr><th>Clarity</th><td>{{ diamond.get_clarity_display }}</td><th>Lab</th><td>{{ diamond.get_lab_display }}</td></tr>
+                            <tr><th>Report #</th><td>{{ diamond.report_number }}</td><th>Types</th><td>{{ diamond.get_types_display }}</td></tr>
+                            <tr><th>Rap Rate</th><td>{{ diamond.rap_rate }}</td><th>Discount %</th><td>{{ diamond.discount_percentage }}</td></tr>
+                            <tr><th>Cut</th><td>{{ diamond.get_cut_display }}</td><th>Polish</th><td>{{ diamond.get_polish_display }}</td></tr>
+                            <tr><th>Symmetry</th><td>{{ diamond.get_symmetry_display }}</td><th>Fluorescence</th><td>{{ diamond.fluorescence }}</td></tr>
+                            <tr><th>Length</th><td>{{ diamond.length }}</td><th>Width</th><td>{{ diamond.width }}</td></tr>
+                            <tr><th>Height</th><td>{{ diamond.height }}</td><th>Table %</th><td>{{ diamond.table_percentage }}</td></tr>
+                            <tr><th>Depth %</th><td>{{ diamond.depth_percentage }}</td><th>Crown Angle</th><td>{{ diamond.crown_angle }}</td></tr>
+                            <tr><th>Crown Height %</th><td>{{ diamond.crown_height_percentage }}</td><th>Pavilion Angle</th><td>{{ diamond.pavilion_angle }}</td></tr>
+                            <tr><th>Pavilion Depth</th><td>{{ diamond.pavilion_depth }}</td><th>Ratio</th><td>{{ diamond.ratio }}</td></tr>
+                            <tr><th>BGM</th><td>{{ diamond.bgm }}</td><th>Report</th><td>{% if diamond.pdf %}<a href="{{ diamond.pdf }}" target="_blank">View Report</a>{% else %}N/A{% endif %}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!-- DiamondImage -->
+        <div class="col-md-6 d-flex flex-column align-items-center">
+            <div class="card-header text-center" style="font-size:1.5rem; font-weight:500; color:black;">Image</div> <br>
+            {% if diamond.photo %}
+                <img src="{{ diamond.photo }}" alt="Diamond Image" style="max-width:100%; border-radius:20px; background:#eee;" />
+            {% else %}
+                <p class="text-muted">No image available</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
