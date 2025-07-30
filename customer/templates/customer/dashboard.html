@@ -110,6 +110,7 @@
         <thead>
             <tr>
                 <th>No.</th>
+                <th>Vendor</th>
                 <th>Type</th>
                 <th>Stock ID</th>
                 <th>Report #</th>
@@ -147,6 +148,7 @@
             {% for diamond in diamonds %}
             <tr>
                 <td>{{ forloop.counter }}</td>
+                <td>{{ diamond.vendor }}</td>
                 <td>{{ diamond.types }}</td>
                 <td>{{ diamond.stock_id }}</td>
                 <td>{{ diamond.report_number }}</td>
