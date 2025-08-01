@@ -21,7 +21,7 @@
         padding: 20px;
         border-radius: 10px;
         text-align: center;
-        color: #0a3d62;
+        color: rgb(11, 25, 55);
         font-size: 18px;
         font-weight: bold;
         border: 1px solid #b6e0f7;
@@ -48,7 +48,7 @@
     }
     .diamond-table th {
         background-color: #e6f4fa;
-        color: #0a3d62;
+        color: rgb(11, 25, 55);
         font-weight: 600;
         position: sticky;
         top: 0;
@@ -56,43 +56,70 @@
     }
     .table thead th {
         white-space: nowrap;
-    } 
+    }
+    /* Shared button styles */
     .equal-button, .btn-sort, .btn-filter {
         min-width: 100px;
         height: 36px;
         white-space: nowrap;
-        background: linear-gradient(90deg, #3ec6e0 0%, #4f8cff 100%);
-        color: #fff !important;
+        background: rgb(11, 25, 55);         /* dark navy background */
+        color: rgb(255, 255, 255) !important; /* white text */
         border: none;
         border-radius: 20px;
         font-weight: 500;
-        box-shadow: 0 2px 8px rgba(62,198,224,0.08);
-        transition: background 0.2s;
+        box-shadow: 0 2px 8px rgba(11, 25, 55, 0.3);
+        transition: background 0.3s, color 0.3s;
     }
-    .equal-button:hover, .btn-sort:hover, .btn-filter:hover {
-        background: linear-gradient(90deg, #4f8cff 0%, #3ec6e0 100%);
-        color: #fff;
+
+    /* Hover styles */
+    .equal-button:hover,
+    .btn-filter:hover {
+        background:rgb(255, 255, 255) ;                 /* light blue background */
+        color: rgb(11, 25, 55) !important;   /* dark navy text */
     }
+
+    /* Sort button override styles */
+    .btn-sort {
+        background-color: rgb(11, 25, 55) !important;   /* white background */
+        color: rgb(255, 255, 255) !important;              /* dark navy text */
+        border: 1px solid #ccc !important;
+        font-weight: 600;
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-sort:hover,
+        .btn-sort:focus {
+            background-color: rgb(255, 255, 255) !important;
+            color: rgb(11, 25, 55) !important;
+    }
+
+    /* Dropdown styles */
     .dropdown-menu {
-        background-color: #e6f4fa;
+        background-color: #e6f4fa !important;
         color: #0a3d62;
         border-radius: 12px;
         border: 1px solid #b6e0f7;
     }
+
     .dropdown-item {
-        color: #0a3d62;
+        color: #0a3d62 !important;
+        background-color: transparent !important;
     }
-    .dropdown-item:hover {
-        background-color: #b6e0f7;
-        color: #0a3d62;
+
+    .dropdown-item:hover,
+    .dropdown-item:focus,
+    .dropdown-item:active {
+        background-color: #b6e0f7 !important;
+        color: rgb(11, 25, 55) !important;
     }
+
     .filter-button-group {
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
         margin-top: 6px;
       }
-      
+
       .filter-toggle {
         padding: 10px 14px;
         border: 1px solid #ccc;
@@ -104,22 +131,76 @@
         text-align: center;
         cursor: pointer;
         transition: all 0.2s ease-in-out;
+        border: 2px solid transparent; /* Added for shape icon labels */
       }
-      
+
       .filter-toggle:hover {
         background-color: #f5f5f5;
         border-color: #888;
       }
-      
+
       input[type="checkbox"].hidden-check {
         display: none;
       }
-      
+
       input[type="checkbox"].hidden-check:checked + .filter-toggle {
         border-color: #000;
         background-color: #eee;
       }
-      
+
+      .page-link {
+        min-width: 80px;
+        height: 36px;
+        border-radius: 20px !important;
+        font-weight: 500;
+        background: rgb(11, 25, 55);
+        color: white !important;
+        border: none;
+        margin: 0 3px;
+        box-shadow: 0 2px 8px rgba(11, 25, 55, 0.3);
+        transition: background 0.3s, color 0.3s;
+    }
+
+    .page-link:hover {
+        background: white !important;
+        color: rgb(11, 25, 55) !important;
+        border: 1px solid rgb(11, 25, 55);
+    }
+
+    .page-item.active .page-link {
+        background: rgb(11, 25, 55) !important;
+        color: white !important;
+        border: none;
+    }
+
+    /* Added styles for shape icons and labels */
+    .shape-icon-label {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        cursor: pointer;
+        padding: 8px 0px; /* Adjusted padding for table cell */
+        border-radius: 12px;
+        transition: box-shadow 0.2s, border 0.2s;
+        border: 2px solid transparent;
+        background: #fff;
+        min-width: 70px;
+    }
+    .shape-icon-label .shape-svg {
+        width: 38px;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .shape-label {
+        font-size: 0.9em; /* Slightly smaller font size for table */
+        color: #222;
+        margin-top: 4px; /* Adjusted margin */
+        font-weight: 500;
+    }
+    /* Removed .btn-check:checked + .shape-icon-label styles as not needed in table */
+
 </style>
 
 <!-- Stats Boxes -->
@@ -195,7 +276,40 @@
                 <td>{{ diamond.stock_id }}</td>
                 <td>{{ diamond.type }}</td>
                 <td>{{ diamond.lab }}</td>
-                <td>{{ diamond.get_shape_display }}</td>
+                <td>
+                    <div class="shape-icon-label">
+                        <span class="shape-svg">
+                            {% if diamond.shape == 'RD' %}
+                                <img src="{% static 'images/shapes/round.png' %}" width="40" height="40" alt="Round Shape">
+                            {% elif diamond.shape == 'EM' %}
+                                <img src="{% static 'images/shapes/emerald.png' %}" width="32" height="40" alt="Emerald Shape">
+                            {% elif diamond.shape == 'HT' %}
+                                <img src="{% static 'images/shapes/heart.png' %}" width="40" height="40" alt="Heart Shape">
+                            {% elif diamond.shape == 'MQ' %}
+                                <img src="{% static 'images/shapes/marquise.png' %}" width="32" height="40" alt="Marquise Shape">
+                            {% elif diamond.shape == 'OVL' %}
+                                <img src="{% static 'images/shapes/oval.png' %}" width="32" height="40" alt="Oval Shape">
+                            {% elif diamond.shape == 'PR' %}
+                                <img src="{% static 'images/shapes/pear.png' %}" width="32" height="40" alt="Pear Shape">
+                            {% elif diamond.shape == 'PRS' %}
+                                <img src="{% static 'images/shapes/princess.png' %}" width="40" height="40" alt="Princess Shape">
+                            {% elif diamond.shape == 'RDNT' %}
+                                <img src="{% static 'images/shapes/radiant.png' %}" width="32" height="40" alt="Radiant Shape">
+                            {% elif diamond.shape == 'CS' %}
+                                <img src="{% static 'images/shapes/cushion.png' %}" width="40" height="40" alt="Cushion Shape">
+                            {% elif diamond.shape == 'AS' %}
+                                <img src="{% static 'images/shapes/asscher.png' %}" width="40" height="40" alt="Asscher Shape">
+                            {% elif diamond.shape == 'OLD' %}
+                                <img src="{% static 'images/shapes/old.png' %}" width="40" height="40" alt="Old Shape">
+                            {% elif diamond.shape == 'SQ' %}
+                                <img src="{% static 'images/shapes/square.png' %}" width="40" height="40" alt="Square Shape">
+                            {% else %}
+                                <img src="{% static 'images/shapes/other.png' %}" width="40" height="40" alt="Other Shape">
+                            {% endif %}
+                        </span>
+                        <div class="shape-label">{{ diamond.get_shape_display|title }}</div>
+                    </div>
+                </td>
                 <td>{{ diamond.carat }}</td>
                 <td>{{ diamond.get_color_display }}</td>
                 <td>{{ diamond.clarity }}</td>
@@ -205,7 +319,7 @@
                 <td>{{ diamond.fluorescence }}</td>
                 <td>${{ diamond.price_per_carat }}</td>
                 <td>
-                    <a href="{% url 'customer:diamond_detail' diamond.sr_no %}" class="btn btn-primary btn-sm" target="_blank">View</a>
+                    <a href="{% url 'customer:diamond_detail' diamond.sr_no %}" class="btn equal-button" target="_blank">View</a>
                 </td>
             </tr>
             {% endfor %}

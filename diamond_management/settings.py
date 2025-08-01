@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-6wrrs3l)jp8)tcr-3#l+=fsjmc)_)zt9z_z=r%dh2xr8dzn(w=
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -57,7 +57,9 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
-# CSRF_TRUSTED_ORIGINS = [""]
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.cloudworkstations.dev',  # Allow Firebase Workstations
+]
 
 
 ROOT_URLCONF = 'diamond_management.urls'
@@ -131,7 +133,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    BASE_DIR / "customer" / "static",  # handling customer app static files
+    BASE_DIR / "customer" / "static",  
 ]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 

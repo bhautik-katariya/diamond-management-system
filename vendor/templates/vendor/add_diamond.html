@@ -1,7 +1,53 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}Add Diamond{% endblock %}
 
 {% block content %}
+<style>
+    /* Added styles for shape icons and labels */
+    .shape-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px; /* Space between shape options */
+        padding: 10px;
+        border: 1.5px solid #ccc;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+    }
+    .shape-icon-label {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        cursor: pointer;
+        padding: 8px 10px;
+        border-radius: 12px;
+        transition: box-shadow 0.2s, border 0.2s;
+        border: 2px solid transparent;
+        background: #fff;
+        min-width: 70px;
+    }
+    .shape-icon-label .shape-svg {
+        width: 38px;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .shape-label {
+        font-size: 1em;
+        color: #222;
+        margin-top: 6px;
+        font-weight: 500;
+    }
+    .btn-check:checked + .shape-icon-label {
+        border: 2.5px solid #222;
+        box-shadow: 0 2px 8px #bbb;
+        background: #f8f8f8;
+    }
+    .hidden-radio {
+        display: none;
+    }
+</style>
 <h2 class="mb-4">Add Diamond</h2>
 
 <div class="mb-5">
@@ -21,11 +67,55 @@
             </div>
             <div id="basic-section" class="collapse show card-body row">
                 {% for field in form %}
-                    {% if field.name == 'type' or field.name == 'stock_id' or field.name == 'report_number' or field.name == 'lab' or field.name == 'shape' or field.name == 'carat' or field.name == 'color' or field.name == 'clarity' or field.name == 'rap_rate' or field.name == 'discount_percentage' %}
+                    {% if field.name == 'type' or field.name == 'stock_id' or field.name == 'report_number' or field.name == 'lab' or field.name == 'carat' or field.name == 'color' or field.name == 'clarity' or field.name == 'rap_rate' or field.name == 'discount_percentage' %}
                         <div class="mb-3 col-md-4">
                             <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
                             {{ field }}
                             {% if field.errors %}
+                                <div class="text-danger">{{ field.errors }}</div>
+                            {% endif %}
+                        </div>
+                    {% elif field.name == 'shape' %}
+                         <div class="mb-3 col-md-12">
+                            <label class="form-label">{{ field.label }}</label>
+                            <div class="shape-container">
+                                {% for choice in field.field.choices %}
+                                    <input type="radio" class="hidden-radio" name="{{ field.name }}" id="{{ field.id_for_label }}_{{ forloop.counter0 }}" value="{{ choice.0 }}">
+                                     <label class="shape-icon-label" for="{{ field.id_for_label }}_{{ forloop.counter0 }}">
+                                        <span class="shape-svg">
+                                            {% if choice.0 == 'RD' %}
+                                                <img src="{% static 'images/shapes/round.png' %}" width="40" height="40" alt="Round Shape">
+                                            {% elif choice.0 == 'EM' %}
+                                                <img src="{% static 'images/shapes/emerald.png' %}" width="32" height="40" alt="Emerald Shape">
+                                            {% elif choice.0 == 'HT' %}
+                                                <img src="{% static 'images/shapes/heart.png' %}" width="40" height="40" alt="Heart Shape">
+                                            {% elif choice.0 == 'MQ' %}
+                                                <img src="{% static 'images/shapes/marquise.png' %}" width="32" height="40" alt="Marquise Shape">
+                                            {% elif choice.0 == 'OVL' %}
+                                                <img src="{% static 'images/shapes/oval.png' %}" width="32" height="40" alt="Oval Shape">
+                                            {% elif choice.0 == 'PR' %}
+                                                <img src="{% static 'images/shapes/pear.png' %}" width="32" height="40" alt="Pear Shape">
+                                            {% elif choice.0 == 'PRS' %}
+                                                <img src="{% static 'images/shapes/princess.png' %}" width="40" height="40" alt="Princess Shape">
+                                            {% elif choice.0 == 'RDNT' %}
+                                                <img src="{% static 'images/shapes/radiant.png' %}" width="32" height="40" alt="Radiant Shape">
+                                            {% elif choice.0 == 'CS' %}
+                                                <img src="{% static 'images/shapes/cushion.png' %}" width="40" height="40" alt="Cushion Shape">
+                                            {% elif choice.0 == 'AS' %}
+                                                <img src="{% static 'images/shapes/asscher.png' %}" width="40" height="40" alt="Asscher Shape">      
+                                            {% elif choice.0 == 'OLD' %}
+                                                <img src="{% static 'images/shapes/old.png' %}" width="40" height="40" alt="Old Shape">
+                                            {% elif choice.0 == 'SQ' %}
+                                                <img src="{% static 'images/shapes/square.png' %}" width="40" height="40" alt="Square Shape">
+                                            {% else %}
+                                                <img src="{% static 'images/shapes/other.png' %}" width="40" height="40" alt="Other Shape">
+                                            {% endif %}
+                                        </span>
+                                        <div class="shape-label">{{ choice.1|title }}</div>
+                                    </label>
+                                {% endfor %}
+                            </div>
+                             {% if field.errors %}
                                 <div class="text-danger">{{ field.errors }}</div>
                             {% endif %}
                         </div>
@@ -125,6 +215,26 @@ document.getElementById('json-upload').addEventListener('change', function(e) {
         }
     };
     reader.readAsText(file);
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const shapeLabels = document.querySelectorAll('.shape-icon-label');
+    shapeLabels.forEach(label => {
+        label.addEventListener('click', function() {
+            const radioId = this.getAttribute('for');
+            const radioInput = document.getElementById(radioId);
+
+            // Uncheck all other radio buttons in the group
+            document.querySelectorAll(`input[name="${radioInput.name}"]`).forEach(radio => {
+                radio.checked = false;
+                document.querySelector(`label[for="${radio.id}"]`).classList.remove('btn-check:checked'); // Remove the checked class
+            });
+
+            // Check the clicked radio button and add the checked class to its label
+            radioInput.checked = true;
+            this.classList.add('btn-check:checked');
+        });
+    });
 });
 </script>
 {% endblock %}
