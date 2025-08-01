@@ -39,7 +39,6 @@ class Diamond(models.Model):
         ('PRS', 'PRINCESS'),
         ('AS', 'ASSCHER'),
         ('CS', 'CUSHION'),
-        ('HX', 'HEXAGON'),
         ('OLD', 'OLD'),
         ('OT', 'OTHER')
     ]

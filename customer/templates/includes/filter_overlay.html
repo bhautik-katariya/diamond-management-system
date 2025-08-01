@@ -1,0 +1,151 @@
+{% load static %}
+{% load custom_filters %}
+
+<!-- Filter Overlay -->
+ 
+<style>
+    .shape-row {
+        border: 1.5px solid #eee;
+        margin-bottom: 10px;
+    }
+    .shape-icon-label {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        cursor: pointer;
+        padding: 8px 10px 0 10px;
+        border-radius: 12px;
+        transition: box-shadow 0.2s, border 0.2s;
+        border: 2px solid transparent;
+        background: #fff;
+        min-width: 70px;
+    }
+    .shape-icon-label .shape-svg {
+        width: 38px;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .shape-label {
+        font-size: 1em;
+        color: #222;
+        margin-top: 6px;
+        font-weight: 500;
+    }
+    .btn-check:checked + .shape-icon-label {
+        border: 2.5px solid #222;
+        box-shadow: 0 2px 8px #bbb;
+        background: #f8f8f8;
+    }
+    .btn-outline-dark {
+        border-width: 2px;
+        background: #fff;
+        color: #222;
+    }
+    .btn-outline-dark:hover, .btn-outline-dark:focus {
+        background: #222;
+        color: #fff;
+    }
+    .btn-group .btn {
+        margin-bottom: 4px;
+    }
+    .form-label {
+        font-weight: bold;
+        font-size: 16px;
+        color: #222;
+        margin-bottom: 6px;
+        display: block;
+    }
+</style>
+<div id="filterOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#fff; color:#222; z-index:9999; overflow-y:auto; padding:30px;">
+    <h4 class="mb-4" style="color:#222;">Filter Options</h4>
+    <form method="get" id="filterForm">
+        <div class="row g-4">
+            <!-- Shape Selection with SVG Icons -->
+            <div class="col-12 mb-3">
+                <label class="form-label" style="color:#222;">Shape</label>
+                <div class="d-flex flex-row flex-nowrap justify-content-between align-items-center shape-row" style="background:#fff; border-radius:12px; padding:18px 10px 10px 10px; box-shadow:0 2px 8px #eee; overflow-x:auto;">
+                    {% for code, label in filter_groups.0.1 %}
+                        <input type="checkbox" class="btn-check" name="shape" id="shape-{{ code }}" value="{{ code }}" autocomplete="off" {% if code in active_filters.shape %}checked{% endif %}>
+                        <label class="shape-icon-label mx-2" for="shape-{{ code }}">
+                            <span class="shape-svg">
+                                {% if label == 'ROUND' %}
+                                    <img src="{% static 'images/shapes/round.png' %}" width="40" height="40" alt="Round Shape">
+                                {% elif label == 'EMERALD' %}
+                                    <img src="{% static 'images/shapes/emerald.png' %}" width="32" height="40" alt="Round Shape">
+                                {% elif label == 'HEART' %}
+                                    <img src="{% static 'images/shapes/heart.png' %}" width="40" height="40" alt="Heart Shape">
+                                {% elif label == 'MARQUISE' %}
+                                    <img src="{% static 'images/shapes/marquise.png' %}" width="32" height="40" alt="Marquise Shape">
+                                {% elif label == 'OVAL' %}
+                                    <img src="{% static 'images/shapes/oval.png' %}" width="32" height="40" alt="Oval Shape">
+                                {% elif label == 'PEAR' %}
+                                    <img src="{% static 'images/shapes/pear.png' %}" width="32" height="40" alt="Pear Shape">
+                                {% elif label == 'PRINCESS' %}
+                                    <img src="{% static 'images/shapes/princess.png' %}" width="40" height="40" alt="Princess Shape">
+                                {% elif label == 'RADIANT' %}
+                                    <img src="{% static 'images/shapes/radiant.png' %}" width="32" height="40" alt="Radiant Shape">
+                                {% elif label == 'CUSHION' %}
+                                    <img src="{% static 'images/shapes/cushion.png' %}" width="40" height="40" alt="Cushion Shape">
+                                {% elif label == 'ASSCHER' %}
+                                    <img src="{% static 'images/shapes/asscher.png' %}" width="40" height="40" alt="Asscher Shape">      
+                                {% elif label == 'OLD' %}
+                                    <img src="{% static 'images/shapes/old.png' %}" width="40" height="40" alt="Old Shape">
+                                {% elif label == 'SQUARE' %}
+                                    <img src="{% static 'images/shapes/square.png' %}" width="40" height="40" alt="Square Shape">
+                                {% else %}
+                                    <img src="{% static 'images/shapes/other.png' %}" width="40" height="40" alt="Other Shape">
+                                {% endif %}
+                            </span>
+                            <div class="shape-label">{{ label|title }}</div>
+                        </label>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Carat Range Slider -->
+            <div class="col-md-6 mb-3">
+                <label class="form-label" style="color:#222;">Carat</label>
+                <div class="d-flex align-items-center gap-2">
+                    <input type="number" step="0.01" min="0" name="min_carat" class="form-control" style="max-width:100px;" placeholder="Min" value="{{ request.GET.min_carat }}">
+                    <span>-</span>
+                    <input type="number" step="0.01" min="0" name="max_carat" class="form-control" style="max-width:100px;" placeholder="Max" value="{{ request.GET.max_carat }}">
+                </div>
+            </div>
+            <!-- Budget/Price Range Slider -->
+            <div class="col-md-6 mb-3">
+                <label class="form-label" style="color:#222;">Budget</label>
+                <div class="d-flex align-items-center gap-2">
+                    <input type="number" step="1" min="0" name="min_price" class="form-control" style="max-width:120px;" placeholder="Min $" value="{{ request.GET.min_price }}">
+                    <span>-</span>
+                    <input type="number" step="1" min="0" name="max_price" class="form-control" style="max-width:120px;" placeholder="Max $" value="{{ request.GET.max_price }}">
+                </div>
+            </div>
+            <!-- Color, Clarity, Cut, Polish, Symmetry, Lab as Button Groups -->
+            {% for title, options, name in filter_groups|slice:'1:' %}
+                <div class="col-md-4 mb-3">
+                    <label class="form-label" style="color:#222;">{{ title }}</label>
+                    <div class="filter-button-group" role="group" aria-label="{{ title }}">
+                        {% for code, label in options %}
+                          <input type="checkbox" class="hidden-check" name="{{ name }}" id="{{ name }}-{{ code }}" value="{{ code }}" {% if code in active_filters|get_item:name %}checked{% endif %}>
+                          <label class="filter-toggle" for="{{ name }}-{{ code }}">{{ label }}</label>
+                        {% endfor %}
+                      </div>                            
+                </div>
+            {% endfor %}
+        </div>
+        <div class="d-flex gap-3 mt-4">
+            <a href="{% url 'customer:dashboard' %}" class="btn btn-outline-dark">Clear Filters</a>
+            <button type="button" class="btn btn-outline-dark" onclick="toggleFilterOverlay()">Cancel</button>
+            <button type="submit" class="btn btn-dark">OK</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    function toggleFilterOverlay() {
+    const overlay = document.getElementById('filterOverlay');
+    overlay.style.display = (overlay.style.display === 'none' || overlay.style.display === '') ? 'block' : 'none';
+}
+</script>
