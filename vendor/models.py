@@ -33,14 +33,14 @@ class Diamond(models.Model):
         ('OVL', 'OVAL'),
         ('RDNT', 'RADIANT'),
         ('EM', 'EMERALD'),
-        ('SE', 'SQUARE EMERALD'),
+        ('SQ', 'SQUARE'),
         ('MQ', 'MARQUISE'),
         ('HT', 'HEART'),
         ('PRS', 'PRINCESS'),
-        ('HM', 'HALF MOON'),
+        ('AS', 'ASSCHER'),
         ('CS', 'CUSHION'),
         ('HX', 'HEXAGON'),
-        ('OLD', 'OLD MINER'),
+        ('OLD', 'OLD'),
         ('OT', 'OTHER')
     ]
 
@@ -103,7 +103,7 @@ class Diamond(models.Model):
     
     sr_no = models.AutoField(primary_key=True)
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE, related_name='diamonds')
-    types = models.CharField(max_length=50, blank=False, null=False, choices=TYPES)
+    type = models.CharField(max_length=50, blank=False, null=False, choices=TYPES)
     stock_id = models.IntegerField(unique=True, blank=False, null=False)
     report_number = models.IntegerField(unique=True, blank=False, null=False)
     lab = models.CharField(max_length=50, blank=False, null=False, choices=LAB)

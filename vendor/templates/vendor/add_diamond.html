@@ -1,4 +1,3 @@
-
 {% extends 'base.html' %}
 {% block title %}Add Diamond{% endblock %}
 
@@ -9,246 +8,93 @@
     <form method="post" enctype="multipart/form-data" id="diamond-form">
         {% csrf_token %}
 
-        <!-- JSON file upload -->
-        <div class="mb-3">
+        <!-- JSON Upload -->
+        <div class="mb-4">
             <label for="json-upload" class="form-label">Import JSON to Auto-Fill Form</label>
             <input type="file" id="json-upload" class="form-control" accept=".json">
         </div>
 
-        <!-- Form fields in two columns -->
-        <div class="row">
-            <!-- Column 1 -->
-            <div class="col-md-6">
-                <div class="mb-3">
-                    <label for="{{ form.types.id_for_label }}" class="form-label">{{ form.types.label }}</label>
-                    {{ form.types }}
-                    {% if form.types.errors %}
-                        <div class="text-danger">{{ form.types.errors }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="mb-3">
-                    <label for="{{ form.stock_id.id_for_label }}" class="form-label">{{ form.stock_id.label }}</label>
-                    {{ form.stock_id }}
-                    {% if form.stock_id.errors %}
-                        <div class="text-danger">{{ form.stock_id.errors }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="mb-3">
-                    <label for="{{ form.report_number.id_for_label }}" class="form-label">{{ form.report_number.label }}</label>
-                    {{ form.report_number }}
-                    {% if form.report_number.errors %}
-                        <div class="text-danger">{{ form.report_number.errors }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="mb-3">
-                    <label for="{{ form.lab.id_for_label }}" class="form-label">{{ form.lab.label }}</label>
-                    {{ form.lab }}
-                    {% if form.lab.errors %}
-                        <div class="text-danger">{{ form.lab.errors }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="mb-3">
-                    <label for="{{ form.shape.id_for_label }}" class="form-label">{{ form.shape.label }}</label>
-                    {{ form.shape }}
-                    {% if form.shape.errors %}
-                        <div class="text-danger">{{ form.shape.errors }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="mb-3">
-                    <label for="{{ form.carat.id_for_label }}" class="form-label">{{ form.carat.label }}</label>
-                    {{ form.carat }}
-                    {% if form.carat.errors %}
-                        <div class="text-danger">{{ form.carat.errors }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="mb-3">
-                    <label for="{{ form.color.id_for_label }}" class="form-label">{{ form.color.label }}</label>
-                    {{ form.color }}
-                    {% if form.color.errors %}
-                        <div class="text-danger">{{ form.color.errors }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="mb-3">
-                    <label for="{{ form.clarity.id_for_label }}" class="form-label">{{ form.clarity.label }}</label>
-                    {{ form.clarity }}
-                    {% if form.clarity.errors %}
-                        <div class="text-danger">{{ form.clarity.errors }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="mb-3">
-                    <label for="{{ form.rap_rate.id_for_label }}" class="form-label">{{ form.rap_rate.label }}</label>
-                    {{ form.rap_rate }}
-                    {% if form.rap_rate.errors %}
-                        <div class="text-danger">{{ form.rap_rate.errors }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="mb-3">
-                    <label for="{{ form.discount_percentage.id_for_label }}" class="form-label">{{ form.discount_percentage.label }}</label>
-                    {{ form.discount_percentage }}
-                    {% if form.discount_percentage.errors %}
-                        <div class="text-danger">{{ form.discount_percentage.errors }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="mb-3">
-                    <label for="{{ form.cut.id_for_label }}" class="form-label">{{ form.cut.label }}</label>
-                    {{ form.cut }}
-                    {% if form.cut.errors %}
-                        <div class="text-danger">{{ form.cut.errors }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="mb-3">
-                    <label for="{{ form.polish.id_for_label }}" class="form-label">{{ form.polish.label }}</label>
-                    {{ form.polish }}
-                    {% if form.polish.errors %}
-                        <div class="text-danger">{{ form.polish.errors }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="mb-3">
-                    <label for="{{ form.symmetry.id_for_label }}" class="form-label">{{ form.symmetry.label }}</label>
-                    {{ form.symmetry }}
-                    {% if form.symmetry.errors %}
-                        <div class="text-danger">{{ form.symmetry.errors }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="mb-3">
-                    <label for="{{ form.fluorescence.id_for_label }}" class="form-label">{{ form.fluorescence.label }}</label>
-                    {{ form.fluorescence }}
-                    {% if form.fluorescence.errors %}
-                        <div class="text-danger">{{ form.fluorescence.errors }}</div>
-                    {% endif %}
-                </div>
+        <!-- BASIC Section -->
+        <div class="card mb-3">
+            <div class="card-header" data-bs-toggle="collapse" data-bs-target="#basic-section" style="cursor:pointer">
+                BASIC
             </div>
-
-            <!-- Column 2 -->
-            <div class="col-md-6">
-
-                <div class="mb-3">
-                    <label for="{{ form.length.id_for_label }}" class="form-label">{{ form.length.label }}</label>
-                    {{ form.length }}
-                    {% if form.length.errors %}
-                        <div class="text-danger">{{ form.length.errors }}</div>
+            <div id="basic-section" class="collapse show card-body row">
+                {% for field in form %}
+                    {% if field.name == 'type' or field.name == 'stock_id' or field.name == 'report_number' or field.name == 'lab' or field.name == 'shape' or field.name == 'carat' or field.name == 'color' or field.name == 'clarity' or field.name == 'rap_rate' or field.name == 'discount_percentage' %}
+                        <div class="mb-3 col-md-4">
+                            <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                                <div class="text-danger">{{ field.errors }}</div>
+                            {% endif %}
+                        </div>
                     {% endif %}
-                </div>
-
-                <div class="mb-3">
-                    <label for="{{ form.width.id_for_label }}" class="form-label">{{ form.width.label }}</label>
-                    {{ form.width }}
-                    {% if form.width.errors %}
-                        <div class="text-danger">{{ form.width.errors }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="mb-3">
-                    <label for="{{ form.height.id_for_label }}" class="form-label">{{ form.height.label }}</label>
-                    {{ form.height }}
-                    {% if form.height.errors %}
-                        <div class="text-danger">{{ form.height.errors }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="mb-3">
-                    <label for="{{ form.table_percentage.id_for_label }}" class="form-label">{{ form.table_percentage.label }}</label>
-                    {{ form.table_percentage }}
-                    {% if form.table_percentage.errors %}
-                        <div class="text-danger">{{ form.table_percentage.errors }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="mb-3">
-                    <label for="{{ form.depth_percentage.id_for_label }}" class="form-label">{{ form.depth_percentage.label }}</label>
-                    {{ form.depth_percentage }}
-                    {% if form.depth_percentage.errors %}
-                        <div class="text-danger">{{ form.depth_percentage.errors }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="mb-3">
-                    <label for="{{ form.crown_angle.id_for_label }}" class="form-label">{{ form.crown_angle.label }}</label>
-                    {{ form.crown_angle }}
-                    {% if form.crown_angle.errors %}
-                        <div class="text-danger">{{ form.crown_angle.errors }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="mb-3">
-                    <label for="{{ form.crown_height_percentage.id_for_label }}" class="form-label">{{ form.crown_height_percentage.label }}</label>
-                    {{ form.crown_height_percentage }}
-                    {% if form.crown_height_percentage.errors %}
-                        <div class="text-danger">{{ form.crown_height_percentage.errors }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="mb-3">
-                    <label for="{{ form.pavilion_angle.id_for_label }}" class="form-label">{{ form.pavilion_angle.label }}</label>
-                    {{ form.pavilion_angle }}
-                    {% if form.pavilion_angle.errors %}
-                        <div class="text-danger">{{ form.pavilion_angle.errors }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="mb-3">
-                    <label for="{{ form.pavilion_depth.id_for_label }}" class="form-label">{{ form.pavilion_depth.label }}</label>
-                    {{ form.pavilion_depth }}
-                    {% if form.pavilion_depth.errors %}
-                        <div class="text-danger">{{ form.pavilion_depth.errors }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="mb-3">
-                    <label for="{{ form.ratio.id_for_label }}" class="form-label">{{ form.ratio.label }}</label>
-                    {{ form.ratio }}
-                    {% if form.ratio.errors %}
-                        <div class="text-danger">{{ form.ratio.errors }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="mb-3">
-                    <label for="{{ form.bgm.id_for_label }}" class="form-label">{{ form.bgm.label }}</label>
-                    {{ form.bgm }}
-                    {% if form.bgm.errors %}
-                        <div class="text-danger">{{ form.bgm.errors }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="mb-3">
-                    <label for="{{ form.video_360.id_for_label }}" class="form-label">{{ form.video_360.label }}</label>
-                    {{ form.video_360 }}
-                    {% if form.video_360.errors %}
-                        <div class="text-danger">{{ form.video_360.errors }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="mb-3">
-                    <label for="{{ form.photo.id_for_label }}" class="form-label">{{ form.photo.label }}</label>
-                    {{ form.photo }}
-                    {% if form.photo.errors %}
-                        <div class="text-danger">{{ form.photo.errors }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="mb-3">
-                    <label for="{{ form.pdf.id_for_label }}" class="form-label">{{ form.pdf.label }}</label>
-                    {{ form.pdf }}
-                    {% if form.pdf.errors %}
-                        <div class="text-danger">{{ form.pdf.errors }}</div>
-                    {% endif %}
-                </div>
+                {% endfor %}
             </div>
         </div>
 
+        <!-- FINISH Section -->
+        <div class="card mb-3">
+            <div class="card-header" data-bs-toggle="collapse" data-bs-target="#finish-section" style="cursor:pointer">
+                FINISH
+            </div>
+            <div id="finish-section" class="collapse card-body row">
+                {% for field in form %}
+                    {% if field.name == 'cut' or field.name == 'polish' or field.name == 'symmetry' or field.name == 'fluorescence' %}
+                        <div class="mb-3 col-md-4">
+                            <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                                <div class="text-danger">{{ field.errors }}</div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- MEASUREMENTS Section -->
+        <div class="card mb-3">
+            <div class="card-header" data-bs-toggle="collapse" data-bs-target="#measurement-section" style="cursor:pointer">
+                MEASUREMENT & PROPORTIONS
+            </div>
+            <div id="measurement-section" class="collapse card-body row">
+                {% for field in form %}
+                    {% if field.name == 'length' or field.name == 'width' or field.name == 'height' or field.name == 'table_percentage' or field.name == 'depth_percentage' or field.name == 'crown_angle' or field.name == 'crown_height_percentage' or field.name == 'pavilion_angle' or field.name == 'pavilion_depth' or field.name == 'ratio' or field.name == 'bgm' %}
+                        <div class="mb-3 col-md-4">
+                            <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                                <div class="text-danger">{{ field.errors }}</div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- MEDIA Section -->
+        <div class="card mb-3">
+            <div class="card-header" data-bs-toggle="collapse" data-bs-target="#media-section" style="cursor:pointer">
+                MEDIA
+            </div>
+            <div id="media-section" class="collapse card-body row">
+                {% for field in form %}
+                    {% if field.name == 'video_360' or field.name == 'photo' or field.name == 'pdf' %}
+                        <div class="mb-3 col-md-6">
+                            <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                                <div class="text-danger">{{ field.errors }}</div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Submit/Cancel Buttons -->
         <div class="row mt-4">
             <div class="col-12">
                 <button type="button" class="btn btn-danger" onclick="window.location.href='{% url 'vendor:load_diamonds' %}'">Cancel</button>
@@ -258,6 +104,7 @@
     </form>
 </div>
 
+<!-- JSON Upload Script -->
 <script>
 document.getElementById('json-upload').addEventListener('change', function(e) {
     const file = e.target.files[0];
@@ -267,20 +114,16 @@ document.getElementById('json-upload').addEventListener('change', function(e) {
     reader.onload = function(event) {
         try {
             const data = JSON.parse(event.target.result);
-            const diamond = Array.isArray(data) ? data[0] : data; // support both single object or array
+            const diamond = Array.isArray(data) ? data[0] : data;
 
-            // Filling form by matching keys
             for (const key in diamond) {
                 const field = document.querySelector(`[name="${key}"]`);
-                if (field) {
-                    field.value = diamond[key];
-                }
+                if (field) field.value = diamond[key];
             }
         } catch (err) {
             alert('Invalid JSON format');
         }
     };
-
     reader.readAsText(file);
 });
 </script>
