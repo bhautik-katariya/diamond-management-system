@@ -11,9 +11,9 @@
         gap: 10px; /* Space between shape options */
         padding: 10px;
         border: 1.5px solid #ccc;
-        border-radius: 8px;
-        background-color: #f9f9f9;
-    }
+        border-radius: 5px;
+            background-color: #f9f9f9;
+        }
     .shape-icon-label {
         display: flex;
         flex-direction: column;
@@ -39,14 +39,33 @@
         margin-top: 6px;
         font-weight: 500;
     }
-    .btn-check:checked + .shape-icon-label {
-        border: 2.5px solid #222;
+    .shape-icon-label.selected-shape, .shape-icon-label.btn-check:checked {
+        border: 2.5px solid #222 !important;
         box-shadow: 0 2px 8px #bbb;
         background: #f8f8f8;
     }
-    .hidden-radio {
-        display: none;
+    .hidden-radio { display: none;
     }
+    .card-header {
+        background-color: #e6f4fa; /* sky blue */
+        color: #0b1937; /* navy text */
+        font-weight: 600;
+        font-size: 15px;
+        padding: 14px 20px;
+        border: 1px solid #c2e4f6;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+        
+    .card-header:hover {
+        background-color: #d1efff;
+    }
+    
+    .card {
+        border: none; /* optional: remove card border if needed */
+    }
+    
 </style>
 <h2 class="mb-4">Add Diamond</h2>
 
@@ -194,29 +213,56 @@
     </form>
 </div>
 
-<!-- JSON Upload Script -->
+<!-- Shape + JSON Scripts -->
 <script>
-document.getElementById('json-upload').addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = function(event) {
-        try {
-            const data = JSON.parse(event.target.result);
-            const diamond = Array.isArray(data) ? data[0] : data;
-
-            for (const key in diamond) {
-                const field = document.querySelector(`[name="${key}"]`);
-                if (field) field.value = diamond[key];
+    document.getElementById('json-upload').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+    
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            try {
+                const data = JSON.parse(event.target.result);
+                const diamond = Array.isArray(data) ? data[0] : data;
+    
+                for (const key in diamond) {
+                    const value = diamond[key];
+    
+                    // Handle shape radio buttons
+                    if (key === 'shape') {
+                        const shapeInput = document.querySelector(`input[name="shape"][value="${value}"]`);
+                        if (shapeInput) {
+                            shapeInput.checked = true;
+    
+                            // Remove previous selection
+                            document.querySelectorAll('label.shape-icon-label').forEach(lbl => lbl.classList.remove('selected-shape'));
+    
+                            // Add selected-shape class to the new one
+                            const label = document.querySelector(`label[for="${shapeInput.id}"]`);
+                            if (label) label.classList.add('selected-shape');
+                        }
+                        continue; // move to next key
+                    }
+    
+                    // Generic input/select handling
+                    const field = document.querySelector(`[name="${key}"]`);
+                    if (field) {
+                        if (field.tagName === 'SELECT') {
+                            const option = field.querySelector(`option[value="${value}"]`);
+                            if (option) field.value = value;
+                        } else {
+                            field.value = value;
+                        }
+                    }
+                }
+    
+            } catch (err) {
+                alert('Invalid JSON format');
+                console.error(err);
             }
-        } catch (err) {
-            alert('Invalid JSON format');
-        }
-    };
-    reader.readAsText(file);
-});
-
+        };
+        reader.readAsText(file);
+    });
 document.addEventListener('DOMContentLoaded', function() {
     const shapeLabels = document.querySelectorAll('.shape-icon-label');
     shapeLabels.forEach(label => {
@@ -227,12 +273,12 @@ document.addEventListener('DOMContentLoaded', function() {
             // Uncheck all other radio buttons in the group
             document.querySelectorAll(`input[name="${radioInput.name}"]`).forEach(radio => {
                 radio.checked = false;
-                document.querySelector(`label[for="${radio.id}"]`).classList.remove('btn-check:checked'); // Remove the checked class
+                document.querySelector(`label[for="${radio.id}"]`).classList.remove('selected-shape'); // Remove the checked class
             });
 
             // Check the clicked radio button and add the checked class to its label
             radioInput.checked = true;
-            this.classList.add('btn-check:checked');
+            this.classList.add('selected-shape');
         });
     });
 });
