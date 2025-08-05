@@ -5,7 +5,7 @@ from .forms import *
 from .models import *
 
 def add_diamond(request):
-    if 'vendor_id' not in request.session:
+    if request.session.get('user_type') != 'vendor' or 'user_id' not in request.session:
         return redirect('login')
     if request.method == 'POST':
         form = DiamondForm(request.POST)
@@ -22,7 +22,7 @@ def add_diamond(request):
     return render(request, 'vendor/add_diamond.html', {'form': form})
 
 def edit_diamond(request, id):
-    if 'vendor_id' not in request.session:
+    if request.session.get('user_type') != 'vendor' or 'user_id' not in request.session:
         return redirect('login')
     diamond = get_object_or_404(Diamond, id=id)
     if request.method == 'POST':
@@ -36,7 +36,7 @@ def edit_diamond(request, id):
     return render(request, 'vendor/edit_diamond.html', {'form': form, 'diamond': diamond})
 
 def delete_diamond(request, id):
-    if 'vendor_id' not in request.session:
+    if request.session.get('user_type') != 'vendor' or 'user_id' not in request.session:
         return redirect('login')
     diamond = get_object_or_404(Diamond, id=id)
     if request.method == 'GET':

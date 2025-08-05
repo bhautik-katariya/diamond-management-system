@@ -49,10 +49,7 @@ def login(request):
                     if check_password(password, vendor.password):
                         request.session['user_type'] = 'vendor'
                         request.session['user_id'] = vendor.id
-                        print("Session user_type:", request.session.get('user_type'))
-                        print("Session user_id:", request.session.get('user_id'))
                         messages.success(request, "Vendor login successful!")
-                        print("Redirecting to:", reverse('vendor:load_diamonds'))
                         return redirect('vendor:load_diamonds')
                     else:
                         messages.error(request, "Incorrect password.")
