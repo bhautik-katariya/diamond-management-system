@@ -82,9 +82,9 @@ def edit_profile(request):
     user_id = request.session.get('user_id')
 
     if user_type == 'vendor':
-        user = Vendor.objects.get(id=user_id)
+        user = Vendor.objects.get(pk=user_id)
     else:
-        user = Customer.objects.get(id=user_id)
+        user = Customer.objects.get(pk=user_id)
 
     if request.method == 'POST':
         form = ProfileForm(request.POST, instance=user, user_type=user_type, user_id=user_id)
@@ -196,6 +196,6 @@ def dashboard(request):
 
 def diamond_detail(request, id):
     from django.shortcuts import get_object_or_404
-    diamond = get_object_or_404(Diamond, id=id)
+    diamond = get_object_or_404(Diamond, pk=id)
     return render(request, 'diamond_detail.html', {'diamond': diamond})
 

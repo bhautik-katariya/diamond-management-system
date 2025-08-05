@@ -11,7 +11,7 @@ def add_diamond(request):
         form = DiamondForm(request.POST)
         if form.is_valid():
             diamond = form.save(commit=False)
-            diamond.vendor = Vendor.objects.get(id=request.session['vendor_id'])
+            diamond.vendor = Vendor.objects.get(pk=request.session['user_id'])
             diamond.save()
             messages.success(request, "Diamond added successfully.")
             return redirect('vendor:load_diamonds')
@@ -24,7 +24,7 @@ def add_diamond(request):
 def edit_diamond(request, id):
     if request.session.get('user_type') != 'vendor' or 'user_id' not in request.session:
         return redirect('login')
-    diamond = get_object_or_404(Diamond, id=id)
+    diamond = get_object_or_404(Diamond, pk=id)
     if request.method == 'POST':
         form = DiamondForm(request.POST, instance=diamond)
         if form.is_valid():
@@ -38,7 +38,7 @@ def edit_diamond(request, id):
 def delete_diamond(request, id):
     if request.session.get('user_type') != 'vendor' or 'user_id' not in request.session:
         return redirect('login')
-    diamond = get_object_or_404(Diamond, id=id)
+    diamond = get_object_or_404(Diamond, pk=id)
     if request.method == 'GET':
         diamond.delete()
         messages.success(request, "Diamond deleted successfully.")

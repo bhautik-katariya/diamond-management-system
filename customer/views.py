@@ -8,8 +8,8 @@ def add_to_cart(request, diamond_id):
         messages.error(request, "You must be logged in as a customer to add to cart.")
         return redirect('login')
 
-    customer = get_object_or_404(Customer, id=request.session['user_id'])
-    diamond = get_object_or_404(Diamond, id=diamond_id)
+    customer = get_object_or_404(Customer, pk=request.session['user_id'])
+    diamond = get_object_or_404(Diamond, pk=diamond_id)
 
     cart, created = Cart.objects.get_or_create(customer=customer)
     cart_item, created = CartItem.objects.get_or_create(cart=cart, diamond=diamond)
