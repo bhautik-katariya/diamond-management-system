@@ -98,7 +98,6 @@ class Diamond(models.Model):
         ('FR', 'FAIR'),
     ]
     
-    sr_no = models.AutoField(primary_key=True)
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE, related_name='diamonds')
     type = models.CharField(max_length=50, blank=False, null=False, choices=TYPES)
     stock_id = models.IntegerField(unique=True, blank=False, null=False)

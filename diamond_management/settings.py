@@ -91,10 +91,10 @@ WSGI_APPLICATION = 'diamond_management.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'diamond_db_buct',
-        'USER': 'diamond_db_buct_user',
-        'PASSWORD': 'OHoZjLfDkIItptdki8nzP5KbNQakAVAO',
-        'HOST': 'dpg-d24alube5dus73bvg2q0-a.oregon-postgres.render.com',
+        'NAME': 'diamond_postgres',
+        'USER': 'diamond_postgres_user',
+        'PASSWORD': 'IU3gfwAEoxA86ZlTxoGuR9lkXyHDVTDL',
+        'HOST': 'dpg-d28tuj1r0fns73eqpdig-a.oregon-postgres.render.com',
         'PORT': '5432',
     }
 }

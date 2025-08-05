@@ -32,6 +32,10 @@
                 </div>
             </div>
         </div>
+        <form action="{% url 'customer:add_to_cart' diamond.id %}" method="post">
+            {% csrf_token %}
+            <button type="submit">Add to Cart</button>
+        </form>
         <!-- DiamondImage -->
         <div class="col-md-6 d-flex flex-column align-items-center">
             <div class="card-header text-center" style="font-size:1.5rem; font-weight:500; color:black;">Image</div> <br>

@@ -19,11 +19,16 @@
         .bg-navy.text-white {
             color: rgb(255, 255, 255) !important; /* Ensure white text for footer */
         }
+        .navbar-nav .nav-link.logout-link {
+            color: #ff3333 !important;
+            font-weight: bold;
+        }
+
     </style>
 </head>
 <body class="d-flex flex-column min-vh-100">
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-navy">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-navy sticky-top">
     <div class="container-fluid">
         <a class="navbar-brand" href="/">Diamond System</a>
         {% comment %} Button for mobile  {% endcomment %}
@@ -45,7 +50,7 @@
             <a class="nav-link" href="{% url 'edit_profile' %}">Edit Profile</a>
             </li>
             <li class="nav-item">
-            <a class="nav-link text-danger" href="{% url 'logout' %}">Logout</a>
+            <a class="nav-link logout-link" href="{% url 'logout' %}">Logout</a>
             </li>
             {% elif request.session.user_id and request.session.user_type == 'customer' %}
             <!-- If customer is logged in -->
@@ -56,7 +61,7 @@
             <a class="nav-link" href="{% url 'edit_profile' %}">Edit Profile</a>
             </li>
             <li class="nav-item">
-            <a class="nav-link text-danger" href="{% url 'logout' %}">Logout</a>
+            <a class="nav-link logout-link" href="{% url 'logout' %}">Logout</a>
             </li>
             {% else %}
             <!-- If not logged in -->

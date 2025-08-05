@@ -323,7 +323,7 @@
                 <td>{{ diamond.fluorescence }}</td>
                 <td>${{ diamond.price_per_carat }}</td>
                 <td>
-                    <a href="{% url 'diamond_detail' diamond.sr_no %}" class="btn equal-button" target="_blank">View</a>
+                    <a href="{% url 'diamond_detail' diamond.id %}" class="btn equal-button" target="_blank">View</a>
                 </td>
             </tr>
             {% endfor %}

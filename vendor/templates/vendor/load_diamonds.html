@@ -61,10 +61,10 @@
             <td>{% if diamond.photo %}<a href="{{ diamond.photo }}" target="_blank">Image</a>{% else %}-{% endif %}</td>
             <td>{% if diamond.pdf %}<a href="{{ diamond.pdf }}" target="_blank">PDF</a>{% else %}-{% endif %}</td>
             <td>
-                <a href="{% url 'vendor:edit_diamond' diamond.sr_no %}" class="btn btn-secondary btn-sm">Edit</a>
+                <a href="{% url 'vendor:edit_diamond' diamond.id %}" class="btn btn-secondary btn-sm">Edit</a>
             </td> 
             <td>
-                <button class="btn btn-sm btn-danger" onclick="showConfirm(this)" data-url="{% url 'vendor:delete_diamond' diamond.sr_no %}">
+                <button class="btn btn-sm btn-danger" onclick="showConfirm(this)" data-url="{% url 'vendor:delete_diamond' diamond.id %}">
                     Delete
                 </button>
                 <span class="d-none ms-2" data-confirm-box>

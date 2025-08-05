@@ -21,10 +21,10 @@ def add_diamond(request):
         form = DiamondForm()
     return render(request, 'vendor/add_diamond.html', {'form': form})
 
-def edit_diamond(request, sr_no):
+def edit_diamond(request, id):
     if 'vendor_id' not in request.session:
         return redirect('login')
-    diamond = get_object_or_404(Diamond, sr_no=sr_no)
+    diamond = get_object_or_404(Diamond, id=id)
     if request.method == 'POST':
         form = DiamondForm(request.POST, instance=diamond)
         if form.is_valid():
@@ -35,10 +35,10 @@ def edit_diamond(request, sr_no):
         form = DiamondForm(instance=diamond)
     return render(request, 'vendor/edit_diamond.html', {'form': form, 'diamond': diamond})
 
-def delete_diamond(request, sr_no):
+def delete_diamond(request, id):
     if 'vendor_id' not in request.session:
         return redirect('login')
-    diamond = get_object_or_404(Diamond, sr_no=sr_no)
+    diamond = get_object_or_404(Diamond, id=id)
     if request.method == 'GET':
         diamond.delete()
         messages.success(request, "Diamond deleted successfully.")

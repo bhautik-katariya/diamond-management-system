@@ -4,7 +4,7 @@ from .models import Diamond
 class DiamondForm(forms.ModelForm):
     class Meta:
         model = Diamond
-        exclude = ['sr_no', 'vendor','price_per_carat', 'total_amount', 'measurements', 'created_at']
+        exclude = ['vendor','price_per_carat', 'total_amount', 'measurements', 'created_at']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

@@ -76,9 +76,8 @@ def login(request):
 
 def logout(request):
     if 'user_id' in request.session:
-        user_type = request.session.get('user_type', '')
         request.session.flush()
-        messages.success(request, f"You have been logged out as {user_type}.")
+        messages.success(request, f"You have been logged out.")
     return redirect('dashboard')
 
 def edit_profile(request):
@@ -102,7 +101,7 @@ def edit_profile(request):
     return render(request, 'edit_profile.html', {'form': form, 'user_type':user_type})
 
 def dashboard(request):
-    diamonds = Diamond.objects.all().order_by('sr_no')
+    diamonds = Diamond.objects.all().order_by('id')
 
     # Get filters from query params
     shape = request.GET.getlist('shape')
@@ -198,8 +197,8 @@ def dashboard(request):
 
     return render(request, 'dashboard.html', context)
 
-def diamond_detail(request, sr_no):
+def diamond_detail(request, id):
     from django.shortcuts import get_object_or_404
-    diamond = get_object_or_404(Diamond, sr_no=sr_no)
+    diamond = get_object_or_404(Diamond, id=id)
     return render(request, 'diamond_detail.html', {'diamond': diamond})
 
