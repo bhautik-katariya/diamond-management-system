@@ -59,6 +59,8 @@ MIDDLEWARE = [
 
 CSRF_TRUSTED_ORIGINS = [
     'https://*.cloudworkstations.dev',  # Allow Firebase Workstations
+    'https://*.onrender.com',              # For Render
+    'https://*.ngrok.io',                   # For Ngrok (Public Tunnel)
 ]
 
 
@@ -133,7 +135,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    BASE_DIR / "customer" / "static",  
+    BASE_DIR / "static",  
 ]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 

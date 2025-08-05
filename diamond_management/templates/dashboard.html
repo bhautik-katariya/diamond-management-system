@@ -1,0 +1,401 @@
+{% extends "base.html" %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}Customer Dashboard{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #f8fafc;
+        color: #222;
+    }
+    .dashboard-header {
+        background-color: #fff;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .stat-box {
+        background-color: #e6f4fa;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        color: rgb(11, 25, 55);
+        font-size: 18px;
+        font-weight: bold;
+        border: 1px solid #b6e0f7;
+    }
+    .table-container {
+        margin-top: 20px;
+        overflow-x: auto;
+        max-width: 100%;
+    }
+    .diamond-table {
+        color: #222;
+        background-color: #fff;
+        border-collapse: separate;
+        border-spacing: 0 5px;
+        width: 100%;
+        border-radius: 15px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .diamond-table th, .diamond-table td {
+        padding: 12px;
+        text-align: center;
+        background-color: #fff;
+        border-bottom: 1px solid #e3e3e3;
+    }
+    .diamond-table th {
+        background-color: #e6f4fa;
+        color: rgb(11, 25, 55);
+        font-weight: 600;
+        position: sticky;
+        top: 0;
+        z-index: 2;
+    }
+    .table thead th {
+        white-space: nowrap;
+    }
+    /* Shared button styles */
+    .equal-button, .btn-sort, .btn-filter {
+        min-width: 100px;
+        height: 36px;
+        white-space: nowrap;
+        background: rgb(11, 25, 55);         /* dark navy background */
+        color: rgb(255, 255, 255) !important; /* white text */
+        border: none;
+        border-radius: 20px;
+        font-weight: 500;
+        box-shadow: 0 2px 8px rgba(11, 25, 55, 0.3);
+        transition: background 0.3s, color 0.3s;
+    }
+
+    /* Hover styles */
+    .equal-button:hover,
+    .btn-filter:hover {
+        background:rgb(255, 255, 255) ;                 /* light blue background */
+        color: rgb(11, 25, 55) !important;   /* dark navy text */
+    }
+
+    /* Sort button override styles */
+    .btn-sort {
+        background-color: rgb(11, 25, 55) !important;   /* white background */
+        color: rgb(255, 255, 255) !important;              /* dark navy text */
+        border: 1px solid #ccc !important;
+        font-weight: 600;
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-sort:hover,
+        .btn-sort:focus {
+            background-color: rgb(255, 255, 255) !important;
+            color: rgb(11, 25, 55) !important;
+    }
+
+    /* Dropdown styles */
+    .dropdown-menu {
+        background-color: #e6f4fa !important;
+        color: #0a3d62;
+        border-radius: 12px;
+        border: 1px solid #b6e0f7;
+    }
+
+    .dropdown-item {
+        color: #0a3d62 !important;
+        background-color: transparent !important;
+    }
+
+    .dropdown-item:hover,
+    .dropdown-item:focus,
+    .dropdown-item:active {
+        background-color: #b6e0f7 !important;
+        color: rgb(11, 25, 55) !important;
+    }
+
+    .filter-button-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 6px;
+      }
+
+      .filter-toggle {
+        padding: 10px 14px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        background-color: #fff;
+        color: #000;
+        font-size: 14px;
+        min-width: 60px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+        border: 1px solid grey; /* Added for shape icon labels */
+      }
+
+      .filter-toggle:hover {
+        background-color: #f5f5f5;
+        border-color: #888;
+      }
+
+      input[type="checkbox"].hidden-check {
+        display: none;
+      }
+
+      input[type="checkbox"].hidden-check:checked + .filter-toggle {
+        border-color: #000;
+        background-color: #eee;
+      }
+
+      .page-link {
+        min-width: 80px;
+        height: 36px;
+        border-radius: 20px !important;
+        font-weight: 500;
+        background: rgb(11, 25, 55);
+        color: white !important;
+        border: none;
+        margin: 0 3px;
+        box-shadow: 0 2px 8px rgba(11, 25, 55, 0.3);
+        transition: background 0.3s, color 0.3s;
+    }
+
+    .page-link:hover {
+        background: white !important;
+        color: rgb(11, 25, 55) !important;
+        border: 1px solid rgb(11, 25, 55);
+    }
+
+    .page-item.active .page-link {
+        background: rgb(11, 25, 55) !important;
+        color: white !important;
+        border: none;
+    }
+
+    /* Added styles for shape icons and labels */
+    .shape-icon-label {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        cursor: pointer;
+        padding: 8px 0px; /* Adjusted padding for table cell */
+        border-radius: 12px;
+        transition: box-shadow 0.2s, border 0.2s;
+        border: 2px solid transparent;
+        background: #fff;
+        min-width: 70px;
+    }
+    .shape-icon-label .shape-svg {
+        width: 38px;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .shape-label {
+        font-size: 0.9em; /* Slightly smaller font size for table */
+        color: #222;
+        margin-top: 4px; /* Adjusted margin */
+        font-weight: 500;
+    }
+    /* Removed .btn-check:checked + .shape-icon-label styles as not needed in table */
+
+</style>
+
+<!-- Stats Boxes -->
+<div class="row g-3 dashboard-header mb-4">
+    <div class="col-md-4">
+        <div class="stat-box">
+            Total Stock<br>
+            {{ total_stock }}
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-box">
+            Total Carat<br>
+            {{ total_carat }}
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-box">
+            Total Amount<br>
+            $ {{ total_amount }}
+        </div>
+    </div>
+</div>
+<div class="d-flex flex-wrap justify-content-end gap-2 mb-3">
+    <div class="dropdown">
+        <button class="btn btn-sort equal-button dropdown-toggle" type="button" id="sortDropdownButton" data-bs-toggle="dropdown" aria-expanded="false">
+            Sort
+        </button>
+        <ul class="dropdown-menu text-small" aria-labelledby="sortDropdownButton">
+            <li class="dropdown-header">Price</li>
+            <li><a class="dropdown-item" href="{{ request.get_full_path|add_sort:'price_asc' }}">Low-to-high</a></li>
+            <li><a class="dropdown-item" href="{{ request.get_full_path|add_sort:'price_desc' }}">High-to-Low</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li class="dropdown-header">Carat</li>
+            <li><a class="dropdown-item" href="{{ request.get_full_path|add_sort:'carat_asc' }}">Low-to-high</a></li>
+            <li><a class="dropdown-item" href="{{ request.get_full_path|add_sort:'carat_desc' }}">High-to-Low</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li class="dropdown-header">Color</li>
+            <li><a class="dropdown-item" href="{{ request.get_full_path|add_sort:'color_asc' }}">Low-to-high</a></li>
+            <li><a class="dropdown-item" href="{{ request.get_full_path|add_sort:'color_desc' }}">High-to-Low</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li class="dropdown-header">Clarity</li>
+            <li><a class="dropdown-item" href="{{ request.get_full_path|add_sort:'clarity_asc' }}">Low-to-high</a></li>
+            <li><a class="dropdown-item" href="{{ request.get_full_path|add_sort:'clarity_desc' }}">High-to-Low</a></li>
+        </ul>
+    </div>
+
+    <button class="btn btn-filter equal-button" type="button" onclick="toggleFilterOverlay()">Filter</button>
+</div>
+
+<div class="table-container">
+    <table class="diamond-table table-bordered w-100">
+        <thead>
+            <tr>
+                <th><input type="checkbox" id="select-all"></th>
+                <th>Sr No</th>
+                <th>Stock Id</th>
+                <th>Type</th>
+                <th>Lab</th>
+                <th>Shape</th>
+                <th>Carat</th>
+                <th>Color</th>
+                <th>Clarity</th>
+                <th>Cut</th>
+                <th>Polish</th>
+                <th>Symmetry</th>
+                <th>Fluorescence</th>
+                <th>Price/Carat</th>
+                <th>View</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for diamond in diamonds %}
+            <tr>
+                <td><input type="checkbox" class="row-checkbox"></td>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ diamond.stock_id }}</td>
+                <td>{{ diamond.type }}</td>
+                <td>{{ diamond.lab }}</td>
+                <td>
+                    <div class="shape-icon-label">
+                        <span class="shape-svg">
+                            {% if diamond.shape == 'RD' %}
+                                <img src="{% static 'images/shapes/round.png' %}" width="40" height="40" alt="Round Shape">
+                            {% elif diamond.shape == 'EM' %}
+                                <img src="{% static 'images/shapes/emerald.png' %}" width="32" height="40" alt="Emerald Shape">
+                            {% elif diamond.shape == 'HT' %}
+                                <img src="{% static 'images/shapes/heart.png' %}" width="40" height="40" alt="Heart Shape">
+                            {% elif diamond.shape == 'MQ' %}
+                                <img src="{% static 'images/shapes/marquise.png' %}" width="32" height="40" alt="Marquise Shape">
+                            {% elif diamond.shape == 'OVL' %}
+                                <img src="{% static 'images/shapes/oval.png' %}" width="32" height="40" alt="Oval Shape">
+                            {% elif diamond.shape == 'PR' %}
+                                <img src="{% static 'images/shapes/pear.png' %}" width="32" height="40" alt="Pear Shape">
+                            {% elif diamond.shape == 'PRS' %}
+                                <img src="{% static 'images/shapes/princess.png' %}" width="40" height="40" alt="Princess Shape">
+                            {% elif diamond.shape == 'RDNT' %}
+                                <img src="{% static 'images/shapes/radiant.png' %}" width="32" height="40" alt="Radiant Shape">
+                            {% elif diamond.shape == 'CS' %}
+                                <img src="{% static 'images/shapes/cushion.png' %}" width="40" height="40" alt="Cushion Shape">
+                            {% elif diamond.shape == 'AS' %}
+                                <img src="{% static 'images/shapes/asscher.png' %}" width="40" height="40" alt="Asscher Shape">
+                            {% elif diamond.shape == 'OLD' %}
+                                <img src="{% static 'images/shapes/old.png' %}" width="40" height="40" alt="Old Shape">
+                            {% elif diamond.shape == 'SQ' %}
+                                <img src="{% static 'images/shapes/square.png' %}" width="40" height="40" alt="Square Shape">
+                            {% else %}
+                                <img src="{% static 'images/shapes/other.png' %}" width="40" height="40" alt="Other Shape">
+                            {% endif %}
+                        </span>
+                        <div class="shape-label">{{ diamond.get_shape_display|title }}</div>
+                    </div>
+                </td>
+                <td>{{ diamond.carat }}</td>
+                <td>{{ diamond.get_color_display }}</td>
+                <td>{{ diamond.clarity }}</td>
+                <td>{{ diamond.get_cut_display }}</td>
+                <td>{{ diamond.get_polish_display }}</td>
+                <td>{{ diamond.get_symmetry_display }}</td>
+                <td>{{ diamond.fluorescence }}</td>
+                <td>${{ diamond.price_per_carat }}</td>
+                <td>
+                    <a href="{% url 'diamond_detail' diamond.sr_no %}" class="btn equal-button" target="_blank">View</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<!-- Pagination Controls -->
+<nav aria-label="Diamond pagination" class="mt-4">
+<ul class="pagination justify-content-center">
+    {% if page_obj.has_previous %}
+    <li class="page-item">
+        <a class="page-link" href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">&laquo; First</a>
+    </li>
+    <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">‹ Prev</a>
+    </li>
+    {% else %}
+    <li class="page-item disabled"><span class="page-link">‹ Prev</span></li>
+    {% endif %}
+
+    <li class="page-item active">
+    <span class="page-link">{{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+    </li>
+
+    {% if page_obj.has_next %}
+    <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Next ›</a>
+    </li>
+    <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Last &raquo;</a>
+    </li>
+    {% else %}
+    <li class="page-item disabled"><span class="page-link">Next ›</span></li>
+    {% endif %}
+</ul>
+</nav>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const selectAllCheckbox = document.getElementById('select-all');
+        const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+        
+        // Handle select all checkbox
+        selectAllCheckbox.addEventListener('change', function() {
+            rowCheckboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+        });
+        
+        // Handle individual row checkboxes
+        rowCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                // Check if all checkboxes are checked
+                const allChecked = Array.from(rowCheckboxes).every(cb => cb.checked);
+                // Check if any checkbox is checked
+                const anyChecked = Array.from(rowCheckboxes).some(cb => cb.checked);
+                
+                // Update select all checkbox state
+                if (allChecked) {
+                    selectAllCheckbox.checked = true;
+                    selectAllCheckbox.indeterminate = false;
+                } else if (anyChecked) {
+                    selectAllCheckbox.checked = false;
+                    selectAllCheckbox.indeterminate = true;
+                } else {
+                    selectAllCheckbox.checked = false;
+                    selectAllCheckbox.indeterminate = false;
+                }
+            });
+        });
+    });
+    </script>
+
+{% include "includes/filter_overlay.html" %}
+{% endblock %}

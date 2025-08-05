@@ -13,8 +13,6 @@ class Vendor(models.Model):
     def __str__(self):
         return f"{self.fname} {self.lname}"
 
-
-
 class Diamond(models.Model):
     
     TYPES = [

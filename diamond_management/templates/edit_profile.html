@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% block title %}Edit Profile{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h2 class="mb-4 text-center">Edit Profile</h2>
+            <hr>
+
+            <form method="POST" novalidate>
+                {% csrf_token %}
+
+                <!-- First Name -->
+                <div class="mb-3">
+                    <label for="{{ form.fname.id_for_label }}" class="form-label">First Name</label>
+                    {{ form.fname }}
+                    {% if form.fname.errors %}
+                        <div class="text-danger small">
+                            {% for error in form.fname.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Last Name -->
+                <div class="mb-3">
+                    <label for="{{ form.lname.id_for_label }}" class="form-label">Last Name</label>
+                    {{ form.lname }}
+                    {% if form.lname.errors %}
+                        <div class="text-danger small">
+                            {% for error in form.lname.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Email -->
+                <div class="mb-3">
+                    <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+                    {{ form.email }}
+                    {% if form.email.errors %}
+                        <div class="text-danger small">
+                            {% for error in form.email.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Phone -->
+                <div class="mb-3">
+                    <label for="{{ form.phone.id_for_label }}" class="form-label">Phone</label>
+                    {{ form.phone }}
+                    {% if form.phone.errors %}
+                        <div class="text-danger small">
+                            {% for error in form.phone.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                <button type="button" class="btn btn-danger" onclick={% if user_type == 'vendor' %}
+                "window.location.href='{% url 'vendor:load_diamonds' %}'">
+                {% else %}
+                "window.location.href='{% url 'dashboard' %}'">
+                {% endif %}Cancel</button>
+                <button type="submit" class="btn btn-primary">Update Profile</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
