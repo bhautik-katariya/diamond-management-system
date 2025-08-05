@@ -6,7 +6,7 @@ from .models import *
 
 def add_diamond(request):
     if 'vendor_id' not in request.session:
-        return redirect('vendor:login')
+        return redirect('login')
     if request.method == 'POST':
         form = DiamondForm(request.POST)
         if form.is_valid():
