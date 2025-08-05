@@ -215,6 +215,68 @@
 
 <!-- Shape + JSON Scripts -->
 <script>
+    const rawMappings = {
+        shape: {
+            "round": "RD",
+            "pear": "PR",
+            "oval": "OVL",
+            "radiant": "RDNT",
+            "emerald": "EM",
+            "square": "SQ",
+            "marquise": "MQ",
+            "heart": "HT",
+            "princess": "PRS",
+            "asscher": "AS",
+            "cushion": "CS",
+            "old": "OLD",
+            "other": "OT"
+        },
+        type: {
+            "cvd": "CVD",
+            "hpht": "HPHT"
+        },
+        lab: {
+            "igi": "IGI",
+            "gia": "GIA"
+        },
+        color: {
+            "d": "D", "e": "E", "f": "F", "g": "G", "h": "H", "i": "I", "j": "J",
+            "fancy blue": "FB",
+            "fancy intense blue": "FIB",
+            "light blue": "LB",
+            "fancy pink": "FP",
+            "fancy intense pink": "FIP",
+            "light pink": "LP"
+        },
+        clarity: {
+            "fl": "FL", "if": "IF", "vvs1": "VVS1", "vvs2": "VVS2",
+            "vs1": "VS1", "vs2": "VS2",
+            "si1": "SI1", "si2": "SI2", "si3": "SI3",
+            "i1": "I1", "i2": "I2", "i3": "I3"
+        },
+        cut: {
+            "ideal": "ID",
+            "excellent": "EX",
+            "very good": "VG",
+            "good": "GD",
+            "fair": "FR"
+        },
+        polish: {
+            "ideal": "ID",
+            "excellent": "EX",
+            "very good": "VG",
+            "good": "GD",
+            "fair": "FR"
+        },
+        symmetry: {
+            "ideal": "ID",
+            "excellent": "EX",
+            "very good": "VG",
+            "good": "GD",
+            "fair": "FR"
+        }
+    };
+    
     document.getElementById('json-upload').addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (!file) return;
@@ -226,25 +288,30 @@
                 const diamond = Array.isArray(data) ? data[0] : data;
     
                 for (const key in diamond) {
-                    const value = diamond[key];
+                    let value = diamond[key];
+                    const normalizedValue = String(value).trim().toLowerCase();
     
-                    // Handle shape radio buttons
+                    // Map value if needed
+                    if (rawMappings[key]) {
+                        const mappedValue = rawMappings[key][normalizedValue];
+                        if (mappedValue) {
+                            value = mappedValue;
+                        }
+                    }
+    
+                    // Handle shape radio
                     if (key === 'shape') {
                         const shapeInput = document.querySelector(`input[name="shape"][value="${value}"]`);
                         if (shapeInput) {
                             shapeInput.checked = true;
-    
-                            // Remove previous selection
                             document.querySelectorAll('label.shape-icon-label').forEach(lbl => lbl.classList.remove('selected-shape'));
-    
-                            // Add selected-shape class to the new one
                             const label = document.querySelector(`label[for="${shapeInput.id}"]`);
                             if (label) label.classList.add('selected-shape');
                         }
-                        continue; // move to next key
+                        continue;
                     }
     
-                    // Generic input/select handling
+                    // Handle other inputs
                     const field = document.querySelector(`[name="${key}"]`);
                     if (field) {
                         if (field.tagName === 'SELECT') {
@@ -263,24 +330,29 @@
         };
         reader.readAsText(file);
     });
-document.addEventListener('DOMContentLoaded', function() {
-    const shapeLabels = document.querySelectorAll('.shape-icon-label');
-    shapeLabels.forEach(label => {
-        label.addEventListener('click', function() {
-            const radioId = this.getAttribute('for');
-            const radioInput = document.getElementById(radioId);
-
-            // Uncheck all other radio buttons in the group
-            document.querySelectorAll(`input[name="${radioInput.name}"]`).forEach(radio => {
-                radio.checked = false;
-                document.querySelector(`label[for="${radio.id}"]`).classList.remove('selected-shape'); // Remove the checked class
+    
+    // Handle manual shape selection and visual feedback
+    document.addEventListener('DOMContentLoaded', function() {
+        const shapeLabels = document.querySelectorAll('.shape-icon-label');
+        shapeLabels.forEach(label => {
+            label.addEventListener('click', function() {
+                const radioId = this.getAttribute('for');
+                const radioInput = document.getElementById(radioId);
+                if (!radioInput) return;
+    
+                // Unselect others
+                document.querySelectorAll(`input[name="${radioInput.name}"]`).forEach(radio => {
+                    radio.checked = false;
+                    const lbl = document.querySelector(`label[for="${radio.id}"]`);
+                    if (lbl) lbl.classList.remove('selected-shape');
+                });
+    
+                // Select current
+                radioInput.checked = true;
+                this.classList.add('selected-shape');
             });
-
-            // Check the clicked radio button and add the checked class to its label
-            radioInput.checked = true;
-            this.classList.add('selected-shape');
         });
     });
-});
-</script>
+    </script>
+    
 {% endblock %}
