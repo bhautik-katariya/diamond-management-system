@@ -70,4 +70,12 @@
         </div>
     </div>
 </div>
+{% if request.session.user_type == 'customer' %}
+<div class="text-center mt-4">
+    <form action="{% url 'customer:add_to_cart' diamond.id %}" method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary btn-lg">Add to Cart</button>
+    </form>
+</div>
+{% endif %}
 {% endblock %}

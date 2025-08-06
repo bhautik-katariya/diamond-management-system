@@ -281,7 +281,7 @@
             <td>{{ diamond.get_symmetry_display }}</td>
             <td>{{ diamond.fluorescence }}</td>
             <td>${{ diamond.price_per_carat }}</td>
-            <td><a href="{% url 'diamond_detail' diamond.id %}" class="btn equal-button" target="_blank">View</a></td>
+            <td><a href="{% url 'diamond_detail' diamond.id %}" class="btn equal-button">View</a></td>
         </tr>
         {% endfor %}
     </tbody>

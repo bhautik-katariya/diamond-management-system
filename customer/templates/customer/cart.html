@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}My Cart{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="text-center mb-4" style="color: rgb(11, 25, 55); font-weight: bold;">My Cart</h2>
+
+    {% if cart.items.all %}
+    <div class="table-responsive">
+        <table class="table table-bordered align-middle">
+            <thead class="table-light">
+                <tr class="text-center">
+                    <th>Diamond</th>
+                    <th>Shape</th>
+                    <th>Carat</th>
+                    <th>Color</th>
+                    <th>Clarity</th>
+                    <th>Price/Carat</th>
+                    <th>Total</th>
+                    <th>Quantity</th>
+                    <th>Remove</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in cart.items.all %}
+                <tr class="text-center">
+                    <td>{{ item.diamond.stock_id }}</td>
+                    <td>{{ item.diamond.get_shape_display }}</td>
+                    <td>{{ item.diamond.carat }}</td>
+                    <td>{{ item.diamond.get_color_display }}</td>
+                    <td>{{ item.diamond.get_clarity_display }}</td>
+                    <td>${{ item.diamond.price_per_carat }}</td>
+                    <td>${{ item.diamond.price_per_carat|floatformat:2|add:"0"|floatformat:2|floatformat:2|floatformat:2|add:""|add:item.diamond.carat|floatformat:2 }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>
+                        <form method="post" action="{% url 'customer:remove_from_cart' item.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-danger">Remove</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="text-end mt-3">
+        <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">Continue Shopping</a>
+        <a href="#" class="btn btn-primary">Proceed to Checkout</a>
+    </div>
+    {% else %}
+    <p class="text-muted text-center">Your cart is empty.</p>
+    <div class="text-center mt-3">
+        <a href="{% url 'dashboard' %}" class="btn btn-outline-primary">Browse Diamonds</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
