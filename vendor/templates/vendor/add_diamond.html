@@ -65,6 +65,11 @@
     .card {
         border: none; /* optional: remove card border if needed */
     }
+
+    .field-focus-highlight {
+        outline: 2px solid #007bff;
+        transition: outline 0.3s ease;
+    }
     
 </style>
 <h2 class="mb-4">Add Diamond</h2>
@@ -100,7 +105,7 @@
                             <div class="shape-container">
                                 {% for choice in field.field.choices %}
                                     <input type="radio" class="hidden-radio" name="{{ field.name }}" id="{{ field.id_for_label }}_{{ forloop.counter0 }}" value="{{ choice.0 }}">
-                                     <label class="shape-icon-label" for="{{ field.id_for_label }}_{{ forloop.counter0 }}">
+                                     <label class="shape-icon-label" for="{{ field.id_for_label }}_{{ forloop.counter0 }}" tabindex=0>
                                         <span class="shape-svg">
                                             {% if choice.0 == 'RD' %}
                                                 <img src="{% static 'images/shapes/round.png' %}" width="40" height="40" alt="Round Shape">
@@ -353,6 +358,99 @@
             });
         });
     });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const allFocusable = Array.from(document.querySelectorAll('input:not([type="hidden"]), select, textarea, .shape-icon-label'));
+        
+        function focusNext(current) {
+            const index = allFocusable.findIndex(el => el === current || (el.contains && el.contains(current)));
+            if (index >= 0 && index + 1 < allFocusable.length) {
+                const next = allFocusable[index + 1];
+                if (next.focus) next.focus();
+                if (next.classList.contains('shape-icon-label')) next.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+    
+        // Move to next on Enter (text/number inputs)
+        document.querySelectorAll('input[type="text"], input[type="number"]').forEach(input => {
+            input.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    focusNext(e.target);
+                }
+            });
+        });
+    
+        // Move to next on select change
+        document.querySelectorAll('select').forEach(select => {
+            select.addEventListener('change', function (e) {
+                focusNext(e.target);
+            });
+        });
+    
+        // Move from Lab to Shape
+        const labSelect = document.querySelector('select[name="lab"]');
+        if (labSelect) {
+            labSelect.addEventListener('change', function () {
+                // Wait a moment in case DOM needs to render shape field
+                setTimeout(() => {
+                    const shapeContainer = document.querySelector('.shape-container');
+                    if (shapeContainer) {
+                        const firstShape = shapeContainer.querySelector('.shape-icon-label');
+                        if (firstShape) firstShape.focus();
+                    }
+                }, 100);
+            });
+        }
+    
+        // Make shape labels focusable
+        document.querySelectorAll('.shape-icon-label').forEach(label => {
+            label.setAttribute('tabindex', '0'); // Make focusable
+            label.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    label.click(); // Select the shape
+                    focusNext(label); // Move forward
+                }
+            });
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const labSelect = document.querySelector('select[name="lab"]');
+        const shapeInputs = document.querySelectorAll('input[name="shape"]');
+        const caratInput = document.querySelector('input[name="carat"]');
+    
+        // When lab is changed
+        if (labSelect && shapeInputs.length > 0) {
+            labSelect.addEventListener('change', function () {
+                // Auto-select the first shape
+                const firstShape = shapeInputs[0];
+                if (firstShape) {
+                    firstShape.checked = true;
+    
+                    // Focus the shape label (for keyboard users)
+                    const shapeLabel = document.querySelector(`label[for="${firstShape.id}"]`);
+                    if (shapeLabel) {
+                        shapeLabel.focus();
+                        shapeLabel.scrollIntoView({ behavior: "smooth", block: "center" });
+                    }
+                }
+            });
+        }
+    
+        // When user selects any shape (even if auto-selected one), focus to carat field
+        shapeInputs.forEach(input => {
+            input.addEventListener('click', function () {
+                if (caratInput) {
+                    setTimeout(() => {
+                        caratInput.focus();
+                    }, 100); // slight delay for smooth transition
+                }
+            });
+        });
+    });
+    
     </script>
     
 {% endblock %}

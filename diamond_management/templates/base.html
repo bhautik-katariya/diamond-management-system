@@ -1,101 +1,104 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    
     <meta charset="UTF-8">
     <title>{% block title %}Diamond Management System{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <style>
         .bg-navy {
-            background-color: rgb(10, 24, 53) !important; /* Dark navy background */
+            background-color: rgb(10, 24, 53) !important;
         }
         .navbar-nav .nav-link {
-            color: rgb(255, 255, 255) !important; /* White text for links */
+            color: rgb(255, 255, 255) !important;
         }
         .navbar-brand {
-             color: rgb(255, 255, 255) !important; /* White text for brand */
+            color: rgb(255, 255, 255) !important;
         }
         .bg-navy.text-white {
-            color: rgb(255, 255, 255) !important; /* Ensure white text for footer */
+            color: rgb(255, 255, 255) !important;
         }
         .navbar-nav .nav-link.logout-link {
             color: #ff3333 !important;
             font-weight: bold;
         }
 
+        /* Fix overflow on very small screens */
+        body {
+            overflow-x: hidden;
+        }
+
+        /* Optional: Better spacing for mobile nav items */
+        @media (max-width: 991.98px) {
+            .navbar-nav .nav-item {
+                padding: 0.5rem 1rem;
+            }
+        }
     </style>
 </head>
 <body class="d-flex flex-column min-vh-100">
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-navy sticky-top">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="/">Diamond System</a>
-        {% comment %} Button for mobile  {% endcomment %}
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-        <ul class="navbar-nav">
-            {% if request.session.user_id and request.session.user_type == 'vendor' %}
-            <!-- If vendor is logged in -->
-             <li class="nav-item">
-                <a class="nav-link" href="{% url 'vendor:load_diamonds' %}">My Diamonds</a>
-            </li>       
-            <li class="nav-item">
-            <a class="nav-link" href="{% url 'vendor:add_diamond' %}">Add Diamond</a>
-            </li>
-            <li class="nav-item">
-            <a class="nav-link" href="{% url 'edit_profile' %}">Edit Profile</a>
-            </li>
-            <li class="nav-item">
-            <a class="nav-link logout-link" href="{% url 'logout' %}">Logout</a>
-            </li>
-            {% elif request.session.user_id and request.session.user_type == 'customer' %}
-            <!-- If customer is logged in -->
-             <li class="nav-item">
-                <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
-            </li>
-            <li class="nav-item">
-            <a class="nav-link" href="{% url 'edit_profile' %}">Edit Profile</a>
-            </li>
-            <li class="nav-item">
-            <a class="nav-link logout-link" href="{% url 'logout' %}">Logout</a>
-            </li>
-            {% else %}
-            <!-- If not logged in -->
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'dashboard' %}">Home</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'login' %}">Login</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'register' %}">Register</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/admin/">Admin</a>
-            </li>
-            {% endif %}
-        </ul>
+        <div class="container-fluid px-3">
+            <a class="navbar-brand" href="/">Diamond System</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav">
+                    {% if request.session.user_id and request.session.user_type == 'vendor' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'vendor:load_diamonds' %}">My Diamonds</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'vendor:add_diamond' %}">Add Diamond</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'edit_profile' %}">Edit Profile</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link logout-link" href="{% url 'logout' %}">Logout</a>
+                        </li>
+                    {% elif request.session.user_id and request.session.user_type == 'customer' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'edit_profile' %}">Edit Profile</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link logout-link" href="{% url 'logout' %}">Logout</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'dashboard' %}">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'login' %}">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'register' %}">Register</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/">Admin</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
         </div>
-    </div>
     </nav>
 
     <!-- Main Content -->
-    <main class="container mt-4 flex-grow-1">
+    <main class="container-fluid mt-4 px-3 flex-grow-1">
         {% if messages %}
             {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">
-                    {{ message }}
-                </div>
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
             {% endfor %}
         {% endif %}
 
-        {% block content %}
-        
-        {% endblock %}
+        {% block content %}{% endblock %}
     </main>
 
     <!-- Footer -->
@@ -104,25 +107,20 @@
     </footer>
 
     <script>
-        // Auto-dismiss alerts after 2 seconds
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const alerts = document.querySelectorAll('.alert');
-            alerts.forEach(function(alert) {
-                setTimeout(function() {
-                    // Add fade-out effect
+            alerts.forEach(function (alert) {
+                setTimeout(function () {
                     alert.style.transition = 'opacity 0.5s ease-out';
                     alert.style.opacity = '0';
-                    
-                    // Remove from DOM after fade-out
-                    setTimeout(function() {
+                    setTimeout(function () {
                         alert.remove();
                     }, 500);
-                }, 3000); // 2 seconds delay
+                }, 3000);
             });
         });
     </script>
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
