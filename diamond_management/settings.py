@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,12 +22,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-6wrrs3l)jp8)tcr-3#l+=fsjmc)_)zt9z_z=r%dh2xr8dzn(w='
+SECRET_KEY = os.environ.get('SECRET_KEY', 'insecure-default-key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = TrueDEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['*']
+
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost').split(',')
 
 # Application definition
 
@@ -89,14 +91,16 @@ WSGI_APPLICATION = 'diamond_management.wsgi.application'
 
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'diamond_postgres',
-        'USER': 'diamond_postgres_user',
-        'PASSWORD': 'IU3gfwAEoxA86ZlTxoGuR9lkXyHDVTDL',
-        'HOST': 'dpg-d28tuj1r0fns73eqpdig-a.oregon-postgres.render.com',
-        'PORT': '5432',
-    }
+    'default': dj_database_url.config(conn_max_age=600, ssl_require=True)
+
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.postgresql',
+    #     'NAME': 'diamond_postgres',
+    #     'USER': 'diamond_postgres_user',
+    #     'PASSWORD': 'IU3gfwAEoxA86ZlTxoGuR9lkXyHDVTDL',
+    #     'HOST': 'dpg-d28tuj1r0fns73eqpdig-a.oregon-postgres.render.com',
+    #     'PORT': '5432',
+    # }
 }
 
 # Password validation
@@ -138,6 +142,7 @@ STATICFILES_DIRS = [
     BASE_DIR / "static",  
 ]
 STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
