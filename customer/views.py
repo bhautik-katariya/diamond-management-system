@@ -64,14 +64,39 @@ def remove_from_cart(request, item_id):
     item = get_object_or_404(CartItem, pk=item_id)
 
     if item.cart.customer.id == request.session['user_id']:
-        if item.quantity > 1:
-            item.quantity -= 1
-            item.save()
-            messages.success(request, f"1 quantity of diamond removed. Remaining: {item.quantity}")
-        else:
-            item.delete()
-            messages.success(request, "Item removed from cart.")
+        item.delete()
+        messages.success(request, "Item removed from cart.")
     else:
         messages.error(request, "You are not authorized to remove this item.")
 
+    return redirect('customer:view_cart')
+
+def increase_quantity(request, item_id):
+    if request.method == 'POST' and 'user_id' in request.session and request.session.get('user_type') == 'customer':
+        item = get_object_or_404(CartItem, pk=item_id)
+        if item.cart.customer.id == request.session['user_id']:
+            item.quantity += 1
+            item.save()
+            messages.success(request, f"Increased quantity for {item.diamond.stock_id}.")
+        else:
+            messages.error(request, "You are not authorized to update this item.")
+    else:
+        messages.error(request, "Invalid request.")
+    return redirect('customer:view_cart')
+
+def decrease_quantity(request, item_id):
+    if request.method == 'POST' and 'user_id' in request.session and request.session.get('user_type') == 'customer':
+        item = get_object_or_404(CartItem, pk=item_id)
+        if item.cart.customer.id == request.session['user_id']:
+            if item.quantity > 1:
+                item.quantity -= 1
+                item.save()
+                messages.success(request, f"Decreased quantity for {item.diamond.stock_id}.")
+            else:
+                item.delete()
+                messages.success(request, f"Removed {item.diamond.stock_id} from cart.")
+        else:
+            messages.error(request, "You are not authorized to update this item.")
+    else:
+        messages.error(request, "Invalid request.")
     return redirect('customer:view_cart')

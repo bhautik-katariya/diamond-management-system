@@ -1,58 +1,196 @@
 {% extends 'base.html' %}
-{% block title %}My Cart{% endblock %}
+{% block title %}Your Shopping Cart{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-    <h2 class="text-center mb-4" style="color: rgb(11, 25, 55); font-weight: bold;">My Cart</h2>
-
-    {% if cart.items.all %}
-    <div class="table-responsive">
-        <table class="table table-bordered align-middle">
-            <thead class="table-light">
-                <tr class="text-center">
-                    <th>Diamond</th>
-                    <th>Shape</th>
-                    <th>Carat</th>
-                    <th>Color</th>
-                    <th>Clarity</th>
-                    <th>Price/Carat</th>
-                    <th>Total</th>
-                    <th>Quantity</th>
-                    <th>Remove</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in cart.items.all %}
-                <tr class="text-center">
-                    <td>{{ item.diamond.stock_id }}</td>
-                    <td>{{ item.diamond.get_shape_display }}</td>
-                    <td>{{ item.diamond.carat }}</td>
-                    <td>{{ item.diamond.get_color_display }}</td>
-                    <td>{{ item.diamond.get_clarity_display }}</td>
-                    <td>${{ item.diamond.price_per_carat }}</td>
-                    <td>${{ item.diamond.price_per_carat|floatformat:2|add:"0"|floatformat:2|floatformat:2|floatformat:2|add:""|add:item.diamond.carat|floatformat:2 }}</td>
-                    <td>{{ item.quantity }}</td>
-                    <td>
-                        <form method="post" action="{% url 'customer:remove_from_cart' item.id %}">
+<div class="container-fluid px-2 px-md-4">
+<style>
+.cart-table {
+    color: #222;
+    background-color: #fff;
+    border-collapse: separate;
+    border-spacing: 0 5px;
+    width: 100%;
+    border-radius: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    overflow: hidden;
+    margin: 40px auto 0 auto;
+    min-width: 700px;
+    max-width: 1200px;
+}
+.cart-table th, .cart-table td {
+    padding: 12px;
+    text-align: center;
+    background-color: #fff;
+    border-bottom: 1px solid #e3e3e3;
+}
+.cart-table th {
+    background-color: #e6f4fa;
+    color: rgb(11, 25, 55);
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    white-space: normal;
+    word-wrap: break-word;
+    font-size: 0.9rem;
+    border-bottom: 2px solid rgb(11, 25, 55);
+}
+.cart-product-img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    border-radius: 8px;
+    background: #f3f2ed;
+    margin-right: 16px;
+}
+.cart-product-title {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #222;
+    display: block;
+}
+.cart-product-info {
+    text-align: left;
+    min-width: 120px;
+}
+.cart-remove {
+    color: #222;
+    font-weight: 600;
+    text-decoration: underline;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    margin-top: 4px;
+    font-size: 1rem;
+    display: block;
+}
+.cart-qty-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+}
+.cart-qty-btn {
+    width: 32px;
+    height: 32px;
+    border: 1px solid #bdb8a3;
+    background: #fff;
+    font-size: 1.1rem;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 0 6px 6px 0;
+    transition: background 0.2s;
+    padding: 0;
+}
+.cart-qty-btn:first-child {
+    border-radius: 6px 0 0 6px;
+}
+.cart-qty-btn:hover {
+    background: #f3f2ed;
+}
+.cart-qty-input {
+    width: 36px;
+    text-align: center;
+    border: none;
+    background: #fff;
+    font-size: 1.05rem;
+    font-weight: 500;
+    margin: 0 2px;
+}
+.cart-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+    margin-top: 32px;
+    flex-wrap: wrap;
+}
+@media (max-width: 900px) {
+    .cart-table {
+        min-width: 600px;
+    }
+}
+@media (max-width: 700px) {
+    .cart-table {
+        min-width: 500px;
+    }
+    .cart-product-info {
+        min-width: 100px;
+    }
+}
+@media (max-width: 576px) {
+    .cart-table th, .cart-table td {
+        padding: 6px 8px;
+        font-size: 0.75rem;
+    }
+    .cart-table {
+        min-width: 400px;
+    }
+    .cart-product-img {
+        width: 32px;
+        height: 32px;
+    }
+}
+</style>
+<div class="table-responsive" style="margin: 0 auto;">
+    <table class="cart-table">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% if cart.items.all %}
+            {% for item in cart.items.all %}
+            <tr>
+                <td>
+                    <div style="display: flex; align-items: center;">
+                        <img class="cart-product-img" src="/static/images/shapes/{{ item.diamond.get_shape_display|lower }}.png" alt="{{ item.diamond.stock_id }}">
+                        <div class="cart-product-info">
+                            <span class="cart-product-title">{{ item.diamond.stock_id }}</span>
+                            <span style="color:#444;">{{ item.diamond.get_shape_display }} | {{ item.diamond.carat }} ct | {{ item.diamond.get_color_display }} | {{ item.diamond.get_clarity_display }}</span>
+                        </div>
+                    </div>
+                </td>
+                <td>${{ item.diamond.price_per_carat }}</td>
+                <td>
+                    <div class="cart-qty-controls">
+                        <form method="post" action="{% url 'customer:decrease_quantity' item.id %}" style="display:inline;">
                             {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-danger">Remove</button>
+                            <button type="submit" class="cart-qty-btn">-</button>
                         </form>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-    <div class="text-end mt-3">
-        <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">Continue Shopping</a>
-        <a href="#" class="btn btn-primary">Proceed to Checkout</a>
-    </div>
-    {% else %}
-    <p class="text-muted text-center">Your cart is empty.</p>
-    <div class="text-center mt-3">
-        <a href="{% url 'dashboard' %}" class="btn btn-outline-primary">Browse Diamonds</a>
-    </div>
-    {% endif %}
+                        <input class="cart-qty-input" type="text" value="{{ item.quantity }}" readonly>
+                        <form method="post" action="{% url 'customer:increase_quantity' item.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="cart-qty-btn">+</button>
+                        </form>
+                    </div>
+                    <div class="cart-qty-controls">
+                        <form method="post" action="{% url 'customer:remove_from_cart' item.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="cart-remove">Remove</button>
+                        </form>
+                    </div>
+                </td>
+                <td>${{ item.line_total|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="4" class="text-center">Your cart is empty.<br><a href="{% url 'dashboard' %}" class="btn btn-outline-primary mt-2">Browse Diamonds</a></td>
+            </tr>
+        {% endif %}
+        </tbody>
+    </table>
+</div>
+{% if cart.items.all %}
+<div class="cart-footer">
+    <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">Continue Shopping</a>
+    <a href="#" class="btn btn-primary">Proceed to Checkout</a>
+</div>
+{% endif %}
 </div>
 {% endblock %}

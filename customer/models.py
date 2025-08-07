@@ -31,3 +31,7 @@ class CartItem(models.Model):
 
     def __str__(self):
         return f"{self.quantity} x diamond in {self.cart}"
+
+    @property
+    def line_total(self):
+        return float(self.diamond.price_per_carat) * float(self.diamond.carat) * self.quantity
