@@ -291,7 +291,7 @@
     <tbody>
         {% for diamond in diamonds %}
         <tr>
-            <td><input type="checkbox"></td>
+            <td><input type="checkbox" class="row-checkbox"></td>
             <td>{{ forloop.counter0|add:page_obj.start_index }}</td>
             <td>{{ diamond.stock_id }}</td>
             <td>{{ diamond.type }}</td>
@@ -350,10 +350,10 @@
     <ul class="pagination justify-content-center">
         {% if page_obj.has_previous %}
         <li class="page-item">
-            <a class="page-link" href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">&laquo; First</a>
+            <a class="page-link" href="?page=1{% if get_params %}&{{ get_params }}{% endif %}">&laquo; First</a>
         </li>
         <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">‹ Prev</a>
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if get_params %}&{{ get_params }}{% endif %}">‹ Prev</a>
         </li>
         {% else %}
         <li class="page-item disabled"><span class="page-link">‹ Prev</span></li>
@@ -365,10 +365,10 @@
     
         {% if page_obj.has_next %}
         <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Next ›</a>
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if get_params %}&{{ get_params }}{% endif %}">Next ›</a>
         </li>
         <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Last &raquo;</a>
+            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if get_params %}&{{ get_params }}{% endif %}">Last &raquo;</a>
         </li>
         {% else %}
         <li class="page-item disabled"><span class="page-link">Next ›</span></li>
@@ -377,38 +377,33 @@
 </nav>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const selectAllCheckbox = document.getElementById('select-all');
-        const rowCheckboxes = document.querySelectorAll('.row-checkbox');
-        
-        // Handle select all checkbox
-        selectAllCheckbox.addEventListener('change', function() {
-            rowCheckboxes.forEach(checkbox => {
-                checkbox.checked = this.checked;
+    
+        function updateCheckboxesState() {
+            const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+            const rowCheckboxArray = Array.from(rowCheckboxes);
+    
+            // Select all logic
+            selectAllCheckbox.addEventListener('change', function () {
+                rowCheckboxArray.forEach(cb => {
+                    cb.checked = this.checked;
+                });
             });
-        });
-        
-        // Handle individual row checkboxes
-        rowCheckboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                // Check if all checkboxes are checked
-                const allChecked = Array.from(rowCheckboxes).every(cb => cb.checked);
-                // Check if any checkbox is checked
-                const anyChecked = Array.from(rowCheckboxes).some(cb => cb.checked);
-                
-                // Update select all checkbox state
-                if (allChecked) {
-                    selectAllCheckbox.checked = true;
-                    selectAllCheckbox.indeterminate = false;
-                } else if (anyChecked) {
-                    selectAllCheckbox.checked = false;
-                    selectAllCheckbox.indeterminate = true;
-                } else {
-                    selectAllCheckbox.checked = false;
-                    selectAllCheckbox.indeterminate = false;
-                }
+    
+            // Update indeterminate state based on visible checkboxes
+            rowCheckboxArray.forEach(cb => {
+                cb.addEventListener('change', function () {
+                    const allChecked = rowCheckboxArray.every(cb => cb.checked);
+                    const anyChecked = rowCheckboxArray.some(cb => cb.checked);
+    
+                    selectAllCheckbox.checked = allChecked;
+                    selectAllCheckbox.indeterminate = !allChecked && anyChecked;
+                });
             });
-        });
+        }
+    
+        updateCheckboxesState();
     });
     </script>
 

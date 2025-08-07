@@ -182,6 +182,11 @@ def dashboard(request):
         ("Lab", Diamond.LAB, "lab"),
     ]
 
+    # Add get_params for pagination links
+    get_params = request.GET.copy()
+    if 'page' in get_params:
+        get_params.pop('page')
+    get_params_str = get_params.urlencode()
     context = {
         'diamonds': page_obj.object_list,
         'page_obj': page_obj,
@@ -190,6 +195,7 @@ def dashboard(request):
         'total_stock': total_stock,
         'total_carat': round(total_carat, 2),
         'total_amount': round(total_amount, 2),
+        'get_params': get_params_str,
     }
 
     return render(request, 'dashboard.html', context)
