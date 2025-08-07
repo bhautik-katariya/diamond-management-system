@@ -1,5 +1,66 @@
 {% extends "admin/base_site.html" %}
 
+{% block extrastyle %}
+<style>
+body, #container {
+    background: #f8fafc !important;
+}
+#header, .breadcrumbs, .nav-global {
+    background: #0a1835 !important;
+    color: #fff !important;
+    border-bottom: 4px solid #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+#branding, #site-name, #site-name a {
+    color: #fff !important;
+    font-size: 2rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-decoration: none !important;
+}
+#nav-sidebar, .module caption {
+    background:rgb(139, 164, 214) !important;
+    color: #fff !important;
+}
+#nav-sidebar .app-label, #nav-sidebar .model-label {
+    color: #fff !important;
+}
+#nav-sidebar .current-app .section, #nav-sidebar .current-model {
+    background: #0a1835 !important;
+    color: #fff !important;
+}
+#user-tools, #user-tools a, #user-tools strong {
+    color: #fff !important;
+    font-size: 1.1rem;
+}
+#user-tools a.logout-link, #user-tools form button {
+    color: #ff3333 !important;
+    font-weight: bold;
+    background: none;
+    border: none;
+    padding: 0;
+    margin-left: 10px;
+    cursor: pointer;
+}
+#user-tools a.logout-link:hover, #user-tools form button:hover {
+    color: #ff6666 !important;
+}
+.module caption {
+    font-size: 1rem;
+    font-weight: 500;
+    border-radius: 8px 8px 0 0;
+    padding: 10px 16px;
+}
+.changeform-tabs .changeform-tabs-item.selected {
+    background: #0a1835 !important;
+    color: #fff !important;
+}
+/* Hide the Django admin color theme toggle button */
+#header .theme-toggle, theme-toggle { display: none !important; }
+</style>
+{{ block.super }}
+{% endblock %}
+
 {% block branding %}
   <a href="{% url 'dashboard' %}" class="branding-link" style="color: white; text-decoration: none;">
     <h1 id="site-name">Diamond System</h1>
