@@ -11,4 +11,6 @@ admin.site.site_url = '/'
 
 admin.site.register(Vendor)
 admin.site.register(Diamond)
+admin.site.register(Order)
+admin.site.register(OrderItem)
 

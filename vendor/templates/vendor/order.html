@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Order Details{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Order Details</h2>
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Customer</th>
+                <th>Diamond ID</th>
+                <th>Shape</th>
+                <th>Carat</th>
+                <th>Color</th>
+                <th>Clarity</th>
+                <th>Quantity</th>
+                <th>Price/Carat</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+                {% for item in order.items.all %}
+                <tr>
+                    <td>{{ order.customer.fname }} {{ order.customer.lname }}</td>
+                    <td>{{ item.diamond.stock_id }}</td>
+                    <td>{{ item.diamond.get_shape_display }}</td>
+                    <td>{{ item.diamond.carat }}</td>
+                    <td>{{ item.diamond.get_color_display }}</td>
+                    <td>{{ item.diamond.get_clarity_display }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>${{ item.price_per_carat }}</td>
+                    <td>${{ item.line_total|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+            {% empty %}
+            <tr><td colspan="9" class="text-center">No orders found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+

@@ -8,4 +8,5 @@ urlpatterns = [
     path('edit_diamond/<int:id>/', edit_diamond, name='edit_diamond'),
     path('load_diamonds/', load_diamonds, name='load_diamonds'),
     path('delete_diamond/<int:id>/', delete_diamond, name='delete_diamond'),
+    path('orders/', view_orders, name='view_orders'),
 ]

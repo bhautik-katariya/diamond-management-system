@@ -1,6 +1,6 @@
 from django.shortcuts import redirect,render, get_object_or_404
 from django.contrib import messages
-from vendor.models import Diamond
+from vendor.models import Diamond, Order, OrderItem
 from .models import Cart, CartItem, Customer
 from django.db import IntegrityError
 from django.core.mail import send_mail
@@ -24,8 +24,8 @@ def add_to_cart(request, diamond_id):
         # send_mail(
         #     subject="New Diamond Added to Cart",
         #     message=f"Customer {customer.username} ({customer.email}) added your diamond {diamond.stock_id} to their cart.",
-        #     from_email="yourapp@example.com",
-        #     recipient_list=[diamond.vendor.email],  # Assuming `diamond.vendor.email` exists
+        #     from_email={diamond.vendor.email},
+        #     recipient_list=[customer.email], 
         # )
     except IntegrityError:
         messages.error(request, "This diamond is already in your cart.")
@@ -42,19 +42,6 @@ def view_cart(request):
     return render(request, 'customer/cart.html', {
         'cart': cart,
     })
-
-# def remove_from_cart(request, item_id):
-#     if 'user_id' not in request.session or request.session.get('user_type') != 'customer':
-#         messages.error(request, "You must be logged in as a customer to remove items.")
-#         return redirect('login')
-
-#     item = get_object_or_404(CartItem, pk=item_id)
-#     if item.cart.customer.id == request.session['user_id']:
-#         item.delete()
-#         messages.success(request, "Item removed from cart.")
-#     else:
-#         messages.error(request, "You are not authorized to remove this item.")
-#     return redirect('customer:view_cart')
 
 def remove_from_cart(request, item_id):
     if 'user_id' not in request.session or request.session.get('user_type') != 'customer':
@@ -100,3 +87,43 @@ def decrease_quantity(request, item_id):
     else:
         messages.error(request, "Invalid request.")
     return redirect('customer:view_cart')
+
+def checkout(request):
+    if 'user_id' not in request.session or request.session.get('user_type') != 'customer':
+        messages.error(request, "Please log in as a customer to checkout.")
+        return redirect('login')
+
+    customer = get_object_or_404(Customer, pk=request.session['user_id'])
+    cart, created = Cart.objects.get_or_create(customer=customer)
+    cart_items = cart.items.all()
+    if not cart_items:
+        messages.error(request, "Your cart is empty.")
+        return redirect('customer:view_cart')
+
+    # Group items by vendor
+    vendor_items = {}
+    for item in cart_items:
+        vendor = item.diamond.vendor
+        if vendor not in vendor_items:
+            vendor_items[vendor] = []
+        vendor_items[vendor].append(item)
+
+    # Create an order for each vendor
+    for vendor, items in vendor_items.items():
+        order = Order.objects.create(customer=customer, vendor=vendor)
+        for item in items:
+            OrderItem.objects.create(
+                order=order,
+                diamond=item.diamond,
+                quantity=item.quantity,
+                price_per_carat=item.diamond.price_per_carat,
+                line_total=item.line_total
+            )
+            item.delete()  # Remove from cart
+
+    messages.success(request, "Order placed successfully!")
+    return redirect('customer:order_confirmation')
+
+
+def order_confirmation(request):
+    return render(request, 'customer/order_confirmation.html')

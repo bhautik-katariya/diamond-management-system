@@ -49,3 +49,10 @@ def load_diamonds(request):
         return redirect('login')   
     diamonds = Diamond.objects.filter(vendor_id=request.session['user_id'])
     return render(request, 'vendor/load_diamonds.html', {'diamonds': diamonds})
+
+def view_orders(request):
+    if request.session.get('user_type') != 'vendor' or 'user_id' not in request.session:
+        return redirect('login')
+    vendor_id = request.session['user_id']
+    orders = Order.objects.filter(vendor_id=vendor_id).order_by('-created_at').prefetch_related('items', 'customer')
+    return render(request, 'vendor/order.html', {'orders': orders})

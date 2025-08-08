@@ -143,3 +143,22 @@ class Diamond(models.Model):
 
     def __str__(self):
         return f"{self.stock_id} - {self.vendor.username}"
+
+class Order(models.Model):
+    customer = models.ForeignKey('customer.Customer', on_delete=models.CASCADE, related_name='orders')
+    vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE, related_name='orders')
+    created_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=20, default='Pending')
+
+    def __str__(self):
+        return f"Order #{self.id} by {self.customer.username} for {self.vendor.username}"
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
+    diamond = models.ForeignKey(Diamond, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
+    price_per_carat = models.DecimalField(max_digits=12, decimal_places=2)
+    line_total = models.DecimalField(max_digits=15, decimal_places=2)
+
+    def __str__(self):
+        return f"{self.quantity} x {self.diamond.stock_id} in Order #{self.order.id}"

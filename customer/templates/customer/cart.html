@@ -139,12 +139,12 @@
                 <th>Product</th>
                 <th>Price</th>
                 <th>Quantity</th>
-                <th>Total</th>
-            </tr>
-        </thead>
-        <tbody>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
         {% if cart.items.all %}
-            {% for item in cart.items.all %}
+                {% for item in cart.items.all %}
             <tr>
                 <td>
                     <div style="display: flex; align-items: center;">
@@ -155,7 +155,7 @@
                         </div>
                     </div>
                 </td>
-                <td>${{ item.diamond.price_per_carat }}</td>
+                    <td>${{ item.diamond.price_per_carat }}</td>
                 <td>
                     <div class="cart-qty-controls">
                         <form method="post" action="{% url 'customer:decrease_quantity' item.id %}" style="display:inline;">
@@ -174,23 +174,23 @@
                             <button type="submit" class="cart-remove">Remove</button>
                         </form>
                     </div>
-                </td>
+                    </td>
                 <td>${{ item.line_total|floatformat:2 }}</td>
-            </tr>
-            {% endfor %}
+                </tr>
+                {% endfor %}
         {% else %}
             <tr>
                 <td colspan="4" class="text-center">Your cart is empty.<br><a href="{% url 'dashboard' %}" class="btn btn-outline-primary mt-2">Browse Diamonds</a></td>
             </tr>
         {% endif %}
-        </tbody>
-    </table>
-</div>
+            </tbody>
+        </table>
+    </div>
 {% if cart.items.all %}
 <div class="cart-footer">
-    <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">Continue Shopping</a>
-    <a href="#" class="btn btn-primary">Proceed to Checkout</a>
-</div>
-{% endif %}
+        <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">Continue Shopping</a>
+        <a href="{% url 'customer:checkout' %}" class="btn btn-primary">Proceed to Checkout</a>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}
