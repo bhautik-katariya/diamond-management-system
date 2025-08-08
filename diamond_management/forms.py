@@ -8,18 +8,6 @@ from vendor.models import Vendor
 from customer.models import Customer
 
 class RegistrationForm(forms.Form):
-    USER_TYPE_CHOICES = [
-        ('vendor', 'Vendor'),
-        ('customer', 'Customer'),
-    ]
-    
-    user_type = forms.ChoiceField(
-        choices=USER_TYPE_CHOICES,
-        widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
-        label="Register as",
-        required=True
-    )
-    
     fname = forms.CharField(max_length=255, label="First Name")
     lname = forms.CharField(max_length=255, label="Last Name")
     username = forms.CharField(max_length=150, label="Username")
@@ -109,17 +97,6 @@ class ProfileForm(forms.ModelForm):
         return phone
 
 class LoginForm(forms.Form):
-    USER_TYPE_CHOICES = [
-        ('vendor', 'Vendor'),
-        ('customer', 'Customer'),
-    ]
-    
-    user_type = forms.ChoiceField(
-        choices=USER_TYPE_CHOICES,
-        widget=forms.RadioSelect,
-        label="Login as",
-        required=True
-    )
     username = forms.CharField(max_length=150, label="Username")
     password = forms.CharField(widget=forms.PasswordInput, label="Password")
 

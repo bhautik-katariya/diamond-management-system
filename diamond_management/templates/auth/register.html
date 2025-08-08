@@ -11,24 +11,6 @@
             <form method="POST" novalidate>
                 {% csrf_token %}
 
-                <!-- user_type field (radio buttons) -->
-                <div class="mb-3">
-                    <label class="form-label d-block">{{ form.user_type.label }}</label>
-                    {% for radio in form.user_type %}
-                        <div class="form-check form-check-inline">
-                            {{ radio.tag }}
-                            <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
-                        </div>
-                    {% endfor %}
-                    {% if form.user_type.errors %}
-                        <div class="text-danger small">
-                            {% for error in form.user_type.errors %}
-                                {{ error }}
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                </div>
-
                 <!-- Other fields -->
                 {% for field in form %}
                     {% if field.name != 'user_type' %}
@@ -60,6 +42,15 @@
                     <button type="submit" class="btn btn-primary">Register</button>
                 </div>
             </form>
+            
+            <!-- Toggle link -->
+            <div class="text-center mt-3">
+                {% if is_vendor_register %}
+                    <p class="mb-0">Register as a customer? <a href="{% url 'register' %}" class="text-decoration-none">Customer Registration</a></p>
+                {% else %}
+                    <p class="mb-0">Register as a vendor? <a href="{% url 'vendor_register' %}" class="text-decoration-none">Vendor Registration</a></p>
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>

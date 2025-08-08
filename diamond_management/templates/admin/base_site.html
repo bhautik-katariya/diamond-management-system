@@ -62,7 +62,8 @@ body, #container {
 {% endblock %}
 
 {% block branding %}
-  <a href="{% url 'dashboard' %}" class="branding-link" style="color: white; text-decoration: none;">
+  <a {% if request.session.user_type == 'vendor' %} href="{% url 'vendor:load_diamonds' %}" {% else %} href="{% url 'dashboard' %}" {% endif %} class="branding-link" style="color: white; text-decoration: none;">
+  {% endif %} href="{% url 'dashboard' %}" class="branding-link" style="color: white; text-decoration: none;">
     <h1 id="site-name">Diamond System</h1>
   </a>
 {% endblock %}

@@ -39,6 +39,8 @@
     <table class="table table-striped table-bordered table-hover w-100">
         <thead class="table-dark">
             <tr>
+                <th><input type="checkbox" id="select-all"></th>
+                <th>Sr No</th>
                 <th>Stock Id</th>
                 <th>Report #</th>
                 <th>Type</th>
@@ -62,6 +64,8 @@
         <tbody>
             {% for diamond in diamonds %}
             <tr>
+                <td><input type="checkbox" class="row-checkbox" name="selected_diamonds" value="{{ diamond.id }}"></td>
+                <td>{{ forloop.counter }}</td>
                 <td>{{ diamond.stock_id }}</td>
                 <td>{{ diamond.report_number }}</td>
                 <td>{{ diamond.type }}</td>
@@ -118,7 +122,48 @@
 <p class="text-muted">You have not added any diamonds yet.</p>
 {% endif %}
 
+{% if page_obj %}
+<nav aria-label="Pagination" class="mt-3 d-flex justify-content-center">
+  <ul class="pagination" style="gap:10px;">
+    {% if page_obj.has_previous %}
+      <li class="page-item"><a class="page-link" style="border-radius:24px;background:#0a1835;color:#fff;padding:10px 18px;box-shadow:0 4px 12px rgba(10,24,53,.25);" href="?page=1">&laquo; First</a></li>
+      <li class="page-item"><a class="page-link" style="border-radius:24px;background:#0a1835;color:#fff;padding:10px 18px;box-shadow:0 4px 12px rgba(10,24,53,.25);" href="?page={{ page_obj.previous_page_number }}">‹ Prev</a></li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link" style="border-radius:24px;background:#eef1f5;color:#9aa4b2;padding:10px 18px;">‹ Prev</span></li>
+    {% endif %}
+
+    <li class="page-item active"><span class="page-link" style="border-radius:24px;background:#0a1835;color:#fff;padding:10px 18px;">{{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
+
+    {% if page_obj.has_next %}
+      <li class="page-item"><a class="page-link" style="border-radius:24px;background:#0a1835;color:#fff;padding:10px 18px;box-shadow:0 4px 12px rgba(10,24,53,.25);" href="?page={{ page_obj.next_page_number }}">Next ›</a></li>
+      <li class="page-item"><a class="page-link" style="border-radius:24px;background:#0a1835;color:#fff;padding:10px 18px;box-shadow:0 4px 12px rgba(10,24,53,.25);" href="?page={{ page_obj.paginator.num_pages }}">Last »</a></li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link" style="border-radius:24px;background:#eef1f5;color:#9aa4b2;padding:10px 18px;">Next ›</span></li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}
+
 <script>
+    // Select all logic
+    (function() {
+        const selectAll = document.getElementById('select-all');
+        if (!selectAll) return;
+        const rowChecks = document.querySelectorAll('.row-checkbox');
+        selectAll.addEventListener('change', function() {
+            rowChecks.forEach(cb => cb.checked = selectAll.checked);
+            selectAll.indeterminate = false;
+        });
+        rowChecks.forEach(cb => {
+            cb.addEventListener('change', function() {
+                const total = rowChecks.length;
+                const checked = Array.from(rowChecks).filter(x => x.checked).length;
+                selectAll.checked = checked === total;
+                selectAll.indeterminate = checked > 0 && checked < total;
+            });
+        });
+    })();
+
     function showConfirm(button) {
         const confirmBox = button.nextElementSibling;
         confirmBox.classList.remove('d-none');

@@ -286,6 +286,7 @@
             <th>Fluorescence</th>
             <th>Price/Carat</th>
             <th>View</th>
+            <th>Add to Cart</th>
         </tr>
     </thead>
     <tbody>
@@ -300,7 +301,7 @@
                 <div class="shape-icon-label">
                     <span class="shape-svg">
                         {% if diamond.shape == 'RD' %}
-                            <img src="{% static 'images/shapes/round.png' %}" width="40" height="40" alt="Round Shape">
+                            <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754645394/round_gwfwgz.svg" width="40" height="40" alt="Round Shape">
                         {% elif diamond.shape == 'EM' %}
                             <img src="{% static 'images/shapes/emerald.png' %}" width="32" height="40" alt="Emerald Shape">
                         {% elif diamond.shape == 'HT' %}
@@ -339,6 +340,7 @@
             <td>{{ diamond.fluorescence }}</td>
             <td>${{ diamond.price_per_carat }}</td>
             <td><a href="{% url 'diamond_detail' diamond.id %}" class="btn equal-button">View</a></td>
+            <td><a href="{% url 'customer:add_to_cart' diamond.id %}" class="btn equal-button">Cart</a></td>
         </tr>
         {% endfor %}
     </tbody>

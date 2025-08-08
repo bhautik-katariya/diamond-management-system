@@ -20,6 +20,7 @@
 .cart-table th, .cart-table td {
     padding: 12px;
     text-align: center;
+    vertical-align: middle;
     background-color: #fff;
     border-bottom: 1px solid #e3e3e3;
 }
@@ -131,21 +132,25 @@
         height: 32px;
     }
 }
-</style>
+</style> 
 <div class="table-responsive" style="margin: 0 auto;">
     <table class="cart-table">
         <thead>
             <tr>
+                <th><input type="checkbox" id="select-all"></th>
+                <th>Sr No</th>
                 <th>Product</th>
                 <th>Price</th>
                 <th>Quantity</th>
-                    <th>Total</th>
-                </tr>
-            </thead>
-            <tbody>
-        {% if cart.items.all %}
-                {% for item in cart.items.all %}
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% if page_obj %}
+            {% for item in paged_items %}
             <tr>
+                <td><input type="checkbox" class="row-checkbox" name="selected_items" value="{{ item.id }}"></td>
+                <td>{{ forloop.counter0|add:page_obj.start_index }}</td>
                 <td>
                     <div style="display: flex; align-items: center;">
                         <img class="cart-product-img" src="/static/images/shapes/{{ item.diamond.get_shape_display|lower }}.png" alt="{{ item.diamond.stock_id }}">
@@ -155,7 +160,7 @@
                         </div>
                     </div>
                 </td>
-                    <td>${{ item.diamond.price_per_carat }}</td>
+                <td>${{ item.diamond.price_per_carat }}</td>
                 <td>
                     <div class="cart-qty-controls">
                         <form method="post" action="{% url 'customer:decrease_quantity' item.id %}" style="display:inline;">
@@ -174,18 +179,77 @@
                             <button type="submit" class="cart-remove">Remove</button>
                         </form>
                     </div>
-                    </td>
+                </td>
                 <td>${{ item.line_total|floatformat:2 }}</td>
-                </tr>
-                {% endfor %}
+            </tr>
+            {% endfor %}
+        {% elif cart.items.all %}
+            {% for item in cart.items.all %}
+            <tr>
+                <td><input type="checkbox" class="row-checkbox" name="selected_items" value="{{ item.id }}"></td>
+                <td>{{ forloop.counter }}</td>
+                <td>
+                    <div style="display: flex; align-items: center;">
+                        <img class="cart-product-img" src="/static/images/shapes/{{ item.diamond.get_shape_display|lower }}.png" alt="{{ item.diamond.stock_id }}">
+                        <div class="cart-product-info">
+                            <span class="cart-product-title">{{ item.diamond.stock_id }}</span>
+                            <span style="color:#444;">{{ item.diamond.get_shape_display }} | {{ item.diamond.carat }} ct | {{ item.diamond.get_color_display }} | {{ item.diamond.get_clarity_display }}</span>
+                        </div>
+                    </div>
+                </td>
+                <td>${{ item.diamond.price_per_carat }}</td>
+                <td>
+                    <div class="cart-qty-controls">
+                        <form method="post" action="{% url 'customer:decrease_quantity' item.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="cart-qty-btn">-</button>
+                        </form>
+                        <input class="cart-qty-input" type="text" value="{{ item.quantity }}" readonly>
+                        <form method="post" action="{% url 'customer:increase_quantity' item.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="cart-qty-btn">+</button>
+                        </form>
+                    </div>
+                    <div class="cart-qty-controls">
+                        <form method="post" action="{% url 'customer:remove_from_cart' item.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="cart-remove">Remove</button>
+                        </form>
+                    </div>
+                </td>
+                <td>${{ item.line_total|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
         {% else %}
             <tr>
-                <td colspan="4" class="text-center">Your cart is empty.<br><a href="{% url 'dashboard' %}" class="btn btn-outline-primary mt-2">Browse Diamonds</a></td>
+                <td colspan="6" class="text-center">Your cart is empty.<br><a href="{% url 'dashboard' %}" class="btn btn-outline-primary mt-2">Browse Diamonds</a></td>
             </tr>
         {% endif %}
-            </tbody>
-        </table>
-    </div>
+        </tbody>
+    </table>
+</div>
+
+{% if page_obj %}
+<nav aria-label="Pagination" class="mt-3 d-flex justify-content-center">
+  <ul class="pagination" style="gap:10px;">
+    {% if page_obj.has_previous %}
+      <li class="page-item"><a class="page-link" style="border-radius:24px;background:#0a1835;color:#fff;padding:10px 18px;box-shadow:0 4px 12px rgba(10,24,53,.25);" href="?page=1">&laquo; First</a></li>
+      <li class="page-item"><a class="page-link" style="border-radius:24px;background:#0a1835;color:#fff;padding:10px 18px;box-shadow:0 4px 12px rgba(10,24,53,.25);" href="?page={{ page_obj.previous_page_number }}">‹ Prev</a></li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link" style="border-radius:24px;background:#eef1f5;color:#9aa4b2;padding:10px 18px;">‹ Prev</span></li>
+    {% endif %}
+
+    <li class="page-item active"><span class="page-link" style="border-radius:24px;background:#0a1835;color:#fff;padding:10px 18px;">{{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
+
+    {% if page_obj.has_next %}
+      <li class="page-item"><a class="page-link" style="border-radius:24px;background:#0a1835;color:#fff;padding:10px 18px;box-shadow:0 4px 12px rgba(10,24,53,.25);" href="?page={{ page_obj.next_page_number }}">Next ›</a></li>
+      <li class="page-item"><a class="page-link" style="border-radius:24px;background:#0a1835;color:#fff;padding:10px 18px;box-shadow:0 4px 12px rgba(10,24,53,.25);" href="?page={{ page_obj.paginator.num_pages }}">Last »</a></li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link" style="border-radius:24px;background:#eef1f5;color:#9aa4b2;padding:10px 18px;">Next ›</span></li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}
 {% if cart.items.all %}
 <div class="cart-footer">
         <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">Continue Shopping</a>
@@ -193,4 +257,25 @@
     </div>
     {% endif %}
 </div>
+
+<script>
+(function() {
+    const selectAll = document.getElementById('select-all');
+    if (!selectAll) return;
+    const rowChecks = document.querySelectorAll('.row-checkbox');
+    selectAll.addEventListener('change', function() {
+        rowChecks.forEach(cb => cb.checked = selectAll.checked);
+        selectAll.indeterminate = false;
+    });
+    rowChecks.forEach(cb => {
+        cb.addEventListener('change', function() {
+            const total = rowChecks.length;
+            const checked = Array.from(rowChecks).filter(x => x.checked).length;
+            selectAll.checked = checked === total;
+            selectAll.indeterminate = checked > 0 && checked < total;
+        });
+    });
+})();
+</script>
 {% endblock %}
+    

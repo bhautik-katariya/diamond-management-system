@@ -2,6 +2,25 @@
 {% block title %}Diamond Details{% endblock %}
 
 {% block content %}
+<style>
+    .btn-cart {
+        min-width: 100px;
+        height: 36px;
+        white-space: nowrap;
+        background: rgb(11, 25, 55);
+        color: rgb(255, 255, 255);
+        border: none;
+        border-radius: 20px;
+        font-weight: 500;
+        box-shadow: 0 2px 8px rgba(11, 25, 55, 0.3);
+        transition: background 0.3s, color 0.3s;
+    }
+    .btn-cart:hover {
+        background: rgb(255, 255, 255);
+        color: rgb(11, 25, 55);
+        border: 1px solid rgb(11, 25, 55);
+    }
+</style>
 <div class="container-fluid py-4">
     <h1 class="text-center mb-5" style="color:rgb(11, 25, 55); font-weight:bold; text-decoration:underline;">
         Diamond {{ diamond.stock_id }}
@@ -60,8 +79,8 @@
                     Image
                 </div>
                 <div class="card-body d-flex align-items-center justify-content-center">
-                    {% if diamond.photo %}
-                        <img src="{{ diamond.photo }}" alt="Diamond Image" class="img-fluid rounded" style="background:#eee; max-height: 400px;" />
+                    {% if image_url %}
+                        <img src="{{ image_url }}" alt="Diamond Image" class="img-fluid rounded" style="background:#eee; max-height: 400px;" />
                     {% else %}
                         <p class="text-muted">No image available</p>
                     {% endif %}
@@ -70,12 +89,9 @@
         </div>
     </div>
 </div>
-{% if request.session.user_type == 'customer' %}
+
 <div class="text-center mt-4">
-    <form action="{% url 'customer:add_to_cart' diamond.id %}" method="post">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-primary btn-lg">Add to Cart</button>
-    </form>
+    <a href="{% url 'customer:add_to_cart' diamond.id %}" class="btn btn-cart btn-lg">Add to Cart</a>
 </div>
-{% endif %}
+
 {% endblock %}

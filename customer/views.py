@@ -3,7 +3,7 @@ from django.contrib import messages
 from vendor.models import Diamond, Order, OrderItem
 from .models import Cart, CartItem, Customer
 from django.db import IntegrityError
-from django.core.mail import send_mail
+from django.core.paginator import Paginator
 
 def add_to_cart(request, diamond_id):
     if 'user_id' not in request.session or request.session.get('user_type') != 'customer':
@@ -21,12 +21,6 @@ def add_to_cart(request, diamond_id):
             cart_item.save()
         messages.success(request, f"Diamond {diamond.stock_id} added to cart.")
         print(f"Customer '{customer.username}' added Diamond '{diamond.stock_id}' to cart. Vendor: {diamond.vendor.fname}")
-        # send_mail(
-        #     subject="New Diamond Added to Cart",
-        #     message=f"Customer {customer.username} ({customer.email}) added your diamond {diamond.stock_id} to their cart.",
-        #     from_email={diamond.vendor.email},
-        #     recipient_list=[customer.email], 
-        # )
     except IntegrityError:
         messages.error(request, "This diamond is already in your cart.")
     return redirect('dashboard') 
@@ -38,9 +32,15 @@ def view_cart(request):
 
     customer = get_object_or_404(Customer, pk=request.session['user_id'])
     cart, created = Cart.objects.get_or_create(customer=customer)
+
+    paginator = Paginator(cart.items.all(), 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
     
     return render(request, 'customer/cart.html', {
         'cart': cart,
+        'page_obj': page_obj,
+        'paged_items': page_obj.object_list,
     })
 
 def remove_from_cart(request, item_id):

@@ -1,7 +1,9 @@
-from django.shortcuts import render, redirect, reverse
+from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.hashers import make_password, check_password
 from django.shortcuts import get_object_or_404
+from bs4 import BeautifulSoup
+import requests
 from django.core.paginator import Paginator
 from django.db.models import Sum
 from .forms import *
@@ -12,10 +14,7 @@ def register(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
         if form.is_valid():
-            user_type = form.cleaned_data['user_type']
-            Model = Vendor if user_type == 'vendor' else Customer
-
-            user = Model.objects.create(
+            customer = Customer.objects.create(
                 fname=form.cleaned_data['fname'],
                 lname=form.cleaned_data['lname'],
                 username=form.cleaned_data['username'],
@@ -25,51 +24,84 @@ def register(request):
             )
 
             # Set session
-            request.session['user_type'] = user_type
-            request.session['user_id'] = user.id
+            request.session['user_type'] = "customer"
+            request.session['user_id'] = customer.id
 
-            messages.success(request, f"{user_type.capitalize()} registration successful!")
-            return redirect('vendor:load_diamonds' if user_type == 'vendor' else 'dashboard')
+            messages.success(request, f"Customer registration successful!")
+            return redirect('dashboard')
     else:
         form = RegistrationForm()
 
     return render(request, 'auth/register.html', {'form': form})
 
+def vendor_register(request):
+    if request.method == 'POST':
+        form = RegistrationForm(request.POST)
+        if form.is_valid():
+            vendor = Vendor.objects.create(
+                fname=form.cleaned_data['fname'],
+                lname=form.cleaned_data['lname'],
+                username=form.cleaned_data['username'],
+                email=form.cleaned_data['email'],
+                phone=form.cleaned_data['phone'],
+                password=make_password(form.cleaned_data['password1']),
+            )
+
+            # Set session
+            request.session['user_type'] = "vendor"
+            request.session['user_id'] = vendor.id
+
+            messages.success(request, f"Vendor registration successful!")
+            return redirect('vendor:load_diamonds')
+    else:
+        form = RegistrationForm(initial={'user_type': 'vendor'})
+
+    return render(request, 'auth/register.html', {'form': form, 'is_vendor_register': True})
+
 def login(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
-            user_type = form.cleaned_data['user_type']
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
-            
-            if user_type == 'vendor':
-                try:
-                    vendor = Vendor.objects.get(username=username)
-                    if check_password(password, vendor.password):
-                        request.session['user_type'] = 'vendor'
-                        request.session['user_id'] = vendor.id
-                        messages.success(request, "Vendor login successful!")
-                        return redirect('vendor:load_diamonds')
-                    else:
-                        messages.error(request, "Incorrect password.")
-                except Vendor.DoesNotExist:
-                    messages.error(request, "Vendor does not exist.")
-            else:
-                try:
-                    customer = Customer.objects.get(username=username)
-                    if check_password(password, customer.password):
-                        request.session['user_type'] = 'customer'
-                        request.session['user_id'] = customer.id
-                        messages.success(request, "Customer login successful!")
-                        return redirect('dashboard')
-                    else:
-                        messages.error(request, "Incorrect password.")
-                except Customer.DoesNotExist:
-                    messages.error(request, "Customer does not exist.")
+            try:
+                customer = Customer.objects.get(username=username)
+                if check_password(password, customer.password):
+                    request.session['user_type'] = 'customer'
+                    request.session['user_id'] = customer.id
+                    messages.success(request, "Customer login successful!")
+                    return redirect('dashboard')
+                else:
+                    messages.error(request, "Incorrect password.")
+                    return render(request, 'auth/login.html', {'form': form})
+            except Customer.DoesNotExist:
+                messages.error(request, "Customer does not exist.")
     else:
         form = LoginForm()
     return render(request, 'auth/login.html', {'form': form})
+
+def vendor_login(request):
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+
+            try:
+                vendor = Vendor.objects.get(username=username)
+                if check_password(password, vendor.password):
+                    request.session['user_type'] = 'vendor'
+                    request.session['user_id'] = vendor.id
+                    messages.success(request, "Vendor login successful!")
+                    return redirect('vendor:load_diamonds')
+                else:
+                    messages.error(request, "Incorrect password.")
+                    return render(request, 'auth/login.html', {'form': form, 'is_vendor_login': True})
+            except Vendor.DoesNotExist:
+                messages.error(request, "Vendor does not exist.")
+    else:
+        form = LoginForm()
+    return render(request, 'auth/login.html', {'form': form, 'is_vendor_login': True})
 
 def logout(request):
     if 'user_id' in request.session:
@@ -201,7 +233,25 @@ def dashboard(request):
     return render(request, 'dashboard.html', context)
 
 def diamond_detail(request, id):
-    from django.shortcuts import get_object_or_404
     diamond = get_object_or_404(Diamond, pk=id)
-    return render(request, 'diamond_detail.html', {'diamond': diamond})
 
+    image_url = None
+
+    if diamond.photo:
+        try:
+            response = requests.get(diamond.photo, timeout=5)
+            if response.status_code == 200:
+                soup = BeautifulSoup(response.text, 'html.parser')
+                
+                # Look for og:image meta tag
+                og_image = soup.find('meta', property='og:image')
+                if og_image and og_image.has_attr('content'):
+                    image_url = og_image['content']
+
+        except Exception as e:
+            print("Error fetching image from meta:", e)
+
+    return render(request, 'diamond_detail.html', {
+        'diamond': diamond,
+        'image_url': image_url
+    })

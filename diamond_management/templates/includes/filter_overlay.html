@@ -71,7 +71,7 @@
                         <label class="shape-icon-label mx-2" for="shape-{{ code }}">
                             <span class="shape-svg">
                                 {% if label == 'ROUND' %}
-                                    <img src="{% static 'images/shapes/round.png' %}" width="40" height="40" alt="Round Shape">
+                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754645394/round_gwfwgz.svg" width="40" height="40" alt="Round Shape">
                                 {% elif label == 'EMERALD' %}
                                     <img src="{% static 'images/shapes/emerald.png' %}" width="32" height="40" alt="Emerald Shape">
                                 {% elif label == 'HEART' %}
@@ -98,7 +98,6 @@
                                     <img src="{% static 'images/shapes/other.png' %}" width="40" height="40" alt="Other Shape">
                                 {% endif %}
                             </span>
-                            <div class="shape-label">{{ label|title }}</div>
                         </label>
                     {% endfor %}
                 </div>
