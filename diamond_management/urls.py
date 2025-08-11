@@ -30,4 +30,5 @@ urlpatterns = [
     path('vendor-register/', vendor_register, name='vendor_register'),
     path('logout/', logout, name='logout'),
     path('profile/', edit_profile, name='edit_profile'),
+    path('download-diamonds/', download_diamonds_excel, name='diamond_download_excel'),
 ]

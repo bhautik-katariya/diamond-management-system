@@ -91,7 +91,11 @@
 </div>
 
 <div class="text-center mt-4">
-    <a href="{% url 'customer:add_to_cart' diamond.id %}" class="btn btn-cart btn-lg">Add to Cart</a>
+    {% if from_order %}
+        <a href="{% url 'vendor:view_orders' %}" class="btn btn-danger btn-lg">Back to Orders</a>
+    {% elif not from_order %}
+        <a href="{% url 'customer:add_to_cart' diamond.id %}" class="btn btn-cart btn-lg">Add to Cart</a>
+    {% endif %}
 </div>
 
 {% endblock %}

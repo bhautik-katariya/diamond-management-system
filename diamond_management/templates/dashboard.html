@@ -243,6 +243,11 @@
 
 <!-- Sort & Filter -->
 <div class="d-flex flex-wrap justify-content-end gap-2 mb-3">
+    <form id="download-form" method="post" action="{% url 'diamond_download_excel' %}" style="display:inline;">
+        {% csrf_token %}
+        <input type="hidden" name="diamond_ids" id="diamond-ids-input">
+        <button type="button" class="btn btn-sort equal-button" id="download-btn">Download</button>
+    </form>
     <div class="dropdown">
         <button class="btn btn-sort equal-button dropdown-toggle" type="button" id="sortDropdownButton" data-bs-toggle="dropdown" aria-expanded="false">
             Sort
@@ -265,7 +270,6 @@
             <li><a class="dropdown-item" href="{{ request.get_full_path|add_sort:'clarity_desc' }}">High-to-Low</a></li>
         </ul>
     </div>
-
     <button class="btn btn-filter equal-button" type="button" onclick="toggleFilterOverlay()">Filter</button>
 </div>
 
@@ -295,7 +299,7 @@
     <tbody>
         {% for diamond in diamonds %}
         <tr>
-            <td><input type="checkbox" class="row-checkbox"></td>
+            <td><input type="checkbox" class="row-checkbox" value="{{ diamond.id }}"></td>
             <td>{{ forloop.counter0|add:page_obj.start_index }}</td>
             <td>{{ diamond.stock_id }}</td>
             <td>{{ diamond.type }}</td>
@@ -414,6 +418,24 @@
         }
     
         updateCheckboxesState();
+
+        // Download button logic
+        const downloadBtn = document.getElementById('download-btn');
+        if (downloadBtn) {
+            downloadBtn.addEventListener('click', function() {
+                const checkboxes = document.querySelectorAll('.row-checkbox');
+                let selected = [];
+                checkboxes.forEach(cb => {
+                    if (cb.checked) selected.push(cb.value);
+                });
+                // If none selected, select all visible
+                if (selected.length === 0) {
+                    checkboxes.forEach(cb => selected.push(cb.value));
+                }
+                document.getElementById('diamond-ids-input').value = selected.join(',');
+                document.getElementById('download-form').submit();
+            });
+        }
     });
     </script>
 

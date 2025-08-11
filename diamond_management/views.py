@@ -9,6 +9,11 @@ from django.db.models import Sum
 from .forms import *
 from vendor.models import *
 from customer.models import *
+import openpyxl
+from django.http import HttpResponse
+from vendor.models import Diamond
+from django.views.decorators.csrf import csrf_exempt
+import datetime
 
 def register(request):
     if request.method == 'POST':
@@ -234,6 +239,7 @@ def dashboard(request):
 
 def diamond_detail(request, id):
     diamond = get_object_or_404(Diamond, pk=id)
+    from_order = request.GET.get('from_order', False)
 
     image_url = None
 
@@ -253,5 +259,52 @@ def diamond_detail(request, id):
 
     return render(request, 'diamond_detail.html', {
         'diamond': diamond,
-        'image_url': image_url
+        'image_url': image_url,
+        'from_order': from_order
     })
+
+@csrf_exempt
+def download_diamonds_excel(request):
+    if request.method == 'POST':
+        ids_str = request.POST.get('diamond_ids', '')
+        ids = [int(i) for i in ids_str.split(',') if i.strip().isdigit()]
+        diamonds = Diamond.objects.filter(id__in=ids) if ids else Diamond.objects.none()
+
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Diamonds"
+
+        # Get all field names from the model, excluding created_at and id
+        fields = [field for field in Diamond._meta.get_fields() if not field.many_to_many and not field.one_to_many and field.name not in ('id', 'created_at')]
+        headers = ['Sr No'] + [field.verbose_name.title() for field in fields]
+        ws.append(headers)
+
+        for index, d in enumerate(diamonds, start=1):
+            row = [index]
+            for field in fields:
+                value = getattr(d, field.name)
+                # For ForeignKey, get readable string
+                if field.is_relation and field.many_to_one:
+                    value = str(value) if value else ''
+                # For display fields, get the display name
+                elif field.name == 'shape':
+                    value = d.get_shape_display()
+                elif field.name == 'cut':
+                    value = d.get_cut_display()
+                elif field.name == 'polish':
+                    value = d.get_polish_display()
+                elif field.name == 'symmetry':
+                    value = d.get_symmetry_display()
+                # Remove timezone from datetime/time fields
+                if isinstance(value, (datetime.datetime, datetime.time)) and getattr(value, 'tzinfo', None) is not None:
+                    value = value.replace(tzinfo=None)
+                row.append(value)
+            ws.append(row)
+
+        response = HttpResponse(
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = 'attachment; filename=diamonds.xlsx'
+        wb.save(response)
+        return response
+    return HttpResponse(status=405)

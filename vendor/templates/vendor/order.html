@@ -20,6 +20,7 @@
                 <th>Quantity</th>
                 <th>Price/Carat</th>
                 <th>Total</th>
+                <th>View</th>
             </tr>
         </thead>
         <tbody>
@@ -37,10 +38,11 @@
                     <td>{{ item.quantity }}</td>
                     <td>${{ item.price_per_carat }}</td>
                     <td>${{ item.line_total|floatformat:2 }}</td>
+                    <td><a href="{% url 'diamond_detail' item.diamond.id %}?from_order=true" class="btn btn-primary btn-sm" style="border-radius:20px;background:#0a1835;border:none;padding:8px 16px;box-shadow:0 2px 8px rgba(10,24,53,.25);">View</a></td>
                 </tr>
                 {% endfor %}
             {% empty %}
-            <tr><td colspan="11" class="text-center">No orders found.</td></tr>
+            <tr><td colspan="12" class="text-center">No orders found.</td></tr>
             {% endfor %}
         </tbody>
     </table>
