@@ -82,8 +82,6 @@
                                     <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651457/heart_piv4mu.svg" width="40" height="40" alt="Heart Shape">
                                 {% elif label == 'MARQUISE' %}
                                     <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651457/marquise_ljlq2v.svg" width="32" height="40" alt="Marquise Shape">
-                                {% elif label == 'ROUND' %}
-                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754645394/round_gwfwgz.svg" width="40" height="40" alt="Round Shape">
                                 {% elif label == 'OLD' %}
                                     <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651458/old_vyq23i.svg" width="40" height="40" alt="Old Shape">
                                 {% elif label == 'OVAL' %}
@@ -94,6 +92,8 @@
                                     <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651459/princess_fh3oqx.svg" width="40" height="40" alt="Princess Shape">
                                 {% elif label == 'RADIANT' %}
                                     <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651460/radiant_jhgoyd.svg" width="32" height="40" alt="Radiant Shape">
+                                {% elif label == 'ROUND' %}
+                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651461/round_phykmr.svg" width="40" height="40" alt="Round Shape">
                                 {% elif label == 'SQUARE' %}
                                     <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651461/square_x76biu.svg" width="40" height="40" alt="Square Shape">
                                 {% elif label == 'TAPERED' %}
@@ -131,7 +131,7 @@
             {% for title, options, name in filter_groups|slice:'1:' %}
                 <div class="col-md-4 mb-3">
                     <label class="form-label" style="color:#222;">{{ title }}</label>
-                    <div class="filter-button-group" role="group" aria-label="{{ title }}">
+                    <div class="filter-button-group" role="group" aria-label="{{ title }}" data-name="{{ name }}">
                         {% for code, label in options %}
                           <input type="checkbox" class="hidden-check" name="{{ name }}" id="{{ name }}-{{ code }}" value="{{ code }}" {% if code in active_filters|get_item:name %}checked{% endif %}>
                           <label class="filter-toggle" for="{{ name }}-{{ code }}">{{ label }}</label>
@@ -153,4 +153,80 @@
     const overlay = document.getElementById('filterOverlay');
     overlay.style.display = (overlay.style.display === 'none' || overlay.style.display === '') ? 'block' : 'none';
 }
+
+// Range select for color and clarity buttons
+document.addEventListener('DOMContentLoaded', function() {
+    // Names we want range behavior for
+    const rangeGroups = new Set(['color', 'clarity']);
+
+    const groups = document.querySelectorAll('.filter-button-group[data-name]');
+
+    groups.forEach(group => {
+        const name = group.getAttribute('data-name');
+        if (!rangeGroups.has(name)) return; // only for color/clarity
+
+        // Get ordered checkboxes in this group
+        const inputs = Array.from(group.querySelectorAll('input.hidden-check'));
+        const labels = Array.from(group.querySelectorAll('label.filter-toggle'));
+
+        let anchorIndex = null; // first clicked index
+        let lastRange = null;   // {lo, hi} of last applied range
+
+        function setCheckedRange(start, end, checked) {
+            const [lo, hi] = start <= end ? [start, end] : [end, start];
+            for (let i = lo; i <= hi; i++) {
+                inputs[i].checked = checked;
+            }
+        }
+
+        // Click handler for labels (since labels are what users click)
+        labels.forEach((label, idx) => {
+            label.addEventListener('click', function(e) {
+                // prevent default label toggle, we'll manage it
+                e.preventDefault();
+
+                const alreadyChecked = inputs[idx].checked;
+
+                // If a completed range exists and no active anchor, any further click clears the previous selection
+                // and treats this click as start of a new selection range (select only the clicked one)
+                if (anchorIndex === null && lastRange) {
+                    // Clear all selections in this group
+                    inputs.forEach(i => { i.checked = false; });
+                    lastRange = null;
+                    inputs[idx].checked = true; // select current as new anchor selection
+                    anchorIndex = idx;
+                    return;
+                }
+
+                if (anchorIndex === null) {
+                    // No anchor yet → start a new selection with just this one toggled
+                    inputs[idx].checked = !alreadyChecked;
+                    anchorIndex = idx;
+                } else if (anchorIndex === idx) {
+                    // Clicking the same item again clears anchor and toggles single
+                    inputs[idx].checked = !alreadyChecked;
+                    anchorIndex = null;
+                    lastRange = null;
+                } else {
+                    // We have an anchor and a second click → select the inclusive range
+                    const lo = Math.min(anchorIndex, idx);
+                    const hi = Math.max(anchorIndex, idx);
+                    setCheckedRange(anchorIndex, idx, true);
+                    // Remember range so next (third) click clears it
+                    lastRange = { lo, hi };
+                    // Clear anchor after completing a range
+                    anchorIndex = null;
+                }
+            });
+        });
+
+        // Also allow clearing the anchor if user clicks outside the group
+        document.addEventListener('click', function(ev) {
+            if (!group.contains(ev.target)) {
+                // Keep lastRange so that returning clicks can clear previous selection
+                anchorIndex = null;
+            }
+        });
+    });
+});
 </script>
