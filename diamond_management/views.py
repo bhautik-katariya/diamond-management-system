@@ -308,3 +308,4 @@ def download_diamonds_excel(request):
         wb.save(response)
         return response
     return HttpResponse(status=405)
+  
