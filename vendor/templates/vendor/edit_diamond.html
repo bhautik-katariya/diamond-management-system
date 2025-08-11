@@ -102,34 +102,39 @@
                                     <label class="shape-icon-label {% if choice.0 == field.value|stringformat:"s" %}selected-shape{% endif %}"
                                            for="{{ field.id_for_label }}_{{ forloop.counter0 }}">
                                         <span class="shape-svg">
-                                            {% if choice.0 == 'RD' %}
-                                                <img src="{% static 'images/shapes/round.png' %}" width="40" height="40" alt="Round Shape">
-                                            {% elif choice.0 == 'EM' %}
-                                                <img src="{% static 'images/shapes/emerald.png' %}" width="32" height="40" alt="Emerald Shape">
-                                            {% elif choice.0 == 'HT' %}
-                                                <img src="{% static 'images/shapes/heart.png' %}" width="40" height="40" alt="Heart Shape">
-                                            {% elif choice.0 == 'MQ' %}
-                                                <img src="{% static 'images/shapes/marquise.png' %}" width="32" height="40" alt="Marquise Shape">
-                                            {% elif choice.0 == 'OVL' %}
-                                                <img src="{% static 'images/shapes/oval.png' %}" width="32" height="40" alt="Oval Shape">
-                                            {% elif choice.0 == 'PR' %}
-                                                <img src="{% static 'images/shapes/pear.png' %}" width="32" height="40" alt="Pear Shape">
-                                            {% elif choice.0 == 'PRS' %}
-                                                <img src="{% static 'images/shapes/princess.png' %}" width="40" height="40" alt="Princess Shape">
-                                            {% elif choice.0 == 'RDNT' %}
-                                                <img src="{% static 'images/shapes/radiant.png' %}" width="32" height="40" alt="Radiant Shape">
+                                            {% if choice.0 == 'AS' %}
+                                                <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651456/asscher_xwkvvy.svg" width="40" height="40" alt="Asscher Shape">
+                                            {% elif choice.0 == 'BG' %}
+                                                <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651456/baguette_gryjpl.svg" width="32" height="40" alt="Emerald Shape">
                                             {% elif choice.0 == 'CS' %}
-                                                <img src="{% static 'images/shapes/cushion.png' %}" width="40" height="40" alt="Cushion Shape">
-                                            {% elif choice.0 == 'AS' %}
-                                                <img src="{% static 'images/shapes/asscher.png' %}" width="40" height="40" alt="Asscher Shape">      
-                                            {% elif choice.0 == 'OLD' %}
-                                                <img src="{% static 'images/shapes/old.png' %}" width="40" height="40" alt="Old Shape">
+                                                <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651456/cushion_mmnoab.svg" width="40" height="40" alt="Cushion Shape">
+                                            {% elif choice.0 == 'EM' %}
+                                                <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651456/emerald_sr9e0f.svg" width="32" height="40" alt="Emerald Shape">
+                                            {% elif choice.0 == 'HT' %}
+                                                <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651457/heart_piv4mu.svg" width="40" height="40" alt="Heart Shape">
+                                            {% elif choice.0 == 'MQ' %}
+                                                <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651457/marquise_ljlq2v.svg" width="32" height="40" alt="Marquise Shape">
+                                            {% elif choice.0 == 'RD' %}
+                                                <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754645394/round_gwfwgz.svg" width="40" height="40" alt="Round Shape">
+                                            {% elif diamond.shape == 'OLD' %}
+                                                <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651458/old_vyq23i.svg" width="40" height="40" alt="Old Shape">
+                                            {% elif choice.0 == 'OVL' %}
+                                                <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651458/oval_epynny.svg" width="32" height="40" alt="Oval Shape">
+                                            {% elif choice.0 == 'PR' %}
+                                                <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651459/pear_vdpfgq.svg" width="32" height="40" alt="Pear Shape">
+                                            {% elif choice.0 == 'PRS' %}
+                                                <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651459/princess_fh3oqx.svg" width="40" height="40" alt="Princess Shape">
+                                            {% elif choice.0 == 'RDNT' %}
+                                                <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651460/radiant_jhgoyd.svg" width="32" height="40" alt="Radiant Shape">
                                             {% elif choice.0 == 'SQ' %}
-                                                <img src="{% static 'images/shapes/square.png' %}" width="40" height="40" alt="Square Shape">
+                                                <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651461/square_x76biu.svg" width="40" height="40" alt="Square Shape">
+                                            {% elif choice.0 == 'TP' %}
+                                                <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651461/tapered_i6pqjb.svg" width="32" height="40" alt="Taper Shape">
+                                            {% elif choice.0 == 'TR' %}
+                                                <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651462/trilliant_hwawud.svg" width="32" height="40" alt="Trillion Shape">
                                             {% else %}
-                                                <img src="{% static 'images/shapes/other.png' %}" width="40" height="40" alt="Other Shape">
+                                                <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651458/other_n3otbi.svg" width="40" height="40" alt="Other Shape">
                                             {% endif %}
-
                                         </span>
                                         <div class="shape-label">{{ choice.1|title }}</div>
                                     </label>
@@ -214,18 +219,21 @@
 <script>
     const rawMappings = {
         shape: {
-            "round": "RD",
-            "pear": "PR",
-            "oval": "OVL",
-            "radiant": "RDNT",
-            "emerald": "EM",
-            "square": "SQ",
-            "marquise": "MQ",
-            "heart": "HT",
-            "princess": "PRS",
             "asscher": "AS",
+            "baguette": "BG",
             "cushion": "CS",
+            "emerald": "EM",
+            "heart": "HT",
+            "marquise": "MQ",
             "old": "OLD",
+            "oval": "OVL",
+            "pear": "PR",
+            "princess": "PRS",
+            "radiant": "RDNT",
+            "round": "RD",
+            "square": "SQ",
+            "taper": "TP",
+            "trillion": "TR",
             "other": "OT"
         },
         type: {
@@ -282,41 +290,16 @@
         reader.onload = function(event) {
             try {
                 const data = JSON.parse(event.target.result);
-                const diamond = Array.isArray(data) ? data[0] : data;
-    
-                for (const key in diamond) {
-                    let value = diamond[key];
-                    const normalizedValue = String(value).trim().toLowerCase();
-    
-                    // Map value if needed
-                    if (rawMappings[key]) {
-                        const mappedValue = rawMappings[key][normalizedValue];
-                        if (mappedValue) {
-                            value = mappedValue;
-                        }
-                    }
-    
-                    // Handle shape radio
-                    if (key === 'shape') {
-                        const shapeInput = document.querySelector(`input[name="shape"][value="${value}"]`);
-                        if (shapeInput) {
-                            shapeInput.checked = true;
-                            document.querySelectorAll('label.shape-icon-label').forEach(lbl => lbl.classList.remove('selected-shape'));
-                            const label = document.querySelector(`label[for="${shapeInput.id}"]`);
-                            if (label) label.classList.add('selected-shape');
-                        }
-                        continue;
-                    }
-    
-                    // Handle other inputs
-                    const field = document.querySelector(`[name="${key}"]`);
-                    if (field) {
-                        if (field.tagName === 'SELECT') {
-                            const option = field.querySelector(`option[value="${value}"]`);
-                            if (option) field.value = value;
-                        } else {
-                            field.value = value;
-                        }
+                const diamonds = Array.isArray(data) ? data : [data];
+                
+                if (diamonds.length === 1) {
+                    // Single diamond - fill the form as before
+                    fillDiamondForm(diamonds[0]);
+                } else {
+                    // Multiple diamonds - show confirmation and process
+                    const confirmed = confirm(`Found ${diamonds.length} diamonds in the JSON file. Do you want to update all of them?`);
+                    if (confirmed) {
+                        processMultipleDiamonds(diamonds);
                     }
                 }
     
@@ -327,6 +310,106 @@
         };
         reader.readAsText(file);
     });
+    
+    function fillDiamondForm(diamond) {
+        for (const key in diamond) {
+            let value = diamond[key];
+            const normalizedValue = String(value).trim().toLowerCase();
+    
+            // Map value if needed
+            if (rawMappings[key]) {
+                const mappedValue = rawMappings[key][normalizedValue];
+                if (mappedValue) {
+                    value = mappedValue;
+                } else if (key === 'shape') {
+                    // If shape is not recognized, automatically set to "OT" (other)
+                    value = "OT";
+                }
+            }
+    
+            // Handle shape radio
+            if (key === 'shape') {
+                const shapeInput = document.querySelector(`input[name="shape"][value="${value}"]`);
+                if (shapeInput) {
+                    shapeInput.checked = true;
+                    document.querySelectorAll('label.shape-icon-label').forEach(lbl => lbl.classList.remove('selected-shape'));
+                    const label = document.querySelector(`label[for="${shapeInput.id}"]`);
+                    if (label) label.classList.add('selected-shape');
+                } else if (value === "OT") {
+                    // If shape is "OT" (other) but not found, try to find the "other" option
+                    const otherShapeInput = document.querySelector(`input[name="shape"][value="OT"]`);
+                    if (otherShapeInput) {
+                        otherShapeInput.checked = true;
+                        document.querySelectorAll('label.shape-icon-label').forEach(lbl => lbl.classList.remove('selected-shape'));
+                        const label = document.querySelector(`label[for="${otherShapeInput.id}"]`);
+                        if (label) label.classList.add('selected-shape');
+                    }
+                }
+                continue;
+            }
+    
+            // Handle other inputs
+            const field = document.querySelector(`[name="${key}"]`);
+            if (field) {
+                if (field.tagName === 'SELECT') {
+                    const option = field.querySelector(`option[value="${value}"]`);
+                    if (option) field.value = value;
+                } else {
+                    field.value = value;
+                }
+            }
+        }
+    }
+    
+    function processMultipleDiamonds(diamonds) {
+        // Show loading message
+        const loadingMsg = document.createElement('div');
+        loadingMsg.innerHTML = `
+            <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; display: flex; align-items: center; justify-content: center;">
+                <div style="background: white; padding: 20px; border-radius: 10px; text-align: center;">
+                    <div class="spinner-border text-primary mb-3" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <h5>Processing Multiple Diamonds...</h5>
+                    <p>Please wait while we update ${diamonds.length} diamonds in your inventory.</p>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(loadingMsg);
+        
+        const requestData = {
+            multiple_diamonds: diamonds
+        };
+        
+        // Process diamonds using fetch API
+        fetch('{% url "vendor:update_multiple_diamonds" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify(requestData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Remove loading message
+            document.body.removeChild(loadingMsg);
+            
+            if (data.success) {
+                alert(`Successfully updated ${data.success_count} diamonds!`);
+                // Redirect to load diamonds page
+                window.location.href = '{% url "vendor:load_diamonds" %}';
+            } else {
+                alert(`Error: ${data.error}`);
+            }
+        })
+        .catch(error => {
+            // Remove loading message
+            document.body.removeChild(loadingMsg);
+            console.error('Error:', error);
+            alert('An error occurred while processing the diamonds. Please try again.');
+        });
+    }
     
     // Handle manual shape selection and visual feedback
     document.addEventListener('DOMContentLoaded', function() {

@@ -137,8 +137,8 @@ def dashboard(request):
     color = request.GET.getlist('color')
     clarity = request.GET.getlist('clarity')
     cut = request.GET.getlist('cut')
-    polish = request.GET.getlist('polish')
-    symmetry = request.GET.getlist('symmetry')
+    # polish = request.GET.getlist('polish')
+    # symmetry = request.GET.getlist('symmetry')
     lab = request.GET.getlist('lab')
     min_carat = request.GET.get('min_carat')
     max_carat = request.GET.get('max_carat')
@@ -152,10 +152,10 @@ def dashboard(request):
         diamonds = diamonds.filter(clarity__in=clarity)
     if cut:
         diamonds = diamonds.filter(cut__in=cut)
-    if polish:
-        diamonds = diamonds.filter(polish__in=polish)
-    if symmetry:
-        diamonds = diamonds.filter(symmetry__in=symmetry)
+    # if polish:
+    #     diamonds = diamonds.filter(polish__in=polish)
+    # if symmetry:
+    #     diamonds = diamonds.filter(symmetry__in=symmetry)
     if lab:
         diamonds = diamonds.filter(lab__in=lab)
     if min_carat:
@@ -198,8 +198,8 @@ def dashboard(request):
         "color": color,
         "clarity": clarity,
         "cut": cut,
-        "polish": polish,
-        "symmetry": symmetry,
+        # "polish": polish,
+        # "symmetry": symmetry,
         "lab": lab,
     }
 
@@ -209,8 +209,8 @@ def dashboard(request):
         ("Color", Diamond.COLOUR, "color"),
         ("Clarity", Diamond.CLARITY, "clarity"),
         ("Cut", Diamond.CUT, "cut"),
-        ("Polish", Diamond.POLISH, "polish"),
-        ("Symmetry", Diamond.SYMMETRY, "symmetry"),
+        # ("Polish", Diamond.POLISH, "polish"),
+        # ("Symmetry", Diamond.SYMMETRY, "symmetry"),
         ("Lab", Diamond.LAB, "lab"),
     ]
 

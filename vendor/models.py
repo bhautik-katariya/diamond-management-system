@@ -26,19 +26,22 @@ class Diamond(models.Model):
     ]
 
     SHAPE = [
-        ('RD', 'ROUND'),
-        ('PR', 'PEAR'),
-        ('OVL', 'OVAL'),
-        ('RDNT', 'RADIANT'),
-        ('EM', 'EMERALD'),
-        ('SQ', 'SQUARE'),
-        ('MQ', 'MARQUISE'),
-        ('HT', 'HEART'),
-        ('PRS', 'PRINCESS'),
         ('AS', 'ASSCHER'),
+        ('BG', 'BAGUETTE'),
         ('CS', 'CUSHION'),
+        ('EM', 'EMERALD'),
+        ('HT', 'HEART'),
+        ('MQ', 'MARQUISE'),
         ('OLD', 'OLD'),
-        ('OT', 'OTHER')
+        ('OVL', 'OVAL'),
+        ('PR', 'PEAR'),
+        ('PRS', 'PRINCESS'),
+        ('RDNT', 'RADIANT'),
+        ('RD', 'ROUND'),
+        ('SQ', 'SQUARE'),
+        ('TP', 'TAPERED'),
+        ('TR', 'TRILLIANT'),
+        ('OT', 'OTHER'),
     ]
 
     COLOUR = [

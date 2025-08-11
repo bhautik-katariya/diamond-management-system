@@ -300,35 +300,40 @@
             <td>
                 <div class="shape-icon-label">
                     <span class="shape-svg">
-                        {% if diamond.shape == 'RD' %}
-                            <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754645394/round_gwfwgz.svg" width="40" height="40" alt="Round Shape">
-                        {% elif diamond.shape == 'EM' %}
-                            <img src="{% static 'images/shapes/emerald.png' %}" width="32" height="40" alt="Emerald Shape">
-                        {% elif diamond.shape == 'HT' %}
-                            <img src="{% static 'images/shapes/heart.png' %}" width="40" height="40" alt="Heart Shape">
-                        {% elif diamond.shape == 'MQ' %}
-                            <img src="{% static 'images/shapes/marquise.png' %}" width="32" height="40" alt="Marquise Shape">
-                        {% elif diamond.shape == 'OVL' %}
-                            <img src="{% static 'images/shapes/oval.png' %}" width="32" height="40" alt="Oval Shape">
-                        {% elif diamond.shape == 'PR' %}
-                            <img src="{% static 'images/shapes/pear.png' %}" width="32" height="40" alt="Pear Shape">
-                        {% elif diamond.shape == 'PRS' %}
-                            <img src="{% static 'images/shapes/princess.png' %}" width="40" height="40" alt="Princess Shape">
-                        {% elif diamond.shape == 'RDNT' %}
-                            <img src="{% static 'images/shapes/radiant.png' %}" width="32" height="40" alt="Radiant Shape">
+                        {% if diamond.shape == 'AS' %}
+                            <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651456/asscher_xwkvvy.svg" width="40" height="40" alt="Asscher Shape">
+                        {% elif diamond.shape == 'BG' %}
+                            <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651456/baguette_gryjpl.svg" width="32" height="40" alt="Emerald Shape">
                         {% elif diamond.shape == 'CS' %}
-                            <img src="{% static 'images/shapes/cushion.png' %}" width="40" height="40" alt="Cushion Shape">
-                        {% elif diamond.shape == 'AS' %}
-                            <img src="{% static 'images/shapes/asscher.png' %}" width="40" height="40" alt="Asscher Shape">
+                            <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651456/cushion_mmnoab.svg" width="40" height="40" alt="Cushion Shape">
+                        {% elif diamond.shape == 'EM' %}
+                            <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651456/emerald_sr9e0f.svg" width="32" height="40" alt="Emerald Shape">
+                        {% elif diamond.shape == 'HT' %}
+                            <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651457/heart_piv4mu.svg" width="40" height="40" alt="Heart Shape">
+                        {% elif diamond.shape == 'MQ' %}
+                            <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651457/marquise_ljlq2v.svg" width="32" height="40" alt="Marquise Shape">
+                        {% elif diamond.shape == 'RD' %}
+                            <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754645394/round_gwfwgz.svg" width="40" height="40" alt="Round Shape">
                         {% elif diamond.shape == 'OLD' %}
-                            <img src="{% static 'images/shapes/old.png' %}" width="40" height="40" alt="Old Shape">
+                            <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651458/old_vyq23i.svg" width="40" height="40" alt="Old Shape">
+                        {% elif diamond.shape == 'OVL' %}
+                            <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651458/oval_epynny.svg" width="32" height="40" alt="Oval Shape">
+                        {% elif diamond.shape == 'PR' %}
+                            <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651459/pear_vdpfgq.svg" width="32" height="40" alt="Pear Shape">
+                        {% elif diamond.shape == 'PRS' %}
+                            <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651459/princess_fh3oqx.svg" width="40" height="40" alt="Princess Shape">
+                        {% elif diamond.shape == 'RDNT' %}
+                            <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651460/radiant_jhgoyd.svg" width="32" height="40" alt="Radiant Shape">
                         {% elif diamond.shape == 'SQ' %}
-                            <img src="{% static 'images/shapes/square.png' %}" width="40" height="40" alt="Square Shape">
+                            <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651461/square_x76biu.svg" width="40" height="40" alt="Square Shape">
+                        {% elif diamond.shape == 'TP' %}
+                            <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651461/tapered_i6pqjb.svg" width="32" height="40" alt="Taper Shape">
+                        {% elif diamond.shape == 'TR' %}
+                            <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651462/trilliant_hwawud.svg" width="32" height="40" alt="Trillion Shape">
                         {% else %}
-                            <img src="{% static 'images/shapes/other.png' %}" width="40" height="40" alt="Other Shape">
+                            <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651458/other_n3otbi.svg" width="40" height="40" alt="Other Shape">
                         {% endif %}
                     </span>
-                    <div class="shape-label">{{ diamond.get_shape_display|title }}</div>
                 </div>
             </td>
             <td>{{ diamond.carat }}</td>
