@@ -65,7 +65,7 @@
             {% for diamond in diamonds %}
             <tr>
                 <td><input type="checkbox" class="row-checkbox" name="selected_diamonds" value="{{ diamond.id }}"></td>
-                <td>{{ forloop.counter }}</td>
+                <td>{{ forloop.counter0|add:page_obj.start_index }}</td>
                 <td>{{ diamond.stock_id }}</td>
                 <td>{{ diamond.report_number }}</td>
                 <td>{{ diamond.type }}</td>

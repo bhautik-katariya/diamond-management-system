@@ -20,7 +20,6 @@ def add_to_cart(request, diamond_id):
             cart_item.quantity += 1
             cart_item.save()
         messages.success(request, f"Diamond {diamond.stock_id} added to cart.")
-        print(f"Customer '{customer.username}' added Diamond '{diamond.stock_id}' to cart. Vendor: {diamond.vendor.fname}")
     except IntegrityError:
         messages.error(request, "This diamond is already in your cart.")
     return redirect('dashboard') 
