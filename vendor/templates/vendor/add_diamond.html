@@ -74,6 +74,22 @@
 </style>
 <h2 class="mb-4">Add Diamond</h2>
 
+<!-- Import from API URL -->
+<div class="card mb-4">
+  <div class="card-header">Import Diamonds from API</div>
+  <div class="card-body">
+    <div class="row g-2 align-items-center">
+      <div class="col-md-9">
+        <input type="url" id="api-url-input" class="form-control" placeholder="Enter API URL that returns JSON list of diamonds">
+      </div>
+      <div class="col-md-3 d-grid">
+        <button type="button" id="import-api-btn" class="btn btn-primary">Import from API</button>
+      </div>
+    </div>
+    <small class="text-muted">The API should return a JSON array or an object containing a list under keys like <code>data</code>, <code>results</code>, <code>items</code>, or <code>diamonds</code>.</small>
+  </div>
+</div>
+
 <div class="mb-5">
     <form method="post" enctype="multipart/form-data" id="diamond-form">
         {% csrf_token %}
@@ -402,11 +418,20 @@
             document.body.removeChild(loadingMsg);
             
             if (data.success) {
-                alert(`Successfully added ${data.success_count} diamonds!`);
-                // Redirect to load diamonds page
-                window.location.href = '{% url "vendor:load_diamonds" %}';
+                // Handle the new response format
+                const successCount = data.success_count || 0;
+                const errorCount = data.error_count || 0;
+                const totalProcessed = data.total_processed || diamonds.length;
+                
+                if (successCount > 0) {
+                    alert(`Successfully imported ${successCount} out of ${totalProcessed} diamonds!${errorCount > 0 ? ` (${errorCount} failed)` : ''}`);
+                    // Redirect to load diamonds page
+                    window.location.href = '{% url "vendor:load_diamonds" %}';
+                } else {
+                    alert(`No diamonds were imported. ${errorCount} errors occurred.`);
+                }
             } else {
-                alert(`Error: ${data.error}`);
+                alert(`Error: ${data.error || 'Unknown error occurred'}`);
             }
         })
         .catch(error => {
@@ -416,6 +441,67 @@
             alert('An error occurred while processing the diamonds. Please try again.');
         });
     }
+
+    // Import from API button handler
+    (function(){
+        const btn = document.getElementById('import-api-btn');
+        const input = document.getElementById('api-url-input');
+        if (!btn || !input) return;
+
+        btn.addEventListener('click', function(){
+            const apiUrl = (input.value || '').trim();
+            if (!apiUrl) {
+                alert('Please enter an API URL');
+                return;
+            }
+
+            // Show loading overlay
+            const overlay = document.createElement('div');
+            overlay.innerHTML = `
+                <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; display: flex; align-items: center; justify-content: center;">
+                    <div style="background: white; padding: 20px; border-radius: 10px; text-align: center;">
+                        <div class="spinner-border text-primary mb-3" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <h5>Importing Diamonds from API...</h5>
+                    </div>
+                </div>`;
+            document.body.appendChild(overlay);
+
+            fetch('{% url "vendor:import_diamonds_from_api" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify({ api_url: apiUrl })
+            })
+            .then(r => r.json())
+            .then(data => {
+                document.body.removeChild(overlay);
+                if (data.success) {
+                    // Handle the new response format
+                    const successCount = data.success_count || 0;
+                    const errorCount = data.error_count || 0;
+                    const totalProcessed = data.total_processed || 0;
+                    
+                    if (successCount > 0) {
+                        alert(`Successfully imported ${successCount} out of ${totalProcessed} diamonds from API!${errorCount > 0 ? ` (${errorCount} failed)` : ''}`);
+                        window.location.href = '{% url "vendor:load_diamonds" %}';
+                    } else {
+                        alert(`No diamonds were imported from API. ${errorCount} errors occurred.`);
+                    }
+                } else {
+                    alert(data.error || 'Failed to import from API');
+                }
+            })
+            .catch(err => {
+                document.body.removeChild(overlay);
+                alert('Error importing from API');
+                console.error(err);
+            });
+        });
+    })();
     
     // Handle manual shape selection and visual feedback
     document.addEventListener('DOMContentLoaded', function() {

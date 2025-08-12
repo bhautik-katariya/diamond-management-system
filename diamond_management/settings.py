@@ -147,7 +147,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Session settings
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
-SESSION_COOKIE_AGE = 5 * 60  # 5 minutes
+SESSION_COOKIE_AGE = 5 * 60 * 60  # 5 hours
 
 # Request body size limits for large JSON uploads
 DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800  # 50MB
