@@ -352,7 +352,7 @@
             <td>{{ diamond.measurements }}</td>
             <td>${{ diamond.price_per_carat }}</td>
             <td><a href="{% url 'diamond_detail' diamond.id %}" class="btn equal-button">View</a></td>
-            <td><a href="{% url 'customer:add_to_cart' diamond.id %}" class="btn equal-button">Cart</a></td>
+            <td><a href="{% url 'customer:add_to_cart' diamond.id %}?next={{ request.get_full_path|urlencode }}" class="btn equal-button">Cart</a></td>
         </tr>
         {% endfor %}
     </tbody>
@@ -374,7 +374,12 @@
         {% endif %}
     
         <li class="page-item active">
-        <span class="page-link">{{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            <div class="d-flex align-items-center" style="min-width: 120px;">
+                <input type="number" id="pageInput" class="form-control form-control-sm" 
+                       value="{{ page_obj.number }}" min="1" max="{{ page_obj.paginator.num_pages }}" 
+                       style="width: 60px; text-align: center; margin: 0 5px; border-radius: 20px; border: 1px solid #ccc;">
+                <span class="text-muted" style="font-size: 0.9rem;">of {{ page_obj.paginator.num_pages }}</span>
+            </div>
         </li>
     
         {% if page_obj.has_next %}
@@ -435,6 +440,42 @@
                 document.getElementById('diamond-ids-input').value = selected.join(',');
                 document.getElementById('download-form').submit();
             });
+        }
+
+        // Page input functionality
+        const pageInput = document.getElementById('pageInput');
+        if (pageInput) {
+            pageInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    goToPage();
+                }
+            });
+            
+            pageInput.addEventListener('blur', function() {
+                goToPage();
+            });
+        }
+
+        function goToPage() {
+            const pageInput = document.getElementById('pageInput');
+            if (!pageInput) return;
+            
+            let pageNum = parseInt(pageInput.value);
+            const maxPages = parseInt(pageInput.getAttribute('max'));
+            
+            // Validate page number
+            if (isNaN(pageNum) || pageNum < 1) {
+                pageNum = 1;
+            } else if (pageNum > maxPages) {
+                pageNum = maxPages;
+            }
+            
+            // Build URL with current parameters
+            const currentUrl = new URL(window.location);
+            currentUrl.searchParams.set('page', pageNum);
+            
+            // Redirect to the new page
+            window.location.href = currentUrl.toString();
         }
     });
     </script>

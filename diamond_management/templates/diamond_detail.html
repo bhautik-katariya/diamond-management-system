@@ -4,8 +4,9 @@
 {% block content %}
 <style>
     .btn-cart {
-        min-width: 100px;
-        height: 36px;
+        min-width: 150px;
+        max-width: 200px;
+        height: 40px;
         white-space: nowrap;
         background: rgb(11, 25, 55);
         color: rgb(255, 255, 255);
@@ -14,6 +15,11 @@
         font-weight: 500;
         box-shadow: 0 2px 8px rgba(11, 25, 55, 0.3);
         transition: background 0.3s, color 0.3s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        margin: 0 10px;
     }
     .btn-cart:hover {
         background: rgb(255, 255, 255);
@@ -94,8 +100,10 @@
     {% if from_order %}
         <a href="{% url 'vendor:view_orders' %}" class="btn btn-danger btn-lg">Back to Orders</a>
     {% elif not from_order %}
-        <a href="{% url 'dashboard' %}" class="btn btn-danger btn-lg">Back to Dashboard</a>
-        <a href="{% url 'customer:add_to_cart' diamond.id %}" class="btn btn-cart btn-lg">Add to Cart</a>
+        <div class="d-flex justify-content-center align-items-center gap-3">
+            <a href="javascript:history.back()" class="btn btn-cart btn-lg">Back</a>
+            <a href="{% url 'customer:add_to_cart' diamond.id %}?next={{ request.get_full_path|urlencode }}" class="btn btn-cart btn-lg">Add to Cart</a>
+        </div>
     {% endif %}
 </div>
 

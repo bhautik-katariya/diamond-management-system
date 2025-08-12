@@ -22,7 +22,18 @@ def add_to_cart(request, diamond_id):
         messages.success(request, f"Diamond {diamond.stock_id} added to cart.")
     except IntegrityError:
         messages.error(request, "This diamond is already in your cart.")
-    return redirect('dashboard') 
+    
+    # Redirect to the same page as before
+    next_url = request.GET.get('next')
+    if next_url:
+        return redirect(next_url)
+    else:
+        # Fallback to HTTP_REFERER or dashboard
+        referer = request.META.get('HTTP_REFERER')
+        if referer:
+            return redirect(referer)
+        else:
+            return redirect('dashboard')
 
 def view_cart(request):
     if 'user_id' not in request.session or request.session.get('user_type') != 'customer':
