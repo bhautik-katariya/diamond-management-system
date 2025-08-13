@@ -1,0 +1,22 @@
+{% extends "admin/base.html" %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+/* Whole breadcrumb container */
+.breadcrumbs {
+    background:#e6f4fa !important; 
+    border: 1px solid #c2e4f6 !important;
+}
+
+/* Links inside breadcrumbs (like Home) */
+.breadcrumbs a {
+    color: rgb(10,24,53) !important;
+}
+
+/* Non-link breadcrumb text (like Vendor) */
+.breadcrumbs {
+    color: rgb(10,24,53) !important;
+}
+</style>
+{% endblock %}

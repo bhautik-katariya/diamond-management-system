@@ -44,7 +44,7 @@ EXTERNAL_APPS = [
     'vendor',
 ]
 
-INSTALLED_APPS += EXTERNAL_APPS
+INSTALLED_APPS += EXTERNAL_APPS 
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

@@ -1,0 +1,38 @@
+{% load i18n %}
+{% if app_list %}
+  {% for app in app_list %}
+    <div class="app-{{ app.app_label }} module">
+      <table>
+        <caption style="background:#e6f4fa; border: 1px solid #c2e4f6;">
+          <a href="{{ app.app_url }}"
+             class="section"
+             title="{% blocktrans with name=app.name %}Models in the {{ name }} application{% endblocktrans %}"
+             style="color:#0b1937; text-decoration:none; font-weight:bold; text-transform:uppercase;">
+            {{ app.name }}
+          </a>
+        </caption>
+        {% for model in app.models %}
+          <tr class="model-{{ model.object_name|lower }}">
+            {% if model.admin_url %}
+              <th scope="row">
+                <a href="{{ model.admin_url }}">{{ model.name }}</a>
+              </th>
+            {% else %}
+              <th scope="row">{{ model.name }}</th>
+            {% endif %}
+            {% if model.add_url %}
+              <td><a href="{{ model.add_url }}" class="addlink">{% translate 'Add' %}</a></td>
+            {% else %}
+              <td>&nbsp;</td>
+            {% endif %}
+            {% if model.admin_url %}
+              <td><a href="{{ model.admin_url }}" class="changelink">{% translate 'Change' %}</a></td>
+            {% else %}
+              <td>&nbsp;</td>
+            {% endif %}
+          </tr>
+        {% endfor %}
+      </table>
+    </div>
+  {% endfor %}
+{% endif %}

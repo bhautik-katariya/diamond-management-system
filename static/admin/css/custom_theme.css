@@ -1,0 +1,56 @@
+/* === NAVBAR BACKGROUND === */
+#header {
+    background-color: rgb(10, 24, 53) !important; /* Navy blue */
+}
+
+/* === SITE NAME ("Diamond System") === */
+#header #site-name a {
+    color: #ffffff !important; /* White text */
+    text-decoration: none !important;
+}
+
+/* === USER TOOLS (WELCOME, ADMIN, links) === */
+#header #user-tools,
+#header #user-tools a {
+    color: #ffffff !important; /* White text */
+}
+
+/* === Links in header hover === */
+#header #site-name a:hover,
+#header #user-tools a:hover {
+    text-decoration: underline !important;
+}
+
+/* === TABLE HEADER STYLING === */
+#content-main table thead th {
+    background-color: #E3F2FD !important; /* Light blue */
+    color: rgb(10, 24, 53) !important; /* Navy blue text */
+}
+
+/* === TABLE BODY TEXT === */
+#content-main table tbody td {
+    color: #000000 !important; /* Black */
+}
+
+/* === BUTTONS === */
+.button,
+input[type=submit],
+.submit-row input {
+    background-color: rgb(10, 24, 53) !important; /* Navy blue */
+    color: #ffffff !important;
+    border: none !important;
+}
+
+.button:hover,
+input[type=submit]:hover,
+.submit-row input:hover {
+    background-color: #09305F !important; /* Slightly darker navy */
+}
+
+/* === Django Admin App Headers === */
+.module caption {
+    background-color: #e6f4fa !important; /* Light blue background */
+    color: #0b1937 !important; /* Dark navy text */
+    font-weight: bold !important;
+    text-transform: uppercase !important;
+}
