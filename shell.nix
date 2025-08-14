@@ -1,14 +1,27 @@
-with import <nixpkgs> {};
+{ pkgs ? import <nixpkgs> {} }:
 
-mkShell {
+pkgs.mkShell {
   buildInputs = [
-    python311
-    python311Packages.django
-    python311Packages.gunicorn
-    python311Packages.psycopg2
-    python311Packages.sqlparse
-    python311Packages.whitenoise
-    python311Packages.pip
-    python311Packages.setuptools
+    pkgs.python310
+    pkgs.python310Packages.pip
+    pkgs.python310Packages.virtualenv
+    pkgs.postgresql
   ];
+
+  shellHook = ''
+    export PIP_DISABLE_PIP_VERSION_CHECK=1
+    export PYTHONPATH=$PYTHONPATH:$(pwd)
+
+    if [ ! -d .venv ]; then
+      echo "Creating virtual environment..."
+      python -m venv .venv
+      source .venv/bin/activate
+      pip install --upgrade pip
+      pip install -r requirements.txt
+    else
+      source .venv/bin/activate
+    fi
+
+    echo "Virtual environment ready. Python $(python --version)"
+  '';
 }

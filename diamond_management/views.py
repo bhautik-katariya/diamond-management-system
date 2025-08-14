@@ -74,7 +74,22 @@ def login(request):
                 if check_password(password, customer.password):
                     request.session['user_type'] = 'customer'
                     request.session['user_id'] = customer.id
-                    messages.success(request, "Customer login successful!")
+
+                    # Merge guest cart with user's cart
+                    guest_cart = request.session.get('guest_cart', {})
+                    if guest_cart:
+                        user_cart, created = Cart.objects.get_or_create(customer=customer)
+                        for diamond_id, quantity in guest_cart.items():
+                            try:
+                                diamond = get_object_or_404(Diamond, pk=diamond_id)
+                                cart_item, created = CartItem.objects.get_or_create(cart=user_cart, diamond=diamond)
+                                if not created:
+                                    cart_item.quantity += quantity
+                                    cart_item.save()
+                            except Diamond.DoesNotExist:
+                                pass # Silently ignore if diamond no longer exists
+                        del request.session['guest_cart']
+
                     return redirect('dashboard')
                 else:
                     messages.error(request, "Incorrect password.")

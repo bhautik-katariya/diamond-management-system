@@ -6,23 +6,28 @@ from django.db import IntegrityError
 from django.core.paginator import Paginator
 
 def add_to_cart(request, diamond_id):
-    if 'user_id' not in request.session or request.session.get('user_type') != 'customer':
-        messages.error(request, "You must be logged in as a customer to add to cart.")
-        return redirect('login')
-
-    customer = get_object_or_404(Customer, pk=request.session['user_id'])
     diamond = get_object_or_404(Diamond, pk=diamond_id)
 
-    cart, created = Cart.objects.get_or_create(customer=customer)
-    try:
-        cart_item, created = CartItem.objects.get_or_create(cart=cart, diamond=diamond)
-        if not created:
-            cart_item.quantity += 1
-            cart_item.save()
-        messages.success(request, f"Diamond {diamond.stock_id} added to cart.")
-    except IntegrityError:
-        messages.error(request, "This diamond is already in your cart.")
-    
+    if request.session.get('user_type') == 'customer' and 'user_id' in request.session:
+        # User is logged in
+        customer = get_object_or_404(Customer, pk=request.session['user_id'])
+        cart, created = Cart.objects.get_or_create(customer=customer)
+        try:
+            cart_item, created = CartItem.objects.get_or_create(cart=cart, diamond=diamond)
+            if not created:
+                cart_item.quantity += 1
+                cart_item.save()
+            messages.success(request, f"Diamond {diamond.stock_id} added to your cart.")
+        except IntegrityError:
+            messages.error(request, "This diamond is already in your cart.")
+    else:
+        # User is not logged in (guest cart)
+        guest_cart = request.session.get('guest_cart', {})
+        diamond_id_str = str(diamond_id)
+        guest_cart[diamond_id_str] = guest_cart.get(diamond_id_str, 0) + 1
+        request.session['guest_cart'] = guest_cart
+        messages.success(request, f"Diamond {diamond.stock_id} added to your guest cart.")
+
     # Redirect to the same page as before
     next_url = request.GET.get('next')
     if next_url:
@@ -36,17 +41,31 @@ def add_to_cart(request, diamond_id):
             return redirect('dashboard')
 
 def view_cart(request):
-    if 'user_id' not in request.session or request.session.get('user_type') != 'customer':
-        messages.error(request, "Please log in as a customer to view your cart.")
-        return redirect('login')
+    cart_items = []
+    if request.session.get('user_type') == 'customer' and 'user_id' in request.session:
+        # Logged-in user's cart
+        customer = get_object_or_404(Customer, pk=request.session['user_id'])
+        cart, created = Cart.objects.get_or_create(customer=customer)
+        cart_items = cart.items.all()
+    else:
+        # Guest cart
+        guest_cart = request.session.get('guest_cart', {})
+        for diamond_id, quantity in guest_cart.items():
+            try:
+                diamond = get_object_or_404(Diamond, pk=diamond_id)
+                # Create a temporary object to represent the cart item
+                cart_items.append({'diamond': diamond, 'quantity': quantity, 'line_total': float(diamond.price_per_carat) * float(diamond.carat) * quantity, 'id': diamond_id})
+            except Diamond.DoesNotExist:
+                # Remove diamond from guest cart if it no longer exists
+                del request.session['guest_cart'][diamond_id]
+        cart = None
+        request.session.modified = True
 
-    customer = get_object_or_404(Customer, pk=request.session['user_id'])
-    cart, created = Cart.objects.get_or_create(customer=customer)
-
-    paginator = Paginator(cart.items.all(), 10)
+    # Apply pagination to cart_items
+    paginator = Paginator(list(cart_items), 10)  # 10 items per page
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    
+
     return render(request, 'customer/cart.html', {
         'cart': cart,
         'page_obj': page_obj,

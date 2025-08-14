@@ -360,10 +360,14 @@
   </ul>
 </nav>
 {% endif %}
-{% if cart.items.all %}
+{% if paged_items %}
 <div class="cart-footer">
         <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">Continue Shopping</a>
+    {% if request.session.user_type == "customer" %}
         <a href="{% url 'customer:checkout' %}" class="btn btn-primary">Proceed to Checkout</a>
+    {% else %}
+        <a href="{% url 'login' %}?next={{ request.get_full_path }}" class="btn btn-primary">Proceed to Checkout</a>
+    {% endif %}
     </div>
     {% endif %}
 </div>
