@@ -3,25 +3,27 @@
 
 {% block extrastyle %}
     {{ block.super }}
-    <style>
-        /* Hide the theme toggle button */
-        button[title="Toggle theme"] {
-        display: none !important;
-    }
-    </style>
     <link rel="stylesheet" type="text/css" href="{% static 'admin/css/custom_theme.css' %}">
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // Force light theme
-            document.documentElement.dataset.theme = "light";
-            localStorage.setItem("django.admin.colorTheme", "light");
-        });
-    </script>
-        
+    <style>
+        /* Style the replaced heading */
+        #content h1 {
+            font-size: 26px;
+            color: rgb(10, 24, 53);
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+    </style>
 {% endblock %}
 
 {% block branding %}
 <div id="site-name" style="color: white; font-size: 24px;">
     Diamond System
 </div>
+{% endblock %}
+
+
+
+{% block content_title %}
+    <h1>Diamond Management Administration</h1>
 {% endblock %}

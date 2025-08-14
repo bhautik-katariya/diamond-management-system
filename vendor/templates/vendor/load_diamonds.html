@@ -104,7 +104,7 @@
                     <a href="{% url 'vendor:edit_diamond' diamond.id %}" class="btn btn-secondary btn-sm">Edit</a>
                 </td> 
                 <td>
-                    <button class="btn btn-sm btn-danger" onclick="showConfirm(this)" data-url="{% url 'vendor:delete_diamond' diamond.id %}">
+                    <button class="btn btn-sm btn-danger" onclick="showConfirm(this)" data-url="{% url 'vendor:delete_diamond' diamond.id %}?page={{ page_obj.number }}">
                         Delete
                     </button>
                     <span class="d-none ms-2" data-confirm-box>

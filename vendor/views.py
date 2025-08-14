@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, reverse
 from django.contrib import messages
 from django.shortcuts import get_object_or_404
 from django.core.paginator import Paginator
@@ -113,13 +113,14 @@ def delete_diamond(request, id):
     if request.method == 'GET':
         diamond.delete()
         messages.success(request, "Diamond deleted successfully.")
-        return redirect('vendor:load_diamonds')
+        page = request.GET.get('page', 1)
+        return redirect(f"{reverse('vendor:load_diamonds')}?page={page}")
 
 def load_diamonds(request):
     if request.session.get('user_type') != 'vendor' or 'user_id' not in request.session:
         return redirect('login')   
     diamond_qs = Diamond.objects.filter(vendor_id=request.session['user_id']).order_by('-created_at')
-    paginator = Paginator(diamond_qs, 10)
+    paginator = Paginator(diamond_qs, 50)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     return render(request, 'vendor/load_diamonds.html', {

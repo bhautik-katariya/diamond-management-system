@@ -193,7 +193,7 @@ def dashboard(request):
     total_amount = diamonds.aggregate(Sum('total_amount'))['total_amount__sum'] or 0
 
     # Pagination
-    paginator = Paginator(diamonds, 10)
+    paginator = Paginator(diamonds, 50)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
