@@ -4,6 +4,19 @@
 {% block extrastyle %}
 {{ block.super }}
 <style>
+/* Force light theme on entire admin */
+html {
+    color-scheme: light !important;
+}
+html[data-theme="dark"],
+html[data-theme="auto"] {
+    --color-primary: #0a1835 !important; /* fallback if needed */
+    --body-bg: #fff !important;
+    --body-fg: #000 !important;
+    background: #fff !important;
+    color: #000 !important;
+}
+
 /* Whole breadcrumb container */
 .breadcrumbs {
     background:#e6f4fa !important; 
@@ -19,7 +32,22 @@
 .breadcrumbs {
     color: rgb(10,24,53) !important;
 }
+
+/* Hide theme toggle button */
+.theme-toggle {
+    display: none !important;
+}
 </style>
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<script>
+    // Force light theme on page load
+    document.addEventListener("DOMContentLoaded", function() {
+        document.documentElement.setAttribute("data-theme", "light");
+    });
+</script>
 {% endblock %}
 
 {% block userlinks %}
@@ -41,6 +69,4 @@
         {% translate 'Log out' %}
     </button>
 </form>
-
-{% include "admin/color_theme_toggle.html" %}
 {% endblock %}

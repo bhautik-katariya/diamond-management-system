@@ -7,7 +7,11 @@
     <div class="col-md-6">
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title mb-0">Login</h3>
+                {% if is_vendor_login %}
+                    <h3 class="card-title mb-0">Vendor Login</h3>
+                {% else %}
+                    <h3 class="card-title mb-0">Login</h3>
+                {% endif %}
             </div>
             <div class="card-body">
                 <form method="post">

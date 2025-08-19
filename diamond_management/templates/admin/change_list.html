@@ -1,0 +1,94 @@
+{% extends "admin/change_list.html" %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    {% comment %} /* ===== Light theme ===== */
+    #changelist .results table#result_list thead th .text a {
+        color: rgb(10, 24, 53) !important;   /* navy blue */
+        font-weight: bold !important;
+        text-decoration: none !important;
+        text-transform: uppercase !important;
+    }
+    
+    /* ===== Dark theme normal ===== */
+    html[data-theme="dark"] #changelist .results table#result_list thead th .text a {
+        color: rgb(10, 24, 53) !important;   /* navy blue even in dark */
+    }
+    
+    /* ===== Dark theme hover ===== */
+    html[data-theme="dark"] #changelist .results table#result_list thead th:hover {
+        background:#e6f4fa !important; 
+        color: rgb(10, 24, 53) !important;
+    }
+    html[data-theme="dark"] #changelist .results table#result_list thead th:hover .text a {
+        background: #e6f4fa !important; 
+        color: rgb(10, 24, 53) !important;
+    } {% endcomment %}
+
+    /* ===== Light theme (manual) ===== */
+    html[data-theme="light"] #changelist .results table#result_list thead th .text a {
+        background: #e6f4fa !important;
+        color: rgb(10, 24, 53) !important;   /* navy blue */
+        font-weight: bold !important;
+        text-decoration: none !important;
+        text-transform: uppercase !important;
+    }
+    html[data-theme="light"] #changelist .results table#result_list thead th:hover {
+        background: #e6f4fa !important;
+        color: rgb(10, 24, 53) !important; 
+    }
+    html[data-theme="light"] #changelist .results table#result_list thead th:hover .text a {
+        background: #e6f4fa !important;
+        color: rgb(10, 24, 53) !important;
+    }
+    
+    /* ===== Dark theme (manual) ===== */
+    html[data-theme="dark"] #changelist .results table#result_list thead th .text a {
+        background: #e6f4fa !important;
+        color: rgb(10, 24, 53) !important;
+    }
+    html[data-theme="dark"] #changelist .results table#result_list thead th:hover {
+        background: #e6f4fa !important;
+        color: rgb(10, 24, 53) !important; 
+    }
+    html[data-theme="dark"] #changelist .results table#result_list thead th:hover .text a {
+        background: #e6f4fa !important;
+        color: rgb(10, 24, 53) !important;
+    }
+    
+    /* ===== Auto detect: Light ===== */
+    @media (prefers-color-scheme: light) {
+      #changelist .results table#result_list thead th .text a {
+        background: #e6f4fa !important;
+        color: rgb(10, 24, 53) !important;
+      }
+      #changelist .results table#result_list thead th:hover {
+        background: #e6f4fa !important;
+        color: rgb(10, 24, 53) !important; 
+      }
+      #changelist .results table#result_list thead th:hover .text a {
+        background: #e6f4fa !important;
+        color: rgb(10, 24, 53) !important;
+      }
+    }
+    
+    /* ===== Auto detect: Dark ===== */
+    @media (prefers-color-scheme: dark) {
+      #changelist .results table#result_list thead th .text a {
+        background: #e6f4fa !important;
+        color: rgb(10, 24, 53) !important;
+      }
+      #changelist .results table#result_list thead th:hover {
+        background: #e6f4fa !important;
+        color: rgb(10, 24, 53) !important; 
+      }
+      #changelist .results table#result_list thead th:hover .text a {
+        background: #e6f4fa !important;
+        color: rgb(10, 24, 53) !important;
+      }
+    }
+    
+    
+</style>
+{% endblock %}

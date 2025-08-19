@@ -25,12 +25,143 @@
         vertical-align: middle;
         font-size: 0.9rem;
     }
+    
+    /* Shared Button Styles */
+    .equal-button,.page-link {
+        min-width: 55px;
+        height: 30px;
+        white-space: nowrap;
+        background: rgb(11, 25, 55);
+        color: rgb(255, 255, 255) !important;
+        border: none;
+        border-radius: 20px;
+        font-weight: 500;
+        box-shadow: 0 2px 8px rgba(11, 25, 55, 0.3);
+        transition: background 0.3s, color 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Hover styles */
+    .equal-button:hover,
+    .btn-filter:hover,
+    .page-link:hover {
+        background: rgb(255, 255, 255);
+        color: rgb(11, 25, 55) !important;
+        border: 1px solid rgb(11, 25, 55);
+    }
+    
+        /* Pagination buttons same as Edit button */
+    .page-link {
+        min-width: 70px !important;
+        height: 36px !important;
+        white-space: nowrap;
+        background: rgb(11, 25, 55) !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 20px !important;
+        font-weight: 500;
+        box-shadow: 0 2px 8px rgba(11, 25, 55, 0.3);
+        transition: background 0.3s, color 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 5px 12px;
+    }
+
+    /* Hover effect same as Edit */
+    .page-link:hover {
+        background: white !important;
+        color: rgb(11, 25, 55) !important;
+        border: 1px solid rgb(11, 25, 55) !important;
+    }
+
+    /* Disabled pagination */
+    .page-link.disabled {
+        background: #e9ecef !important;
+        color: #6c757d !important;
+        border: none !important;
+        box-shadow: none !important;
+        cursor: not-allowed;
+    }
+     /* Pagination wrapper: all in one line */
+.pagination-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;         /* space between buttons */
+    flex-wrap: nowrap; /* prevent line break */
+}
+
+/* Page input box alignment */
+.page-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Input box style */
+.page-input {
+    width: 60px;
+    text-align: center;
+    border-radius: 20px;
+    border: 1px solid #ccc;
+    padding: 6px 10px;
+    height: 36px;
+    font-size: 0.9rem;
+}
+/* Whole pagination wrapper */
+.pagination-wrapper {
+    display: flex;
+    justify-content: center;   /* center align horizontally */
+    align-items: center;       /* align vertically */
+    gap: 12px;                 /* equal space between items */
+    margin-top: 20px;
+}
+
+/* Buttons style (same as Edit button look) */
+.pagination-wrapper .btn {
+    background-color: #0a183c;
+    color: white;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: 0.2s;
+}
+
+.pagination-wrapper .btn:hover {
+    background-color: #0c1f52;
+}
+
+/* Page input + "of XX" wrapper */
+.page-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Input box */
+.page-input {
+    width: 60px;
+    text-align: center;
+    border-radius: 20px;
+    border: 1px solid #ccc;
+    padding: 6px 10px;
+    height: 36px;
+    font-size: 0.9rem;
+}
 
     @media (max-width: 768px) {
         .table th, .table td {
             font-size: 0.75rem;
             padding: 6px;
         }
+        
     }
 </style>
 
@@ -101,10 +232,10 @@
                     {% endif %}
                 </td>
                 <td>
-                    <a href="{% url 'vendor:edit_diamond' diamond.id %}" class="btn btn-secondary btn-sm">Edit</a>
+                    <a href="{% url 'vendor:edit_diamond' diamond.id %}" class="btn equal-button">Edit</a>
                 </td> 
                 <td>
-                    <button class="btn btn-sm btn-danger" onclick="showConfirm(this)" data-url="{% url 'vendor:delete_diamond' diamond.id %}?page={{ page_obj.number }}">
+                    <button class="btn btn-sm btn-danger" style="border-radius:20px;" onclick="showConfirm(this)" data-url="{% url 'vendor:delete_diamond' diamond.id %}?page={{ page_obj.number }}">
                         Delete
                     </button>
                     <span class="d-none ms-2" data-confirm-box>
@@ -175,7 +306,7 @@
         const confirmBox = button.nextElementSibling;
         confirmBox.classList.remove('d-none');
         button.style.display = 'none';
-    }
+    } 
 
     function cancelDelete(button) {
         const confirmBox = button.parentElement;

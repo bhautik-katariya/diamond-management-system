@@ -62,8 +62,8 @@
 
     /* SHared Button Styles */
     .equal-button, .btn-sort, .btn-filter {
-        min-width: 100px;
-        height: 36px;
+        min-width: 90px !important;
+        height: 36px !important;
         white-space: nowrap;
         background: rgb(11, 25, 55);
         color: rgb(255, 255, 255) !important;
@@ -72,11 +72,17 @@
         font-weight: 500;
         box-shadow: 0 2px 8px rgba(11, 25, 55, 0.3);
         transition: background 0.3s, color 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 5px 12px;
     }
 
     /* Hover styles */
     .equal-button:hover,
-    .btn-filter:hover {
+    .btn-filter:hover
+     {
         background: rgb(255, 255, 255);
         color: rgb(11, 25, 55) !important;
         border: 1px solid rgb(11, 25, 55);

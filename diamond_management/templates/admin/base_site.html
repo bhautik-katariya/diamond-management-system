@@ -13,7 +13,54 @@
             text-transform: uppercase;
             letter-spacing: 1px;
         }
+
+        /* hide dark/light theme toggle */
+        .theme-toggle {
+            display: none !important;
+        }
+
+        /* recent actions panel */
+        #recent-actions-module h2 {
+            background: #e6f4fa !important;
+            color: rgb(10, 24, 53) !important;
+            padding: 10px 15px !important;
+            border-radius: 4px;
+        }
+
+        #recent-actions-module h3 {
+            color: rgb(10, 24, 53) !important;
+        }
+
+        /* --- SORT ICONS (ALWAYS VISIBLE + CUSTOM COLOR) --- */
+        th .sortoptions a {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            background: url("/static/admin/img/sorting-icons.svg") 0 -60px no-repeat !important; /* unsorted ↕ */
+            filter: invert(12%) sepia(32%) saturate(1823%) hue-rotate(204deg) brightness(92%) contrast(96%);
+        }
+
+        th.sorted .sortoptions a.toggle.ascending {
+            background: url("/static/admin/img/sorting-icons.svg") 0 0 no-repeat !important; /* ascending ↑ */
+        }
+
+        th.sorted .sortoptions a.toggle.descending {
+            background: url("/static/admin/img/sorting-icons.svg") 0 -20px no-repeat !important; /* descending ↓ */
+        }
+
+        th.sorted .sortoptions a.sortremove {
+            background: url("/static/admin/img/sorting-icons.svg") 0 -40px no-repeat !important; /* remove ✖ */
+        }
+
+        /* Hover effect (optional darker shade) */
+        th .sortoptions a:hover {
+            filter: invert(12%) sepia(60%) saturate(2000%) hue-rotate(204deg) brightness(70%) contrast(96%);
+        }
     </style>
+{% endblock %}
+
+{% block title %}
+    {% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | Diamond Site Admin
 {% endblock %}
 
 {% block branding %}
@@ -21,8 +68,6 @@
     Diamond System
 </div>
 {% endblock %}
-
-
 
 {% block content_title %}
     <h1>Diamond Management Administration</h1>
