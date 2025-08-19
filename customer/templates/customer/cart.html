@@ -166,6 +166,29 @@
     border: 1px solid rgb(11, 25, 55);
 }
 
+/* Hover effect - white background, dark blue text & border */
+.pagination .page-item .page-link:hover {
+        background-color: rgb(255, 255, 255) !important;
+        color: rgb(11, 25, 55) !important;
+        border: 1px solid rgb(11, 25, 55) !important;
+    }
+
+    /* Center buttons + textbox */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 12px;   /* spacing between all items */
+        margin-top: 20px;
+    }
+    
+    /* Page number box + label (of 3) */
+    .page-info {
+        display: flex;
+        align-items: center;
+        gap: 6px; /* spacing between input & text */
+    }
+
 @media (max-width: 700px) {
     .cart-table {
         min-width: 500px;
@@ -188,21 +211,23 @@
     }
 }
 </style> 
-<div class="table-responsive" style="margin: 0 auto;">
-    <table class="cart-table">
-        <thead>
-            <tr>
-                <th><input type="checkbox" id="select-all"></th>
-                <th>Sr No</th>
-                <th>Product</th>
-                <th>Price</th>
-                <th>Quantity</th>
-                <th>Total</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% if page_obj %}
-            {% for item in paged_items %}
+{% if page_obj or cart.items.exists %}
+    <!-- CART TABLE -->
+    <div class="table-responsive" style="margin: 0 auto;">
+        <table class="cart-table">
+            <thead>
+                <tr>
+                    <th><input type="checkbox" id="select-all"></th>
+                    <th>Sr No</th>
+                    <th>Product</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if page_obj %}
+                    {% for item in paged_items %}
             <tr>
                 <td><input type="checkbox" class="row-checkbox" name="selected_items" value="{{ item.id }}"></td>
                 <td>{{ forloop.counter0|add:page_obj.start_index }}</td>
@@ -274,7 +299,7 @@
                 <td>${{ item.line_total|floatformat:2 }}</td>
             </tr>
             {% endfor %}
-        {% elif cart.items.all %}
+{% else %}
             {% for item in cart.items.all %}
             <tr>
                 <td><input type="checkbox" class="row-checkbox" name="selected_items" value="{{ item.id }}"></td>
@@ -296,7 +321,7 @@
                                 {% elif item.diamond.shape == 'MQ' %}
                                     <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651457/marquise_ljlq2v.svg" width="32" height="40" alt="Marquise Shape">
                                 {% elif item.diamond.shape == 'RD' %}
-                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754645394/round_gwfwgz.svg" width="40" height="40" alt="Round Shape">
+                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651461/round_phykmr.svg" width="40" height="40" alt="Round Shape">
                                 {% elif item.diamond.shape == 'OLD' %}
                                     <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651458/old_vyq23i.svg" width="40" height="40" alt="Old Shape">
                                 {% elif item.diamond.shape == 'OVL' %}
@@ -347,10 +372,6 @@
                 <td>${{ item.line_total|floatformat:2 }}</td>
             </tr>
             {% endfor %}
-        {% else %}
-            <tr>
-                <td colspan="6" class="text-center">Your cart is empty.<br><a href="{% url 'dashboard' %}" class="btn equal-button mt-2">Browse Diamonds</a></td>
-            </tr>
         {% endif %}
         </tbody>
     </table>
@@ -370,7 +391,7 @@
         <div class="d-flex align-items-center" style="min-width: 120px;">
             <input type="number" id="pageInput" class="form-control form-control-sm" 
                    value="{{ page_obj.number }}" min="1" max="{{ page_obj.paginator.num_pages }}" 
-                   style="width: 60px; text-align: center; margin: 0 5px; border-radius: 20px; border: 1px solid #ccc;">
+                   style="width: 60px; text-align: center; margin: 0 12px; border-radius: 20px; border: 1px solid #ccc;">
             <span class="text-muted" style="font-size: 0.9rem; color: #0a1835;">of {{ page_obj.paginator.num_pages }}</span>
         </div>
     </li>
@@ -392,9 +413,16 @@
     {% else %}
         <a href="{% url 'login' %}?next={{ request.get_full_path }}" class="btn btn-primary">Proceed to Checkout</a>
     {% endif %}
-    </div>
-    {% endif %}
 </div>
+    {% endif %}
+
+    {% else %}
+    <!-- EMPTY CART MESSAGE -->
+    <div class="text-center mt-5">
+        <p class="mb-3">Your cart is empty.</p>
+        <a href="{% url 'dashboard' %}" class="btn equal-button">Browse Diamonds</a>
+    </div>
+{% endif %}
 
 <script>
 (function() {

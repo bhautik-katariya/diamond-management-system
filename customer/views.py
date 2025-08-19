@@ -26,7 +26,7 @@ def add_to_cart(request, diamond_id):
         diamond_id_str = str(diamond_id)
         guest_cart[diamond_id_str] = guest_cart.get(diamond_id_str, 0) + 1
         request.session['guest_cart'] = guest_cart
-        messages.success(request, f"Diamond {diamond.stock_id} added to your guest cart.")
+        messages.success(request, f"Diamond {diamond.stock_id} added to your cart.")
 
     # Redirect to the same page as before
     next_url = request.GET.get('next')
@@ -73,48 +73,66 @@ def view_cart(request):
     })
 
 def remove_from_cart(request, item_id):
-    if 'user_id' not in request.session or request.session.get('user_type') != 'customer':
-        messages.error(request, "You must be logged in as a customer to remove items.")
-        return redirect('login')
-
-    item = get_object_or_404(CartItem, pk=item_id)
-
-    if item.cart.customer.id == request.session['user_id']:
+    if request.session.get('user_type') == 'customer' and 'user_id' in request.session:
+        # Customer cart
+        item = get_object_or_404(CartItem, pk=item_id, cart__customer_id=request.session['user_id'])
         item.delete()
-        messages.success(request, "Item removed from cart.")
+        messages.success(request, "Item removed from your cart.")
     else:
-        messages.error(request, "You are not authorized to remove this item.")
-
+        # Guest cart
+        guest_cart = request.session.get('guest_cart', {})
+        if str(item_id) in guest_cart:
+            del guest_cart[str(item_id)]
+            request.session['guest_cart'] = guest_cart
+            messages.success(request, "Item removed from your cart.")
+        else:
+            messages.error(request, "Item not found in your cart.")
     return redirect('customer:view_cart')
+
 
 def increase_quantity(request, item_id):
-    if request.method == 'POST' and 'user_id' in request.session and request.session.get('user_type') == 'customer':
-        item = get_object_or_404(CartItem, pk=item_id)
-        if item.cart.customer.id == request.session['user_id']:
-            item.quantity += 1
-            item.save()
-            messages.success(request, f"Increased quantity for {item.diamond.stock_id}.")
-        else:
-            messages.error(request, "You are not authorized to update this item.")
+    if request.session.get('user_type') == 'customer' and 'user_id' in request.session:
+        # Customer cart
+        item = get_object_or_404(CartItem, pk=item_id, cart__customer_id=request.session['user_id'])
+        item.quantity += 1
+        item.save()
+        messages.success(request, f"Increased quantity for {item.diamond.stock_id}.")
     else:
-        messages.error(request, "Invalid request.")
+        # Guest cart
+        guest_cart = request.session.get('guest_cart', {})
+        if str(item_id) in guest_cart:
+            guest_cart[str(item_id)] += 1
+            request.session['guest_cart'] = guest_cart
+            messages.success(request, "Increased quantity in your cart.")
+        else:
+            messages.error(request, "Item not found in your cart.")
     return redirect('customer:view_cart')
 
+
 def decrease_quantity(request, item_id):
-    if request.method == 'POST' and 'user_id' in request.session and request.session.get('user_type') == 'customer':
-        item = get_object_or_404(CartItem, pk=item_id)
-        if item.cart.customer.id == request.session['user_id']:
-            if item.quantity > 1:
-                item.quantity -= 1
-                item.save()
-                messages.success(request, f"Decreased quantity for {item.diamond.stock_id}.")
-            else:
-                item.delete()
-                messages.success(request, f"Removed {item.diamond.stock_id} from cart.")
+    if request.session.get('user_type') == 'customer' and 'user_id' in request.session:
+        # Customer cart
+        item = get_object_or_404(CartItem, pk=item_id, cart__customer_id=request.session['user_id'])
+        if item.quantity > 1:
+            item.quantity -= 1
+            item.save()
+            messages.success(request, f"Decreased quantity for {item.diamond.stock_id}.")
         else:
-            messages.error(request, "You are not authorized to update this item.")
+            item.delete()
+            messages.success(request, f"Removed {item.diamond.stock_id} from your cart.")
     else:
-        messages.error(request, "Invalid request.")
+        # Guest cart
+        guest_cart = request.session.get('guest_cart', {})
+        if str(item_id) in guest_cart:
+            if guest_cart[str(item_id)] > 1:
+                guest_cart[str(item_id)] -= 1
+                messages.success(request, "Decreased quantity in your cart.")
+            else:
+                del guest_cart[str(item_id)]
+                messages.success(request, "Removed item from your cart.")
+            request.session['guest_cart'] = guest_cart
+        else:
+            messages.error(request, "Item not found in your cart.")
     return redirect('customer:view_cart')
 
 def checkout(request):
@@ -151,8 +169,4 @@ def checkout(request):
             item.delete()  # Remove from cart
 
     messages.success(request, "Order placed successfully!")
-    return redirect('customer:order_confirmation')
-
-
-def order_confirmation(request):
     return render(request, 'customer/order_confirmation.html')
