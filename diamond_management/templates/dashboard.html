@@ -2,7 +2,7 @@
 {% load static %}
 {% load custom_filters %}
 
-{% block title %}Customer Dashboard{% endblock %}
+{% block title %}Dashboard{% endblock %}
 
 {% block content %}
 <style>
@@ -36,7 +36,7 @@
         border-spacing: 0 5px;
         width: 100%;
         border-radius: 15px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);   
     }
 
     .diamond-table th,
@@ -225,6 +225,18 @@
         margin-top: 4px;
         font-weight: 500;
     }
+    .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px; /* spacing between elements */
+    }
+    
+    .pagination .form-control-sm {
+        height: 36px;
+        padding: 0;
+    }
+    
 
     @media (max-width: 576px) {
         .diamond-table th, .diamond-table td {
@@ -367,39 +379,52 @@
 
 <!-- Pagination Controls -->
 <nav aria-label="Diamond pagination" class="mt-4">
-    <ul class="pagination justify-content-center">
+    <ul class="pagination justify-content-center align-items-center" style="gap: 10px;">
+
         {% if page_obj.has_previous %}
+        <!-- First Button -->
         <li class="page-item">
-            <a class="page-link" href="?page=1{% if get_params %}&{{ get_params }}{% endif %}">&laquo; First</a>
+            <a class="page-link" href="?page=1{% if get_params %}&{{ get_params }}{% endif %}">« First</a>
         </li>
+
+        <!-- Prev Button -->
         <li class="page-item">
             <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if get_params %}&{{ get_params }}{% endif %}">‹ Prev</a>
         </li>
         {% else %}
+        <!-- Disabled First & Prev -->
+        <li class="page-item disabled"><span class="page-link">« First</span></li>
         <li class="page-item disabled"><span class="page-link">‹ Prev</span></li>
         {% endif %}
-    
-        <li class="page-item active">
-            <div class="d-flex align-items-center" style="min-width: 120px;">
-                <input type="number" id="pageInput" class="form-control form-control-sm" 
-                       value="{{ page_obj.number }}" min="1" max="{{ page_obj.paginator.num_pages }}" 
-                       style="width: 60px; text-align: center; margin: 0 5px; border-radius: 20px; border: 1px solid #ccc;">
-                <span class="text-muted" style="font-size: 0.9rem;">of {{ page_obj.paginator.num_pages }}</span>
-            </div>
+
+        <!-- Page Input Center -->
+        <li class="page-item d-flex align-items-center" style="gap: 8px;">
+            <input type="number" id="pageInput" class="form-control form-control-sm" 
+                   value="{{ page_obj.number }}" min="1" max="{{ page_obj.paginator.num_pages }}" 
+                   style="width: 60px; text-align: center; border-radius: 20px; border: 1px solid #ccc;">
+            <span class="text-muted" style="font-size: 0.9rem;">of {{ page_obj.paginator.num_pages }}</span>
         </li>
-    
+
         {% if page_obj.has_next %}
+        <!-- Next Button -->
         <li class="page-item">
             <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if get_params %}&{{ get_params }}{% endif %}">Next ›</a>
         </li>
+
+        <!-- Last Button -->
         <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if get_params %}&{{ get_params }}{% endif %}">Last &raquo;</a>
+            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if get_params %}&{{ get_params }}{% endif %}">Last »</a>
         </li>
         {% else %}
+        <!-- Disabled Next & Last -->
         <li class="page-item disabled"><span class="page-link">Next ›</span></li>
+        <li class="page-item disabled"><span class="page-link">Last »</span></li>
         {% endif %}
+
     </ul>
 </nav>
+
+
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {

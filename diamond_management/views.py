@@ -14,6 +14,7 @@ from django.http import HttpResponse
 from vendor.models import Diamond
 from django.views.decorators.csrf import csrf_exempt
 import datetime
+from django.contrib.auth.views import LogoutView
 
 def register(request):
     if request.method == 'POST':
@@ -324,3 +325,7 @@ def download_diamonds_excel(request):
         return response
     return HttpResponse(status=405)
   
+class AdminLogoutView(LogoutView):
+    next_page = 'admin:login'
+    def get(self, request, *args, **kwargs):   # allow GET request
+        return self.post(request, *args, **kwargs)

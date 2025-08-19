@@ -10,28 +10,53 @@
                 <h3 class="card-title mb-0">Admin Login</h3>
             </div>
             <div class="card-body">
-                {% if form.errors %}
+                {# Non-field errors (like wrong username/password) #}
+                {% if form.non_field_errors %}
                     <div class="alert alert-danger">
-                        {% for field in form %}
-                            {% for error in field.errors %}
-                                <div>{{ error }}</div>
-                            {% endfor %}
-                        {% endfor %}
-                        {% for error in m.non_field_errors %}
+                        {% for error in form.non_field_errors %}
                             <div>{{ error }}</div>
                         {% endfor %}
                     </div>
                 {% endif %}
+
                 <form method="post" action="">
                     {% csrf_token %}
+
                     <div class="mb-3">
                         <label for="id_username" class="form-label">Username</label>
-                        <input type="text" name="username" autofocus autocapitalize="none" autocomplete="username" maxlength="150" class="form-control" required id="id_username">
+                        <input type="text" 
+                               name="username" 
+                               autofocus 
+                               autocapitalize="none" 
+                               autocomplete="username" 
+                               maxlength="150" 
+                               class="form-control {% if form.username.errors %}is-invalid{% endif %}" 
+                               required 
+                               id="id_username">
+
+                        {% for error in form.username.errors %}
+                            <div class="invalid-feedback">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
                     </div>
+
                     <div class="mb-4">
                         <label for="id_password" class="form-label">Password</label>
-                        <input type="password" name="password" autocomplete="current-password" class="form-control" required id="id_password">
+                        <input type="password" 
+                               name="password" 
+                               autocomplete="current-password" 
+                               class="form-control {% if form.password.errors %}is-invalid{% endif %}" 
+                               required 
+                               id="id_password">
+
+                        {% for error in form.password.errors %}
+                            <div class="invalid-feedback">
+                                {{ error }}
+                            </div>
+                        {% endfor %}
                     </div>
+
                     <div class="d-grid">
                         <button type="submit" class="btn btn-primary">Sign In</button>
                     </div>

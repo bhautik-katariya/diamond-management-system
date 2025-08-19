@@ -142,6 +142,30 @@
         min-width: 600px;
     }
 }
+.equal-button {
+    min-width: 70px;
+    height: 36px;
+    white-space: nowrap;
+    background: rgb(11, 25, 55);
+    color: #fff !important;
+    border: none;
+    border-radius: 20px;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(11, 25, 55, 0.3);
+    transition: 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+/* Hover effect */
+.equal-button:hover {
+    background: #fff;
+    color: rgb(11, 25, 55) !important;
+    border: 1px solid rgb(11, 25, 55);
+}
+
 @media (max-width: 700px) {
     .cart-table {
         min-width: 500px;
@@ -325,7 +349,7 @@
             {% endfor %}
         {% else %}
             <tr>
-                <td colspan="6" class="text-center">Your cart is empty.<br><a href="{% url 'dashboard' %}" class="btn btn-outline-primary mt-2">Browse Diamonds</a></td>
+                <td colspan="6" class="text-center">Your cart is empty.<br><a href="{% url 'dashboard' %}" class="btn equal-button mt-2">Browse Diamonds</a></td>
             </tr>
         {% endif %}
         </tbody>
@@ -428,4 +452,3 @@ function goToPage() {
 }
 </script>
 {% endblock %}
-    
