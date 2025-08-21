@@ -65,6 +65,8 @@ def vendor_register(request):
     return render(request, 'auth/register.html', {'form': form, 'is_vendor_register': True})
 
 def login(request):
+    next_url = request.GET.get('next')  # Capture ?next param if present
+
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
@@ -88,19 +90,22 @@ def login(request):
                                     cart_item.quantity += quantity
                                     cart_item.save()
                             except Diamond.DoesNotExist:
-                                pass # Silently ignore if diamond no longer exists
+                                pass  # Ignore if diamond no longer exists
                         del request.session['guest_cart']
 
+                    # Redirect back to next_url if provided, else dashboard
+                    if next_url:
+                        return redirect(next_url)
                     return redirect('dashboard')
                 else:
                     messages.error(request, "Incorrect password.")
-                    return render(request, 'auth/login.html', {'form': form})
             except Customer.DoesNotExist:
                 messages.error(request, "Customer does not exist.")
     else:
         form = LoginForm()
-    return render(request, 'auth/login.html', {'form': form})
 
+    return render(request, 'auth/login.html', {'form': form, 'next': next_url})
+    
 def vendor_login(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
@@ -291,7 +296,7 @@ def download_diamonds_excel(request):
         ws.title = "Diamonds"
 
         # Get all field names from the model, excluding created_at and id
-        fields = [field for field in Diamond._meta.get_fields() if not field.many_to_many and not field.one_to_many and field.name not in ('id', 'created_at')]
+        fields = [field for field in Diamond._meta.get_fields() if not field.many_to_many and not field.one_to_many and field.name not in ('id', 'vendor', 'created_at')]
         headers = ['Sr No'] + [field.verbose_name.title() for field in fields]
         ws.append(headers)
 

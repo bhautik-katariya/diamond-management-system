@@ -143,17 +143,19 @@
     }
 }
 .equal-button {
-    min-width: 70px;
-    height: 36px;
+    min-width: 70px !important;   /* reduced from 90px */
+    height: 28px !important;      /* reduced from 36px */
+    font-size: 0.8rem !important; /* smaller font size */
+    padding: 3px 8px;             /* reduced padding */
     white-space: nowrap;
     background: rgb(11, 25, 55);
-    color: #fff !important;
+    color: rgb(255, 255, 255) !important;
     border: none;
-    border-radius: 20px;
+    border-radius: 14px;          /* smaller radius to match new size */
     font-weight: 500;
-    box-shadow: 0 2px 8px rgba(11, 25, 55, 0.3);
-    transition: 0.3s ease;
-    display: inline-flex;
+    box-shadow: 0 2px 6px rgba(11, 25, 55, 0.25);
+    transition: background 0.3s, color 0.3s;
+    display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
@@ -166,38 +168,75 @@
     border: 1px solid rgb(11, 25, 55);
 }
 
-/* Hover effect - white background, dark blue text & border */
-.pagination .page-item .page-link:hover {
-        background-color: rgb(255, 255, 255) !important;
-        color: rgb(11, 25, 55) !important;
-        border: 1px solid rgb(11, 25, 55) !important;
-    }
-
-    /* Center buttons + textbox */
-    .pagination {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 12px;   /* spacing between all items */
-        margin-top: 20px;
-    }
-    
-    /* Page number box + label (of 3) */
-    .page-info {
-        display: flex;
-        align-items: center;
-        gap: 6px; /* spacing between input & text */
-    }
-
-@media (max-width: 700px) {
-    .cart-table {
-        min-width: 500px;
-    }
-    .cart-product-info {
-        min-width: 100px;
-    }
+.page-link {
+    min-width: 60px;            /* smaller width */
+    height: 28px;               /* smaller height */
+    border-radius: 14px !important; /* adjusted radius */
+    font-size: 0.8rem;          /* smaller text */
+    font-weight: 500;
+    background: rgb(11, 25, 55);
+    color: white !important;
+    border: none;
+    margin: 0 2px;
+    box-shadow: 0 2px 6px rgba(11, 25, 55, 0.25);
+    text-align: center !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 }
+
+.page-link:hover {
+    background: white !important;
+    color: rgb(11, 25, 55) !important;
+    border: 1px solid rgb(11, 25, 55);
+}
+
+.page-item.active .page-link {
+    background: rgb(11, 25, 55) !important;
+    color: white !important;
+    border: none;
+}
+
+.page-item {
+    list-style: none;   /* removes the bullet */
+}    
+
+/* Pagination Input + Text */
+.page-input {
+    height: 28px;               /* match button height */
+    width: 50px;                /* compact */
+    font-size: 0.8rem;
+    text-align: center;
+    border-radius: 14px;
+    border: 1px solid #ccc;
+    padding: 2px;
+}
+
+.page-total {
+    font-size: 0.8rem;
+    line-height: 28px;          /* vertically aligned */
+    color: #6c757d;             /* muted text color */
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px; /* spacing between elements */
+}
+
+.pagination .form-control-sm {
+    height: 36px;
+    padding: 0;
+}
+
 @media (max-width: 576px) {
+
+    .page-link {
+        min-width: 60px;
+        font-size: 0.8rem;
+        padding: 4px 8px;
+    }
     .cart-table th, .cart-table td {
         padding: 6px 8px;
         font-size: 0.75rem;
@@ -208,6 +247,14 @@
     .cart-product-img {
         width: 32px;
         height: 32px;
+    }
+}
+@media (max-width: 700px) {
+    .cart-table {
+        min-width: 500px;
+    }
+    .cart-product-info {
+        min-width: 100px;
     }
 }
 </style> 
@@ -381,37 +428,34 @@
 <nav aria-label="Pagination" class="mt-3 d-flex justify-content-center">
   <ul class="pagination" style="gap:10px;">
     {% if page_obj.has_previous %}
-      <li class="page-item"><a class="page-link" style="border-radius:24px;background:#0a1835;color:#fff;padding:10px 18px;box-shadow:0 4px 12px rgba(10,24,53,.25);" href="?page=1">&laquo; First</a></li>
-      <li class="page-item"><a class="page-link" style="border-radius:24px;background:#0a1835;color:#fff;padding:10px 18px;box-shadow:0 4px 12px rgba(10,24,53,.25);" href="?page={{ page_obj.previous_page_number }}">‹ Prev</a></li>
+      <li class="page-item"><a class="page-link" href="?page=1">&laquo; First</a></li>
+      <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">‹ Prev</a></li>
     {% else %}
-      <li class="page-item disabled"><span class="page-link" style="border-radius:24px;background:#eef1f5;color:#9aa4b2;padding:10px 18px;">‹ Prev</span></li>
+      <li class="page-item disabled"><span class="page-link">‹ Prev</span></li>
     {% endif %}
 
-    <li class="page-item active">
-        <div class="d-flex align-items-center" style="min-width: 120px;">
-            <input type="number" id="pageInput" class="form-control form-control-sm" 
-                   value="{{ page_obj.number }}" min="1" max="{{ page_obj.paginator.num_pages }}" 
-                   style="width: 60px; text-align: center; margin: 0 12px; border-radius: 20px; border: 1px solid #ccc;">
-            <span class="text-muted" style="font-size: 0.9rem; color: #0a1835;">of {{ page_obj.paginator.num_pages }}</span>
-        </div>
+    <li class="page-item d-flex align-items-center" style="gap: 6px;">
+        <input type="number" id="pageInput" class="page-input"
+               value="{{ page_obj.number }}" min="1" max="{{ page_obj.paginator.num_pages }}">
+        <span class="page-total">of {{ page_obj.paginator.num_pages }}</span>
     </li>
 
     {% if page_obj.has_next %}
-      <li class="page-item"><a class="page-link" style="border-radius:24px;background:#0a1835;color:#fff;padding:10px 18px;box-shadow:0 4px 12px rgba(10,24,53,.25);" href="?page={{ page_obj.next_page_number }}">Next ›</a></li>
-      <li class="page-item"><a class="page-link" style="border-radius:24px;background:#0a1835;color:#fff;padding:10px 18px;box-shadow:0 4px 12px rgba(10,24,53,.25);" href="?page={{ page_obj.paginator.num_pages }}">Last »</a></li>
+      <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next ›</a></li>
+      <li class="page-item"><a class="page-link"  href="?page={{ page_obj.paginator.num_pages }}">Last »</a></li>
     {% else %}
-      <li class="page-item disabled"><span class="page-link" style="border-radius:24px;background:#eef1f5;color:#9aa4b2;padding:10px 18px;">Next ›</span></li>
+      <li class="page-item disabled"><span class="page-link">Next ›</span></li>
     {% endif %}
   </ul>
 </nav>
 {% endif %}
 {% if paged_items %}
 <div class="cart-footer">
-        <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">Continue Shopping</a>
+        <a href="{% url 'dashboard' %}" class="btn equal-button">Continue Shopping</a>
     {% if request.session.user_type == "customer" %}
-        <a href="{% url 'customer:checkout' %}" class="btn btn-primary">Proceed to Checkout</a>
+        <a href="{% url 'customer:checkout' %}" class="btn equal-button">Proceed to Checkout</a>
     {% else %}
-        <a href="{% url 'login' %}?next={{ request.get_full_path }}" class="btn btn-primary">Proceed to Checkout</a>
+        <a href="{% url 'login' %}?next={{ request.get_full_path }}" class="btn equal-button">Proceed to Checkout</a>
     {% endif %}
 </div>
     {% endif %}

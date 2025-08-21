@@ -27,24 +27,27 @@
     }
     
     /* Shared Button Styles (Edit button) */
-    .equal-button {
-        min-width: 55px;
-        height: 30px;
+    .edit-btn {
+        min-width: 70px !important;   /* reduced from 90px */
+        height: 28px !important;      /* reduced from 36px */
+        font-size: 0.8rem !important; /* smaller font size */
+        padding: 3px 8px;             /* reduced padding */
         white-space: nowrap;
         background: rgb(11, 25, 55);
         color: rgb(255, 255, 255) !important;
         border: none;
-        border-radius: 20px;
+        border-radius: 14px;          /* smaller radius to match new size */
         font-weight: 500;
-        box-shadow: 0 2px 8px rgba(11, 25, 55, 0.3);
+        box-shadow: 0 2px 6px rgba(11, 25, 55, 0.25);
         transition: background 0.3s, color 0.3s;
         display: flex;
         align-items: center;
         justify-content: center;
+        text-align: center;
     }
 
     /* Hover styles for Edit button */
-    .equal-button:hover {
+    .edit-btn:hover {
         background: rgb(255, 255, 255);
         color: rgb(11, 25, 55) !important;
         border: 1px solid rgb(11, 25, 55);
@@ -52,19 +55,22 @@
 
     /* Delete button - same size as Edit */
     .btn-delete {
-        min-width: 55px;
-        height: 30px;
+        min-width: 70px !important;   /* reduced from 90px */
+        height: 28px !important;      /* reduced from 36px */
+        font-size: 0.8rem !important; /* smaller font size */
+        padding: 3px 8px;             /* reduced padding */
         white-space: nowrap;
-        background: #dc3545;   /* red */
-        color: #fff !important;
+        background:  #dc3545;
+        color: rgb(255, 255, 255) !important;
         border: none;
-        border-radius: 20px;
+        border-radius: 14px;          /* smaller radius to match new size */
         font-weight: 500;
         box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
         transition: background 0.3s, color 0.3s;
         display: flex;
         align-items: center;
         justify-content: center;
+        text-align: center;
     }
 
     /* Delete button hover effect */
@@ -74,73 +80,78 @@
         border: 1px solid #dc3545 !important;
     }
 
-    /* Pagination wrapper: all in one line */
-    .pagination-wrapper {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 6px;          /* reduced space between items */
-        flex-wrap: nowrap;
-        margin-top: 20px;
-    }
-
-    /* Page input box alignment */
-    .page-input-wrapper {
-        display: flex;
-        align-items: center;
-        gap: 4px;          /* tighter spacing for input + text */
-    }
-
-    /* Input box style */
-    .page-input {
-        width: 60px;
-        text-align: center;
-        border-radius: 20px;
-        border: 1px solid #ccc;
-        padding: 6px 10px;
-        height: 36px;
-        font-size: 0.9rem;
-    }
-
-    /* Common button style for pagination */
-    .pagination-wrapper .btn {
-        min-width: 80px;
-        height: 36px;
-        border-radius: 20px;
+    .page-link {
+        min-width: 60px;            /* smaller width */
+        height: 28px;               /* smaller height */
+        border-radius: 14px !important; /* adjusted radius */
+        font-size: 0.8rem;          /* smaller text */
         font-weight: 500;
         background: rgb(11, 25, 55);
-        color: #fff;
+        color: white !important;
         border: none;
-        margin: 0 3px;
-        box-shadow: 0 2px 8px rgba(11, 25, 55, 0.3);
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        transition: 0.3s ease;
+        margin: 0 2px;
+        box-shadow: 0 2px 6px rgba(11, 25, 55, 0.25);
+        text-align: center !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
     }
 
-    /* Hover effect for pagination buttons */
-    .pagination-wrapper .btn:hover {
-        background: #fff !important;
+    .page-link:hover {
+        background: white !important;
         color: rgb(11, 25, 55) !important;
-        border: 1px solid rgb(11, 25, 55) !important;
+        border: 1px solid rgb(11, 25, 55);
     }
 
-    /* Disabled button style - dashboard jevu */
-    .pagination-wrapper .btn:disabled {
-        background: rgb(242, 247, 251) !important;
-        color: rgb(179, 198, 215) !important;
-        border: none !important;
-        box-shadow: none !important;
-        cursor: not-allowed;
-        opacity: 1;
+    .page-item.active .page-link {
+        background: rgb(11, 25, 55) !important;
+        color: white !important;
+        border: none;
+    }
+
+    .page-item {
+        list-style: none;   /* removes the bullet */
+    }    
+
+    /* Pagination Input + Text */
+    .page-input {
+        height: 28px;               /* match button height */
+        width: 50px;                /* compact */
+        font-size: 0.8rem;
+        text-align: center;
+        border-radius: 14px;
+        border: 1px solid #ccc;
+        padding: 2px;
+    }
+
+    .page-total {
+        font-size: 0.8rem;
+        line-height: 28px;          /* vertically aligned */
+        color: #6c757d;             /* muted text color */
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px; /* spacing between elements */
+    }
+    
+    .pagination .form-control-sm {
+        height: 36px;
+        padding: 0;
     }
 
     @media (max-width: 768px) {
         .table th, .table td {
             font-size: 0.75rem;
             padding: 6px;
+        }
+
+        .page-link {
+            min-width: 60px;
+            font-size: 0.8rem;
+            padding: 4px 8px;
         }
     }
 </style>
@@ -212,7 +223,7 @@
                     {% endif %}
                 </td>
                 <td>
-                    <a href="{% url 'vendor:edit_diamond' diamond.id %}" class="btn equal-button">Edit</a>
+                    <a href="{% url 'vendor:edit_diamond' diamond.id %}" class="btn edit-btn">Edit</a>
                 </td> 
                 <td>
                     <button class="btn btn-delete" 
@@ -236,29 +247,29 @@
 {% endif %}
 
 {% if page_obj %}
-<div class="pagination-wrapper">
+<nav aria-label="Pagination" class="mt-3 d-flex justify-content-center">
+  <ul class="pagination" style="gap:10px;">
     {% if page_obj.has_previous %}
-        <a class="btn" href="?page=1">&laquo; First</a>
-        <a class="btn" href="?page={{ page_obj.previous_page_number }}">‹ Prev</a>
+      <li class="page-item"><a class="page-link" href="?page=1">&laquo; First</a></li>
+      <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">‹ Prev</a></li>
     {% else %}
-        <button class="btn" disabled>&laquo; First</button>
-        <button class="btn" disabled>‹ Prev</button>
+      <li class="page-item disabled"><span class="page-link">‹ Prev</span></li>
     {% endif %}
 
-    <div class="page-input-wrapper">
+    <li class="page-item d-flex align-items-center" style="gap: 6px;">
         <input type="number" id="pageInput" class="page-input"
                value="{{ page_obj.number }}" min="1" max="{{ page_obj.paginator.num_pages }}">
-        <span>of {{ page_obj.paginator.num_pages }}</span>
-    </div>
+        <span class="page-total">of {{ page_obj.paginator.num_pages }}</span>
+    </li>
 
     {% if page_obj.has_next %}
-        <a class="btn" href="?page={{ page_obj.next_page_number }}">Next ›</a>
-        <a class="btn" href="?page={{ page_obj.paginator.num_pages }}">Last »</a>
+      <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next ›</a></li>
+      <li class="page-item"><a class="page-link"  href="?page={{ page_obj.paginator.num_pages }}">Last »</a></li>
     {% else %}
-        <button class="btn" disabled>Next ›</button>
-        <button class="btn" disabled>Last »</button>
+      <li class="page-item disabled"><span class="page-link">Next ›</span></li>
     {% endif %}
-</div>
+  </ul>
+</nav>
 {% endif %}
 
 <script>
@@ -282,10 +293,19 @@
     })();
 
     function showConfirm(button) {
+        // Hide any other open confirm boxes
+        document.querySelectorAll('[data-confirm-box]').forEach(box => {
+            box.classList.add('d-none');
+            if (box.previousElementSibling) {
+                box.previousElementSibling.style.display = 'inline-block';
+            }
+        });
+    
+        // Show the confirm box for the clicked button
         const confirmBox = button.nextElementSibling;
         confirmBox.classList.remove('d-none');
         button.style.display = 'none';
-    } 
+    }
 
     function cancelDelete(button) {
         const confirmBox = button.parentElement;
@@ -335,5 +355,5 @@
         // Redirect to the new page
         window.location.href = currentUrl.toString();
     }
-</script>
+</script>   
 {% endblock %}

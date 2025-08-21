@@ -4,13 +4,88 @@
 <div class="container mt-5">
     <h2 class="mb-4">Order Details</h2>
     <style>
-        .table th, .table td { vertical-align: middle; }
+        .table th, .table td { 
+            vertical-align: middle; 
+        }
+
+        .page-link {
+            min-width: 60px;            /* smaller width */
+            height: 28px;               /* smaller height */
+            border-radius: 14px !important; /* adjusted radius */
+            font-size: 0.8rem;          /* smaller text */
+            font-weight: 500;
+            background: rgb(11, 25, 55);
+            color: white !important;
+            border: none;
+            margin: 0 2px;
+            box-shadow: 0 2px 6px rgba(11, 25, 55, 0.25);
+            text-align: center !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+    
+        .page-link:hover {
+            background: white !important;
+            color: rgb(11, 25, 55) !important;
+            border: 1px solid rgb(11, 25, 55);
+        }
+    
+        .page-item.active .page-link {
+            background: rgb(11, 25, 55) !important;
+            color: white !important;
+            border: none;
+        }
+    
+        .page-item {
+            list-style: none;   /* removes the bullet */
+        }    
+    
+        /* Pagination Input + Text */
+        .page-input {
+            height: 28px;               /* match button height */
+            width: 50px;                /* compact */
+            font-size: 0.8rem;
+            text-align: center;
+            border-radius: 14px;
+            border: 1px solid #ccc;
+            padding: 2px;
+        }
+    
+        .page-total {
+            font-size: 0.8rem;
+            line-height: 28px;          /* vertically aligned */
+            color: #6c757d;             /* muted text color */
+        }
+    
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px; /* spacing between elements */
+        }
+        
+        .pagination .form-control-sm {
+            height: 36px;
+            padding: 0;
+        }
+
+        @media (max-width: 576px) {
+    
+            .page-link {
+                min-width: 60px;
+                font-size: 0.8rem;
+                padding: 4px 8px;
+            }
+        }
+
     </style>
     <table class="table table-bordered table-striped">
         <thead>
             <tr>
                 <th><input type="checkbox" id="select-all"></th>
                 <th>Sr No</th>
+                <th>Order Date</th>
                 <th>Customer</th>
                 <th>Diamond ID</th>
                 <th>Shape</th>
@@ -24,27 +99,32 @@
             </tr>
         </thead>
         <tbody>
-            {% for order in orders %}
-                {% for item in order.items.all %}
-                <tr>
-                    <td><input type="checkbox" class="row-checkbox" name="selected_order_items" value="{{ item.id }}"></td>
-                    <td>{{ forloop.parentloop.counter0|add:forloop.counter }}</td>
-                    <td>{{ order.customer.fname }} {{ order.customer.lname }}</td>
-                    <td>{{ item.diamond.stock_id }}</td>
-                    <td>{{ item.diamond.get_shape_display }}</td>
-                    <td>{{ item.diamond.carat }}</td>
-                    <td>{{ item.diamond.get_color_display }}</td>
-                    <td>{{ item.diamond.get_clarity_display }}</td>
-                    <td>{{ item.quantity }}</td>
-                    <td>${{ item.price_per_carat }}</td>
-                    <td>${{ item.line_total|floatformat:2 }}</td>
-                    <td><a href="{% url 'diamond_detail' item.diamond.id %}?from_order=true" class="btn btn-primary btn-sm" style="border-radius:20px;background:#0a1835;border:none;padding:8px 16px;box-shadow:0 2px 8px rgba(10,24,53,.25);">View</a></td>
-                </tr>
-                {% endfor %}
+            {% for oi in page_obj %}
+            <tr>
+                <td><input type="checkbox" class="row-checkbox" name="selected_order_items" value="{{ oi.item.id }}"></td>
+                <td>{{ forloop.counter0|add:page_obj.start_index }}</td>
+                <td>{{ oi.order.created_at }}</td>
+                <td>{{ oi.order.customer.fname }} {{ oi.order.customer.lname }}</td>
+                <td>{{ oi.item.diamond.stock_id }}</td>
+                <td>{{ oi.item.diamond.get_shape_display }}</td>
+                <td>{{ oi.item.diamond.carat }}</td>
+                <td>{{ oi.item.diamond.get_color_display }}</td>
+                <td>{{ oi.item.diamond.get_clarity_display }}</td>
+                <td>{{ oi.item.quantity }}</td>
+                <td>${{ oi.item.price_per_carat }}</td>
+                <td>${{ oi.item.line_total|floatformat:2 }}</td>
+                <td>
+                    <a href="{% url 'diamond_detail' oi.item.diamond.id %}?from_order=true"
+                       class="btn btn-primary btn-sm"
+                       style="border-radius:20px;background:#0a1835;border:none;padding:8px 16px;box-shadow:0 2px 8px rgba(10,24,53,.25);">
+                       View
+                    </a>
+                </td>
+            </tr>
             {% empty %}
             <tr><td colspan="12" class="text-center">No orders found.</td></tr>
             {% endfor %}
-        </tbody>
+        </tbody>        
     </table>
 </div>
 
@@ -52,26 +132,23 @@
 <nav aria-label="Pagination" class="mt-3 d-flex justify-content-center">
   <ul class="pagination" style="gap:10px;">
     {% if page_obj.has_previous %}
-      <li class="page-item"><a class="page-link" style="border-radius:24px;background:#0a1835;color:#fff;padding:10px 18px;box-shadow:0 4px 12px rgba(10,24,53,.25);" href="?page=1">&laquo; First</a></li>
-      <li class="page-item"><a class="page-link" style="border-radius:24px;background:#0a1835;color:#fff;padding:10px 18px;box-shadow:0 4px 12px rgba(10,24,53,.25);" href="?page={{ page_obj.previous_page_number }}">‹ Prev</a></li>
+      <li class="page-item"><a class="page-link" href="?page=1">&laquo; First</a></li>
+      <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">‹ Prev</a></li>
     {% else %}
-      <li class="page-item disabled"><span class="page-link" style="border-radius:24px;background:#eef1f5;color:#9aa4b2;padding:10px 18px;">‹ Prev</span></li>
+      <li class="page-item disabled"><span class="page-link">‹ Prev</span></li>
     {% endif %}
 
-    <li class="page-item active">
-        <div class="d-flex align-items-center" style="min-width: 120px;">
-            <input type="number" id="pageInput" class="form-control form-control-sm" 
-                   value="{{ page_obj.number }}" min="1" max="{{ page_obj.paginator.num_pages }}" 
-                   style="width: 60px; text-align: center; margin: 0 5px; border-radius: 20px; border: 1px solid #ccc;">
-            <span class="text-muted" style="font-size: 0.9rem; color: #0a1835;">of {{ page_obj.paginator.num_pages }}</span>
-        </div>
+    <li class="page-item d-flex align-items-center" style="gap: 6px;">
+        <input type="number" id="pageInput" class="page-input"
+               value="{{ page_obj.number }}" min="1" max="{{ page_obj.paginator.num_pages }}">
+        <span class="page-total">of {{ page_obj.paginator.num_pages }}</span>
     </li>
 
     {% if page_obj.has_next %}
-      <li class="page-item"><a class="page-link" style="border-radius:24px;background:#0a1835;color:#fff;padding:10px 18px;box-shadow:0 4px 12px rgba(10,24,53,.25);" href="?page={{ page_obj.next_page_number }}">Next ›</a></li>
-      <li class="page-item"><a class="page-link" style="border-radius:24px;background:#0a1835;color:#fff;padding:10px 18px;box-shadow:0 4px 12px rgba(10,24,53,.25);" href="?page={{ page_obj.paginator.num_pages }}">Last »</a></li>
+      <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next ›</a></li>
+      <li class="page-item"><a class="page-link"  href="?page={{ page_obj.paginator.num_pages }}">Last »</a></li>
     {% else %}
-      <li class="page-item disabled"><span class="page-link" style="border-radius:24px;background:#eef1f5;color:#9aa4b2;padding:10px 18px;">Next ›</span></li>
+      <li class="page-item disabled"><span class="page-link">Next ›</span></li>
     {% endif %}
   </ul>
 </nav>

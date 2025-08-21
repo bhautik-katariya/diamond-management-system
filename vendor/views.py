@@ -131,15 +131,30 @@ def load_diamonds(request):
 def view_orders(request):
     if request.session.get('user_type') != 'vendor' or 'user_id' not in request.session:
         return redirect('login')
+
     vendor_id = request.session['user_id']
-    orders_qs = Order.objects.filter(vendor_id=vendor_id).order_by('-created_at').prefetch_related('items', 'customer')
-    paginator = Paginator(orders_qs, 5)
+    orders_qs = (
+        Order.objects
+        .filter(vendor_id=vendor_id)
+        .order_by('-created_at')
+        .prefetch_related('items__diamond', 'customer')
+    )
+
+    # Flatten into order_items
+    order_items = []
+    for order in orders_qs:
+        for item in order.items.all():
+            order_items.append({
+                "order": order,
+                "item": item,
+            })
+
+    # Paginate order_items instead of orders
+    paginator = Paginator(order_items, 10)  # 10 rows per page
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    return render(request, 'vendor/order.html', {
-        'orders': page_obj.object_list,
-        'page_obj': page_obj,
-    })
+
+    return render(request, 'vendor/order.html', {'page_obj': page_obj})
 
 def _process_multiple_diamonds_list(multiple_diamonds, vendor, batch_size=1000):
     """Normalize, validate, and bulk save a list of diamond dicts.

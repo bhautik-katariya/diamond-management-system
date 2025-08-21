@@ -9,6 +9,7 @@ class Vendor(models.Model):
     email = models.EmailField(unique=True, blank=False, null=False)
     phone = models.CharField(max_length=15, unique=True, blank=False, null=False)
     password = models.CharField(max_length=128, blank=False, null=False)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.fname} {self.lname}"

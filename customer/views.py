@@ -1,4 +1,4 @@
-from django.shortcuts import redirect,render, get_object_or_404
+from django.shortcuts import redirect, render, reverse, get_object_or_404
 from django.contrib import messages
 from vendor.models import Diamond, Order, OrderItem
 from .models import Cart, CartItem, Customer
@@ -138,7 +138,8 @@ def decrease_quantity(request, item_id):
 def checkout(request):
     if 'user_id' not in request.session or request.session.get('user_type') != 'customer':
         messages.error(request, "Please log in as a customer to checkout.")
-        return redirect('login')
+        login_url = f"{reverse('login')}?next={reverse('checkout')}"
+        return redirect(login_url)
 
     customer = get_object_or_404(Customer, pk=request.session['user_id'])
     cart, created = Cart.objects.get_or_create(customer=customer)
@@ -151,9 +152,7 @@ def checkout(request):
     vendor_items = {}
     for item in cart_items:
         vendor = item.diamond.vendor
-        if vendor not in vendor_items:
-            vendor_items[vendor] = []
-        vendor_items[vendor].append(item)
+        vendor_items.setdefault(vendor, []).append(item)
 
     # Create an order for each vendor
     for vendor, items in vendor_items.items():
