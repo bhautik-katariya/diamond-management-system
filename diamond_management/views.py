@@ -15,6 +15,8 @@ from vendor.models import Diamond
 from django.views.decorators.csrf import csrf_exempt
 import datetime
 from django.contrib.auth.views import LogoutView
+from urllib.parse import urlencode
+
 
 def register(request):
     if request.method == 'POST':
@@ -155,16 +157,15 @@ def edit_profile(request):
 
     return render(request, 'edit_profile.html', {'form': form, 'user_type':user_type})
 
-def dashboard(request):
-    diamonds = Diamond.objects.all().order_by('id')
 
+def dashboard(request):
+    diamonds = Diamond.objects.all().order_by('-created_at')
+    
     # Get filters from query params
     shape = request.GET.getlist('shape')
     color = request.GET.getlist('color')
     clarity = request.GET.getlist('clarity')
     cut = request.GET.getlist('cut')
-    # polish = request.GET.getlist('polish')
-    # symmetry = request.GET.getlist('symmetry')
     lab = request.GET.getlist('lab')
     min_carat = request.GET.get('min_carat')
     max_carat = request.GET.get('max_carat')
@@ -178,17 +179,13 @@ def dashboard(request):
         diamonds = diamonds.filter(clarity__in=clarity)
     if cut:
         diamonds = diamonds.filter(cut__in=cut)
-    # if polish:
-    #     diamonds = diamonds.filter(polish__in=polish)
-    # if symmetry:
-    #     diamonds = diamonds.filter(symmetry__in=symmetry)
     if lab:
         diamonds = diamonds.filter(lab__in=lab)
     if min_carat:
         diamonds = diamonds.filter(carat__gte=min_carat)
     if max_carat:
         diamonds = diamonds.filter(carat__lte=max_carat)
-        
+
     # Sorting
     sort = request.GET.get('sort')
     if sort == 'price_asc':
@@ -224,8 +221,6 @@ def dashboard(request):
         "color": color,
         "clarity": clarity,
         "cut": cut,
-        # "polish": polish,
-        # "symmetry": symmetry,
         "lab": lab,
     }
 
@@ -235,16 +230,12 @@ def dashboard(request):
         ("Color", Diamond.COLOUR, "color"),
         ("Clarity", Diamond.CLARITY, "clarity"),
         ("Cut", Diamond.CUT, "cut"),
-        # ("Polish", Diamond.POLISH, "polish"),
-        # ("Symmetry", Diamond.SYMMETRY, "symmetry"),
         ("Lab", Diamond.LAB, "lab"),
     ]
 
-    # Add get_params for pagination links
-    get_params = request.GET.copy()
-    if 'page' in get_params:
-        get_params.pop('page')
-    get_params_str = get_params.urlencode()
+    # Keep raw params (no backend cleaning)
+    get_params = request.GET.urlencode()
+
     context = {
         'diamonds': page_obj.object_list,
         'page_obj': page_obj,
@@ -253,7 +244,7 @@ def dashboard(request):
         'total_stock': total_stock,
         'total_carat': round(total_carat, 2),
         'total_amount': round(total_amount, 2),
-        'get_params': get_params_str,
+        'get_params': get_params,
     }
 
     return render(request, 'dashboard.html', context)

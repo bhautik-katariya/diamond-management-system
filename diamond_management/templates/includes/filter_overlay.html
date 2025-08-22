@@ -4,10 +4,49 @@
 <!-- Filter Overlay -->
  
 <style>
+    .filter-collapse {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.2s ease, opacity 0.2s ease;
+        opacity: 0;
+    }
+    .filter-collapse.active {
+        max-height: 1000px; /* big enough to fit content */
+        opacity: 1;
+    }
+
+    #filterOverlayWrapper.active {
+        margin-bottom: 30px; /* only when expanded */
+    }
+
+    #filterOverlay {
+        background: #fff;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        margin-bottom: 30px;
+    }
+
+    .filter-section {
+        margin-bottom: 20px;  /* adjust as needed */
+    }    
+
     .shape-row {
         border: 1.5px solid #eee;
         margin-bottom: 10px;
     }
+
+    /* ensure buttons wrap and rows leave space before the table */
+    .filter-button-group { 
+        display: flex; 
+        flex-wrap: wrap; 
+        gap: 0.5rem; 
+    }
+
+    .filters-block { 
+        margin-bottom: 1.5rem; 
+    }  /* prevents overlap with table when zoomed */
+
     .shape-icon-label {
         display: flex;
         flex-direction: column;
@@ -31,7 +70,7 @@
         justify-content: center;
     }
     .shape-label {
-        font-size: 1em;
+        font-size: 0.7rem;
         color: #222;
         margin-top: 6px;
         font-weight: 500;
@@ -60,177 +99,210 @@
         margin-bottom: 6px;
         display: block;
     }
+
 </style>
-<div id="filterOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#fff; color:#222; z-index:9999; overflow-y:auto; padding:30px;">
+<div id="filterOverlay">
     <h4 class="mb-4" style="color:#222;">Filter Options</h4>
     <form method="get" id="filterForm">
         <div class="row g-4">
-            <!-- Shape Selection with SVG Icons -->
-            <div class="col-12 mb-3">
-                <label class="form-label" style="color:#222;">Shape</label>
-                <div class="d-flex flex-row flex-nowrap justify-content-between align-items-center shape-row" style="background:#fff; border-radius:12px; padding:18px 10px 10px 10px; box-shadow:0 2px 8px #eee; overflow-x:auto;">
-                    {% for code, label in filter_groups.0.1 %}
-                        <input type="checkbox" class="btn-check" name="shape" id="shape-{{ code }}" value="{{ code }}" autocomplete="off" {% if code in active_filters.shape %}checked{% endif %}>
-                        <label class="shape-icon-label mx-2" for="shape-{{ code }}">
-                            <span class="shape-svg">
-                                {% if label == 'ASSCHER' %}
-                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651456/asscher_xwkvvy.svg" width="40" height="40" alt="Asscher Shape">
-                                {% elif label == 'BAGUETTE' %}
-                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651456/baguette_gryjpl.svg" width="32" height="40" alt="Emerald Shape">
-                                {% elif label == 'CUSHION' %}
-                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651456/cushion_mmnoab.svg" width="40" height="40" alt="Cushion Shape">
-                                {% elif label == 'EMERALD' %}
-                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651456/emerald_sr9e0f.svg" width="32" height="40" alt="Emerald Shape">
-                                {% elif label == 'HEART' %}
-                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651457/heart_piv4mu.svg" width="40" height="40" alt="Heart Shape">
-                                {% elif label == 'MARQUISE' %}
-                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651457/marquise_ljlq2v.svg" width="32" height="40" alt="Marquise Shape">
-                                {% elif label == 'OLD' %}
-                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651458/old_vyq23i.svg" width="40" height="40" alt="Old Shape">
-                                {% elif label == 'OVAL' %}
-                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651458/oval_epynny.svg" width="32" height="40" alt="Oval Shape">
-                                {% elif label == 'PEAR' %}
-                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651459/pear_vdpfgq.svg" width="32" height="40" alt="Pear Shape">
-                                {% elif label == 'PRINCESS' %}
-                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651459/princess_fh3oqx.svg" width="40" height="40" alt="Princess Shape">
-                                {% elif label == 'RADIANT' %}
-                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651460/radiant_jhgoyd.svg" width="32" height="40" alt="Radiant Shape">
-                                {% elif label == 'ROUND' %}
-                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651461/round_phykmr.svg" width="40" height="40" alt="Round Shape">
-                                {% elif label == 'SQUARE' %}
-                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651461/square_x76biu.svg" width="40" height="40" alt="Square Shape">
-                                {% elif label == 'TAPERED' %}
-                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651461/tapered_i6pqjb.svg" width="32" height="40" alt="Taper Shape">
-                                {% elif label == 'TRILLIANT' %}
-                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651462/trilliant_hwawud.svg" width="32" height="40" alt="Trillion Shape">
-                                {% else %}
-                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651458/other_n3otbi.svg" width="40" height="40" alt="Other Shape">
-                                {% endif %}
-                                    </span>
-                                    <span class="shape-label">{{ label }}</span>
-                                </label>
-                            {% endfor %}
-                </div>
+      
+          <!-- Shape -->
+          <div class="col-12 mb-3">
+            <label class="form-label" style="color:#222;">Shape</label>
+            <div class="d-flex flex-row flex-nowrap justify-content-between align-items-center shape-row"
+                 style="background:#fff; border-radius:12px; padding:18px 10px 10px 10px; box-shadow:0 2px 8px #eee; overflow-x:auto;">
+              {% for code, label in filter_groups.0.1 %}
+                <input type="checkbox" class="btn-check" name="shape" id="shape-{{ code }}" value="{{ code }}" autocomplete="off"
+                       {% if code in active_filters.shape %}checked{% endif %}>
+                <label class="shape-icon-label mx-2" for="shape-{{ code }}">
+                  <span class="shape-svg">
+                    {# your SVG <img> if/elif block unchanged #}
+                    {% if label == 'ASSCHER' %}
+                      <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651456/asscher_xwkvvy.svg" width="40" height="40" alt="Asscher Shape">
+                    {% elif label == 'BAGUETTE' %}
+                      <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651456/baguette_gryjpl.svg" width="32" height="40" alt="Emerald Shape">
+                    {% elif label == 'CUSHION' %}
+                      <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651456/cushion_mmnoab.svg" width="40" height="40" alt="Cushion Shape">
+                    {% elif label == 'EMERALD' %}
+                      <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651456/emerald_sr9e0f.svg" width="32" height="40" alt="Emerald Shape">
+                    {% elif label == 'HEART' %}
+                      <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651457/heart_piv4mu.svg" width="40" height="40" alt="Heart Shape">
+                    {% elif label == 'MARQUISE' %}
+                      <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651457/marquise_ljlq2v.svg" width="32" height="40" alt="Marquise Shape">
+                    {% elif label == 'OLD' %}
+                      <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651458/old_vyq23i.svg" width="40" height="40" alt="Old Shape">
+                    {% elif label == 'OVAL' %}
+                      <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651458/oval_epynny.svg" width="32" height="40" alt="Oval Shape">
+                    {% elif label == 'PEAR' %}
+                      <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651459/pear_vdpfgq.svg" width="32" height="40" alt="Pear Shape">
+                    {% elif label == 'PRINCESS' %}
+                      <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651459/princess_fh3oqx.svg" width="40" height="40" alt="Princess Shape">
+                    {% elif label == 'RADIANT' %}
+                      <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651460/radiant_jhgoyd.svg" width="32" height="40" alt="Radiant Shape">
+                    {% elif label == 'ROUND' %}
+                      <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651461/round_phykmr.svg" width="40" height="40" alt="Round Shape">
+                    {% elif label == 'SQUARE' %}
+                      <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651461/square_x76biu.svg" width="40" height="40" alt="Square Shape">
+                    {% elif label == 'TAPERED' %}
+                      <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651461/tapered_i6pqjb.svg" width="32" height="40" alt="Taper Shape">
+                    {% elif label == 'TRILLIANT' %}
+                      <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651462/trilliant_hwawud.svg" width="32" height="40" alt="Trillion Shape">
+                    {% else %}
+                      <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651458/other_n3otbi.svg" width="40" height="40" alt="Other Shape">
+                    {% endif %}
+                  </span>
+                  <span class="shape-label">{{ label }}</span>
+                </label>
+              {% endfor %}
             </div>
-
-            <!-- Carat Range Slider -->
-            <div class="col-md-6 mb-3">
-                <label class="form-label" style="color:#222;">Carat</label>
-                <div class="d-flex align-items-center gap-2">
-                    <input type="number" step="0.01" min="0" name="min_carat" class="form-control" style="max-width:100px;" placeholder="Min" value="{{ request.GET.min_carat }}">
-                    <span>-</span>
-                    <input type="number" step="0.01" min="0" name="max_carat" class="form-control" style="max-width:100px;" placeholder="Max" value="{{ request.GET.max_carat }}">
-                </div>
+          </div>
+      
+          <!-- Carat + Budget + Lab on one row -->
+          <div class="row g-4 mb-4 align-items-end">
+            <!-- Carat -->
+            <div class="col-lg-4 col-md-6">
+              <label class="form-label" style="color:#222;">Carat</label>
+              <div class="d-flex align-items-center gap-2 flex-wrap">
+                <input type="number" step="0.01" min="0" name="min_carat" class="form-control" style="max-width:100px;" placeholder="Min" value="{{ request.GET.min_carat }}">
+                <span>-</span>
+                <input type="number" step="0.01" min="0" name="max_carat" class="form-control" style="max-width:100px;" placeholder="Max" value="{{ request.GET.max_carat }}">
+              </div>
             </div>
-            <!-- Budget/Price Range Slider -->
-            <div class="col-md-6 mb-3">
-                <label class="form-label" style="color:#222;">Budget</label>
-                <div class="d-flex align-items-center gap-2">
-                    <input type="number" step="1" min="0" name="min_price" class="form-control" style="max-width:120px;" placeholder="Min $" value="{{ request.GET.min_price }}">
-                    <span>-</span>
-                    <input type="number" step="1" min="0" name="max_price" class="form-control" style="max-width:120px;" placeholder="Max $" value="{{ request.GET.max_price }}">
-                </div>
+      
+            <!-- Budget -->
+            <div class="col-lg-4 col-md-6">
+              <label class="form-label" style="color:#222;">Budget</label>
+              <div class="d-flex align-items-center gap-2 flex-wrap">
+                <input type="number" step="1" min="0" name="min_price" class="form-control" style="max-width:120px;" placeholder="Min $" value="{{ request.GET.min_price }}">
+                <span>-</span>
+                <input type="number" step="1" min="0" name="max_price" class="form-control" style="max-width:120px;" placeholder="Max $" value="{{ request.GET.max_price }}">
+              </div>
             </div>
-            <!-- Color, Clarity, Cut, Polish, Symmetry, Lab as Button Groups -->
+      
+            <!-- Lab (correctly sourced from the 'lab' group) -->
+            <div class="col-lg-4 col-12">
+              <label class="form-label" style="color:#222;">Lab</label>
+              <div class="filter-button-group" role="group" aria-label="Lab" data-name="lab">
+                {% for title, options, name in filter_groups %}
+                  {% if name == 'lab' %}
+                    {% for code, label in options %}
+                      <input type="checkbox" class="hidden-check" name="lab" id="lab-{{ code }}" value="{{ code }}"
+                             {% if code in active_filters.lab %}checked{% endif %}>
+                      <label class="filter-toggle" for="lab-{{ code }}">{{ label }}</label>
+                    {% endfor %}
+                  {% endif %}
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+      
+          <!-- Remaining groups EXCEPT lab -->
+          <div class="row g-4 filters-block">
             {% for title, options, name in filter_groups|slice:'1:' %}
+              {% if name != 'lab' %}
                 <div class="col-md-4 mb-3">
-                    <label class="form-label" style="color:#222;">{{ title }}</label>
-                    <div class="filter-button-group" role="group" aria-label="{{ title }}" data-name="{{ name }}">
-                        {% for code, label in options %}
-                          <input type="checkbox" class="hidden-check" name="{{ name }}" id="{{ name }}-{{ code }}" value="{{ code }}" {% if code in active_filters|get_item:name %}checked{% endif %}>
-                          <label class="filter-toggle" for="{{ name }}-{{ code }}">{{ label }}</label>
-                        {% endfor %}
-                      </div>                            
+                  <label class="form-label" style="color:#222;">{{ title }}</label>
+                  <div class="filter-button-group" role="group" aria-label="{{ title }}" data-name="{{ name }}">
+                    {% for code, label in options %}
+                      <input type="checkbox" class="hidden-check" name="{{ name }}" id="{{ name }}-{{ code }}" value="{{ code }}"
+                             {% if code in active_filters|get_item:name %}checked{% endif %}>
+                      <label class="filter-toggle" for="{{ name }}-{{ code }}">{{ label }}</label>
+                    {% endfor %}
+                  </div>
                 </div>
+              {% endif %}
             {% endfor %}
-        </div>
-        <div class="d-flex gap-3 mt-4">
+          </div>
+      
+          <div class="d-flex gap-3 mt-3">
             <a href="{% url 'dashboard' %}" class="btn btn-outline-dark">Clear Filters</a>
             <button type="button" class="btn btn-outline-dark" onclick="toggleFilterOverlay()">Cancel</button>
             <button type="submit" class="btn btn-dark">OK</button>
+          </div>
+      
         </div>
-    </form>
+      </form>    
 </div>
 
 <script>
     function toggleFilterOverlay() {
-    const overlay = document.getElementById('filterOverlay');
-    overlay.style.display = (overlay.style.display === 'none' || overlay.style.display === '') ? 'block' : 'none';
-}
+        const wrapper = document.getElementById('filterOverlayWrapper');
+        wrapper.classList.toggle('active');
+    }
 
-// Range select for color and clarity buttons
-document.addEventListener('DOMContentLoaded', function() {
-    // Names we want range behavior for
-    const rangeGroups = new Set(['color', 'clarity']);
+    // Range select for color and clarity buttons
+    document.addEventListener('DOMContentLoaded', function() {
+        // Names we want range behavior for
+        const rangeGroups = new Set(['color', 'clarity']);
 
-    const groups = document.querySelectorAll('.filter-button-group[data-name]');
+        const groups = document.querySelectorAll('.filter-button-group[data-name]');
 
-    groups.forEach(group => {
-        const name = group.getAttribute('data-name');
-        if (!rangeGroups.has(name)) return; // only for color/clarity
+        groups.forEach(group => {
+            const name = group.getAttribute('data-name');
+            if (!rangeGroups.has(name)) return; // only for color/clarity
 
-        // Get ordered checkboxes in this group
-        const inputs = Array.from(group.querySelectorAll('input.hidden-check'));
-        const labels = Array.from(group.querySelectorAll('label.filter-toggle'));
+            // Get ordered checkboxes in this group
+            const inputs = Array.from(group.querySelectorAll('input.hidden-check'));
+            const labels = Array.from(group.querySelectorAll('label.filter-toggle'));
 
-        let anchorIndex = null; // first clicked index
-        let lastRange = null;   // {lo, hi} of last applied range
+            let anchorIndex = null; // first clicked index
+            let lastRange = null;   // {lo, hi} of last applied range
 
-        function setCheckedRange(start, end, checked) {
-            const [lo, hi] = start <= end ? [start, end] : [end, start];
-            for (let i = lo; i <= hi; i++) {
-                inputs[i].checked = checked;
-            }
-        }
-
-        // Click handler for labels (since labels are what users click)
-        labels.forEach((label, idx) => {
-            label.addEventListener('click', function(e) {
-                // prevent default label toggle, we'll manage it
-                e.preventDefault();
-
-                const alreadyChecked = inputs[idx].checked;
-
-                // If a completed range exists and no active anchor, any further click clears the previous selection
-                // and treats this click as start of a new selection range (select only the clicked one)
-                if (anchorIndex === null && lastRange) {
-                    // Clear all selections in this group
-                    inputs.forEach(i => { i.checked = false; });
-                    lastRange = null;
-                    inputs[idx].checked = true; // select current as new anchor selection
-                    anchorIndex = idx;
-                    return;
+            function setCheckedRange(start, end, checked) {
+                const [lo, hi] = start <= end ? [start, end] : [end, start];
+                for (let i = lo; i <= hi; i++) {
+                    inputs[i].checked = checked;
                 }
+            }
 
-                if (anchorIndex === null) {
-                    // No anchor yet → start a new selection with just this one toggled
-                    inputs[idx].checked = !alreadyChecked;
-                    anchorIndex = idx;
-                } else if (anchorIndex === idx) {
-                    // Clicking the same item again clears anchor and toggles single
-                    inputs[idx].checked = !alreadyChecked;
-                    anchorIndex = null;
-                    lastRange = null;
-                } else {
-                    // We have an anchor and a second click → select the inclusive range
-                    const lo = Math.min(anchorIndex, idx);
-                    const hi = Math.max(anchorIndex, idx);
-                    setCheckedRange(anchorIndex, idx, true);
-                    // Remember range so next (third) click clears it
-                    lastRange = { lo, hi };
-                    // Clear anchor after completing a range
+            // Click handler for labels (since labels are what users click)
+            labels.forEach((label, idx) => {
+                label.addEventListener('click', function(e) {
+                    // prevent default label toggle, we'll manage it
+                    e.preventDefault();
+
+                    const alreadyChecked = inputs[idx].checked;
+
+                    // If a completed range exists and no active anchor, any further click clears the previous selection
+                    // and treats this click as start of a new selection range (select only the clicked one)
+                    if (anchorIndex === null && lastRange) {
+                        // Clear all selections in this group
+                        inputs.forEach(i => { i.checked = false; });
+                        lastRange = null;
+                        inputs[idx].checked = true; // select current as new anchor selection
+                        anchorIndex = idx;
+                        return;
+                    }
+
+                    if (anchorIndex === null) {
+                        // No anchor yet → start a new selection with just this one toggled
+                        inputs[idx].checked = !alreadyChecked;
+                        anchorIndex = idx;
+                    } else if (anchorIndex === idx) {
+                        // Clicking the same item again clears anchor and toggles single
+                        inputs[idx].checked = !alreadyChecked;
+                        anchorIndex = null;
+                        lastRange = null;
+                    } else {
+                        // We have an anchor and a second click → select the inclusive range
+                        const lo = Math.min(anchorIndex, idx);
+                        const hi = Math.max(anchorIndex, idx);
+                        setCheckedRange(anchorIndex, idx, true);
+                        // Remember range so next (third) click clears it
+                        lastRange = { lo, hi };
+                        // Clear anchor after completing a range
+                        anchorIndex = null;
+                    }
+                });
+            });
+
+            // Also allow clearing the anchor if user clicks outside the group
+            document.addEventListener('click', function(ev) {
+                if (!group.contains(ev.target)) {
+                    // Keep lastRange so that returning clicks can clear previous selection
                     anchorIndex = null;
                 }
             });
         });
-
-        // Also allow clearing the anchor if user clicks outside the group
-        document.addEventListener('click', function(ev) {
-            if (!group.contains(ev.target)) {
-                // Keep lastRange so that returning clicks can clear previous selection
-                anchorIndex = null;
-            }
-        });
     });
-});
 </script>

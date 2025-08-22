@@ -42,6 +42,12 @@
         margin-bottom: 20px;
     }
 
+    #tableContainer {
+        overflow-x: auto;
+        overflow-y: auto;
+        max-height: none !important;
+      }
+
     .diamond-table {
         color: #222;
         background-color: #fff;
@@ -91,7 +97,7 @@
         font-weight: 500;
         box-shadow: 0 2px 6px rgba(11, 25, 55, 0.25);
         transition: background 0.3s, color 0.3s;
-        display: flex;
+        display: inline-block;
         align-items: center;
         justify-content: center;
         text-align: center;
@@ -275,49 +281,39 @@
 
 <!-- Sort & Filter + Page Controls -->
 <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
-
-    <!-- Left Side: Page Controls -->
     <div class="d-flex align-items-center gap-2">
-        <!-- Prev Button -->
-                {% if page_obj.has_previous %}
-        <!-- First Button -->
-        <li class="page-item">
-            <a class="page-link" href="?page=1{% if get_params %}&{{ get_params }}{% endif %}">« First</a>
-        </li>
+        {# First + Prev #}
+      {% if page_obj.has_previous %}
+      <li class="page-item">
+        <a class="page-link" href="?page=1{% if get_params %}&{{ get_params }}{% endif %}">« First</a>
+      </li>
+      <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if get_params %}&{{ get_params }}{% endif %}">‹ Prev</a>
+      </li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link">« First</span></li>
+      <li class="page-item disabled"><span class="page-link">‹ Prev</span></li>
+    {% endif %}
 
-        <!-- Prev Button -->
-        <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if get_params %}&{{ get_params }}{% endif %}">‹ Prev</a>
-        </li>
-        {% else %}
-        <!-- Disabled First & Prev -->
-        <li class="page-item disabled"><span class="page-link">« First</span></li>
-        <li class="page-item disabled"><span class="page-link">‹ Prev</span></li>
-        {% endif %}
+    {# Page Input in the middle #}
+    <li class="page-item d-flex align-items-center" style="gap: 6px;">
+      <input type="number" id="pageInputBottom" class="page-input form-control" value="{{ page_obj.number }}" min="1" max="{{ page_obj.paginator.num_pages }}" style="width: 70px; text-align: center;">
+      <span class="page-total">of {{ page_obj.paginator.num_pages }}</span>
+    </li>
 
-        <!-- Page Input Center -->
-        <li class="page-item d-flex align-items-center" style="gap: 6px;">
-            <input type="number" id="pageInput" class="page-input"
-                   value="{{ page_obj.number }}" min="1" max="{{ page_obj.paginator.num_pages }}">
-            <span class="page-total">of {{ page_obj.paginator.num_pages }}</span>
-        </li>
-
-        {% if page_obj.has_next %}
-        <!-- Next Button -->
-        <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if get_params %}&{{ get_params }}{% endif %}">Next ›</a>
-        </li>
-
-        <!-- Last Button -->
-        <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if get_params %}&{{ get_params }}{% endif %}">Last »</a>
-        </li>
-        {% else %}
-        <!-- Disabled Next & Last -->
-        <li class="page-item disabled"><span class="page-link">Next ›</span></li>
-        <li class="page-item disabled"><span class="page-link">Last »</span></li>
-        {% endif %}
-    </div>
+    {# Next + Last #}
+    {% if page_obj.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if get_params %}&{{ get_params }}{% endif %}">Next ›</a>
+      </li>
+      <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if get_params %}&{{ get_params }}{% endif %}">Last »</a>
+      </li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link">Next ›</span></li>
+      <li class="page-item disabled"><span class="page-link">Last »</span></li>
+    {% endif %}
+</div>
 
     <!-- Right Side: Download / Sort / Filter -->
     <div class="d-flex gap-2">
@@ -348,13 +344,17 @@
                 <li><a class="dropdown-item" href="{{ request.get_full_path|add_sort:'clarity_asc' }}">Low-to-high</a></li>
                 <li><a class="dropdown-item" href="{{ request.get_full_path|add_sort:'clarity_desc' }}">High-to-Low</a></li>
             </ul>
-        </div>
-        <button class="btn btn-filter equal-button" type="button" onclick="toggleFilterOverlay()">Filter</button>
+        </div>   
+        <button class="btn btn-filter equal-button" type="button" onclick="toggleFilterOverlay()">Filter</button>     
     </div>
 </div>
 
+<div id="filterOverlayWrapper" class="filter-collapse">
+    {% include "includes/filter_overlay.html" %}
+</div>
+
 <!-- Table -->
-<div class="table-responsive" style="overflow-x: auto;">
+<div id="tableContainer" class="table-responsive" style="overflow-x: auto;">
 <table class="diamond-table table table-bordered w-100">
     <thead>
         <tr>
@@ -438,67 +438,63 @@
 <!-- Pagination Controls -->
 <nav aria-label="Diamond pagination" class="mt-4">
     <ul class="pagination justify-content-center align-items-center" style="gap: 10px;">
-
-        {% if page_obj.has_previous %}
-        <!-- First Button -->
+  
+      {# First + Prev #}
+      {% if page_obj.has_previous %}
         <li class="page-item">
-            <a class="page-link" href="?page=1{% if get_params %}&{{ get_params }}{% endif %}">« First</a>
+          <a class="page-link" href="?page=1{% if get_params %}&{{ get_params }}{% endif %}">« First</a>
         </li>
-
-        <!-- Prev Button -->
         <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if get_params %}&{{ get_params }}{% endif %}">‹ Prev</a>
+          <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if get_params %}&{{ get_params }}{% endif %}">‹ Prev</a>
         </li>
-        {% else %}
-        <!-- Disabled First & Prev -->
+      {% else %}
         <li class="page-item disabled"><span class="page-link">« First</span></li>
         <li class="page-item disabled"><span class="page-link">‹ Prev</span></li>
-        {% endif %}
-
-        <!-- Page Input Center -->
-        <li class="page-item d-flex align-items-center" style="gap: 6px;">
-            <input type="number" id="pageInput" class="page-input"
-                   value="{{ page_obj.number }}" min="1" max="{{ page_obj.paginator.num_pages }}">
-            <span class="page-total">of {{ page_obj.paginator.num_pages }}</span>
-        </li>
-
-        {% if page_obj.has_next %}
-        <!-- Next Button -->
+      {% endif %}
+  
+      {# Page Input in the middle #}
+      <li class="page-item d-flex align-items-center" style="gap: 6px;">
+        <input type="number" 
+               id="pageInputBottom" 
+               class="page-input form-control" 
+               value="{{ page_obj.number }}" 
+               min="1" 
+               max="{{ page_obj.paginator.num_pages }}" 
+               style="width: 70px; text-align: center;">
+        <span class="page-total">of {{ page_obj.paginator.num_pages }}</span>
+      </li>
+  
+      {# Next + Last #}
+      {% if page_obj.has_next %}
         <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if get_params %}&{{ get_params }}{% endif %}">Next ›</a>
+          <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if get_params %}&{{ get_params }}{% endif %}">Next ›</a>
         </li>
-
-        <!-- Last Button -->
         <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if get_params %}&{{ get_params }}{% endif %}">Last »</a>
+          <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if get_params %}&{{ get_params }}{% endif %}">Last »</a>
         </li>
-        {% else %}
-        <!-- Disabled Next & Last -->
+      {% else %}
         <li class="page-item disabled"><span class="page-link">Next ›</span></li>
         <li class="page-item disabled"><span class="page-link">Last »</span></li>
-        {% endif %}
-
+      {% endif %}
+  
     </ul>
-</nav>
-
-
+  </nav>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const selectAllCheckbox = document.getElementById('select-all');
     
+        // === Checkbox Logic ===
         function updateCheckboxesState() {
             const rowCheckboxes = document.querySelectorAll('.row-checkbox');
             const rowCheckboxArray = Array.from(rowCheckboxes);
     
-            // Select all logic
-            selectAllCheckbox.addEventListener('change', function () {
-                rowCheckboxArray.forEach(cb => {
-                    cb.checked = this.checked;
-                });
+            // Select all toggle
+            selectAllCheckbox?.addEventListener('change', function () {
+                rowCheckboxArray.forEach(cb => cb.checked = this.checked);
             });
     
-            // Update indeterminate state based on visible checkboxes
+            // Sync indeterminate state
             rowCheckboxArray.forEach(cb => {
                 cb.addEventListener('change', function () {
                     const allChecked = rowCheckboxArray.every(cb => cb.checked);
@@ -509,13 +505,12 @@
                 });
             });
         }
-    
         updateCheckboxesState();
-
-        // Download button logic
+    
+        // === Download Button Logic ===
         const downloadBtn = document.getElementById('download-btn');
         if (downloadBtn) {
-            downloadBtn.addEventListener('click', function() {
+            downloadBtn.addEventListener('click', function () {
                 const checkboxes = document.querySelectorAll('.row-checkbox');
                 let selected = [];
                 checkboxes.forEach(cb => {
@@ -529,44 +524,79 @@
                 document.getElementById('download-form').submit();
             });
         }
-
-        // Page input functionality
-        const pageInput = document.getElementById('pageInput');
-        if (pageInput) {
-            pageInput.addEventListener('keypress', function(e) {
+    
+        // === Pagination Input Logic ===
+        document.querySelectorAll('.page-input').forEach(function (pageInput) {
+            // On Enter
+            pageInput.addEventListener('keypress', function (e) {
                 if (e.key === 'Enter') {
-                    goToPage();
+                    goToPage(this);
                 }
             });
-            
-            pageInput.addEventListener('blur', function() {
-                goToPage();
+    
+            // On Blur
+            pageInput.addEventListener('blur', function () {
+                goToPage(this);
             });
-        }
-
-        function goToPage() {
-            const pageInput = document.getElementById('pageInput');
-            if (!pageInput) return;
-            
-            let pageNum = parseInt(pageInput.value);
-            const maxPages = parseInt(pageInput.getAttribute('max'));
-            
+        });
+    
+        function goToPage(inputEl) {
+            if (!inputEl) return;
+    
+            let pageNum = parseInt(inputEl.value);
+            const maxPages = parseInt(inputEl.getAttribute('max'));
+    
             // Validate page number
             if (isNaN(pageNum) || pageNum < 1) {
                 pageNum = 1;
             } else if (pageNum > maxPages) {
                 pageNum = maxPages;
             }
-            
-            // Build URL with current parameters
-            const currentUrl = new URL(window.location);
+    
+            // Build URL
+            let currentUrl = new URL(window.location.href);
+    
+            // Clean empty params (important!)
+            currentUrl.searchParams.forEach((value, key) => {
+                if (value === "" || value === null) {
+                    currentUrl.searchParams.delete(key);
+                }
+            });
+    
+            // Update page param
             currentUrl.searchParams.set('page', pageNum);
-            
-            // Redirect to the new page
+    
+            // Redirect
             window.location.href = currentUrl.toString();
         }
-    });
-    </script>
 
-{% include "includes/filter_overlay.html" %}
+        // Run table adjustment on load and resize
+        window.addEventListener('load', adjustTableHeight);
+        window.addEventListener('resize', adjustTableHeight);
+
+        // Also adjust when filter overlay toggles
+        const wrapper = document.getElementById('filterOverlayWrapper');
+        if (wrapper && window.MutationObserver) {
+            const mo = new MutationObserver(adjustTableHeight);
+            mo.observe(wrapper, { attributes: true, attributeFilter: ['class', 'style'] });
+        }
+    });
+
+    function adjustTableHeight() {
+        const tableContainer = document.getElementById('tableContainer');
+        if (!tableContainer) return;
+
+        // distance from top of viewport to the top of the table container
+        const top = tableContainer.getBoundingClientRect().top;
+
+        // available area below the table container to the bottom of viewport
+        const available = window.innerHeight - top - 20; // 20px safety margin
+
+        // Provide a sensible minimum height to avoid tiny table
+        const minHeight = 220;
+        tableContainer.style.maxHeight = (available > minHeight ? available : minHeight) + 'px';
+    }
+</script>
+    
+       
 {% endblock %}
