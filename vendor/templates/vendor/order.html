@@ -121,6 +121,7 @@
                 <th>Price/Carat</th>
                 <th>Total</th>
                 <th>View</th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody>
@@ -141,6 +142,16 @@
                 <td>
                     <a href="{% url 'diamond_detail' oi.item.diamond.id %}?from_order=true" class="btn btn-primary btn-sm">View</a>
                 </td>
+                <td>
+                    {% if oi.order.status == "Pending" %}
+                      <form method="post" action="{% url 'vendor:process_order' oi.order.id %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success btn-sm">Mark as Processed</button>
+                      </form>
+                    {% else %}
+                      <span class="badge bg-secondary">{{ oi.order.status }}</span>
+                    {% endif %}
+                  </td>
             </tr>
             {% empty %}
             <tr><td colspan="12" class="text-center">No orders found.</td></tr>
@@ -228,6 +239,18 @@ function goToPage() {
     // Redirect to the new page
     window.location.href = currentUrl.toString();
 }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        // Find all "Process Order" buttons (adjust selector to match your template)
+        const buttons = document.querySelectorAll(".process-order-btn");
+    
+        buttons.forEach(btn => {
+            btn.addEventListener("click", function () {
+                // Wait a little after redirect or AJAX finishes
+                setTimeout(updateOrderBadge, 1500);
+            });
+        });
+    });
 </script>
 {% endblock %}
 

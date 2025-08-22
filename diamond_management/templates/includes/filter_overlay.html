@@ -47,6 +47,25 @@
         margin-bottom: 1.5rem; 
     }  /* prevents overlap with table when zoomed */
 
+    .shape-row {
+      display: flex;
+      flex-wrap: wrap;          /* wrap allow */
+      gap: 10px;                /* spacing */
+      justify-content: flex-start; /* left align */
+  }
+  
+  .shape-row .btn,
+  .shape-row label {
+      flex: 0 0 auto;           /* buttons ni width content jetli j */
+      white-space: nowrap;      /* text break na thai */
+      max-width: 100%;          /* parent thi bahar na jai */
+  }
+  
+  
+  .shape-icon-label {
+      flex: 0 1 auto;  /* responsive */
+  }
+
     .shape-icon-label {
         display: flex;
         flex-direction: column;
@@ -109,8 +128,8 @@
           <!-- Shape -->
           <div class="col-12 mb-3">
             <label class="form-label" style="color:#222;">Shape</label>
-            <div class="d-flex flex-row flex-nowrap justify-content-between align-items-center shape-row"
-                 style="background:#fff; border-radius:12px; padding:18px 10px 10px 10px; box-shadow:0 2px 8px #eee; overflow-x:auto;">
+            <div class="d-flex flex-row flex-wrap justify-content-start align-items-center shape-row"
+            style="background:#fff; border-radius:12px; padding:18px 10px 10px 10px; box-shadow:0 2px 8px #eee;">
               {% for code, label in filter_groups.0.1 %}
                 <input type="checkbox" class="btn-check" name="shape" id="shape-{{ code }}" value="{{ code }}" autocomplete="off"
                        {% if code in active_filters.shape %}checked{% endif %}>

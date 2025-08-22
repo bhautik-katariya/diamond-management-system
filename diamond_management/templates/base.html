@@ -24,6 +24,30 @@
             font-weight: bold;
         }
 
+        .nav-item .nav-link {
+            display: block;
+            padding-top: 0.2rem;
+            padding-right: 1px;
+            padding-bottom: 0.2rem;
+            padding-left: 1px;
+            position: relative; /* so badge positions relative to Orders link */
+        } 
+        
+        .badge-notify {
+            position: absolute;
+            top: -6px;         /* lift it above text */
+            right: 8px;        /* push it exactly above the "s" */
+            background: red;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 5px;
+            font-size: 0.65rem;
+            font-weight: bold;
+            line-height: 1;
+            min-width: 16px;
+            text-align: center;
+        }
+        
         /* Fix overflow on very small screens */
         body {
             overflow-x: hidden;
@@ -37,6 +61,7 @@
         }
     </style>
 </head>
+
 <body class="d-flex flex-column min-vh-100">
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-navy sticky-top">
@@ -55,9 +80,16 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'vendor:add_diamond' %}">Add Diamond</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'vendor:view_orders' %}">Orders</a>
-                        </li>
+                        <li class="nav-item position-relative">
+                            <a class="nav-link position-relative" href="{% url 'vendor:view_orders' %}">
+                                Orders
+                                <span id="orderBadge"
+                                      class="badge-notify"
+                                      style="{% if pending_orders_count == 0 %}display:none;{% endif %}">
+                                    {{ pending_orders_count }}
+                                </span>
+                            </a>
+                        </li>                                                          
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'edit_profile' %}">Edit Profile</a>
                         </li>
@@ -127,6 +159,28 @@
                     }, 500);
                 }, 3000);
             });
+        }); 
+
+        function updateOrderBadge() {
+            fetch("{% url 'vendor:pending_orders_count' %}")
+                .then(res => res.json())
+                .then(data => {
+                    const badge = document.getElementById("orderBadge");
+                    if (!badge) return;
+        
+                    if (data.count > 0) {
+                        badge.style.display = "inline-block";
+                        badge.textContent = data.count;
+                    } else {
+                        badge.style.display = "none";
+                    }
+                })
+                .catch(err => console.error("Badge fetch failed:", err));
+        }
+        
+        // keep polling for updates
+        document.addEventListener("DOMContentLoaded", function() {
+            setInterval(updateOrderBadge, 10000); // refresh every 10s
         });
     </script>
 
