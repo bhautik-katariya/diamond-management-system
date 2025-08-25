@@ -5,37 +5,26 @@
  
 <style>
     .filter-collapse {
-        max-height: 0;
         overflow: hidden;
-        transition: max-height 0.2s ease, opacity 0.2s ease;
-        opacity: 0;
-    }
-    .filter-collapse.active {
-        max-height: 1000px; /* big enough to fit content */
-        opacity: 1;
     }
 
     #filterOverlayWrapper.active {
-        margin-bottom: 30px; /* only when expanded */
+        margin-bottom: 15px; /* only when expanded */
     }
 
     #filterOverlay {
         background: #fff;
         border-radius: 8px;
-        padding: 20px;
+        padding: 10px;
         box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-        margin-bottom: 30px;
+        margin-bottom: 15px;
     }
-
     .filter-section {
-        margin-bottom: 20px;  /* adjust as needed */
+        margin-bottom: 2px;  /* adjust as needed */
     }    
-
     .shape-row {
         border: 1.5px solid #eee;
         margin-bottom: 10px;
-    }
-
     /* ensure buttons wrap and rows leave space before the table */
     .filter-button-group { 
         display: flex; 
@@ -43,14 +32,11 @@
         gap: 0.5rem; 
     }
 
-    .filters-block { 
-        margin-bottom: 1.5rem; 
-    }  /* prevents overlap with table when zoomed */
-
+    .filters-block { margin-bottom: 0.5rem; }  /* prevents overlap with table when zoomed */
     .shape-row {
       display: flex;
       flex-wrap: wrap;          /* wrap allow */
-      gap: 10px;                /* spacing */
+      gap: 2px;                /* spacing */
       justify-content: flex-start; /* left align */
   }
   
@@ -60,8 +46,7 @@
       white-space: nowrap;      /* text break na thai */
       max-width: 100%;          /* parent thi bahar na jai */
   }
-  
-  
+
   .shape-icon-label {
       flex: 0 1 auto;  /* responsive */
   }
@@ -121,13 +106,13 @@
 
 </style>
 <div id="filterOverlay">
-    <h4 class="mb-4" style="color:#222;">Filter Options</h4>
+    <h4 style="color:#222;">Filter Options</h4>
     <form method="get" id="filterForm">
-        <div class="row g-4">
+        <div class="row">
       
           <!-- Shape -->
-          <div class="col-12 mb-3">
-            <label class="form-label" style="color:#222;">Shape</label>
+          <div class="col-12">
+            <label class="form-label" style="color:#222;"></label>
             <div class="d-flex flex-row flex-wrap justify-content-start align-items-center shape-row"
             style="background:#fff; border-radius:12px; padding:18px 10px 10px 10px; box-shadow:0 2px 8px #eee;">
               {% for code, label in filter_groups.0.1 %}
@@ -177,7 +162,7 @@
           </div>
       
           <!-- Carat + Budget + Lab on one row -->
-          <div class="row g-4 mb-4 align-items-end">
+          <div class="row align-items-end">
             <!-- Carat -->
             <div class="col-lg-4 col-md-6">
               <label class="form-label" style="color:#222;">Carat</label>
@@ -216,7 +201,7 @@
           </div>
       
           <!-- Remaining groups EXCEPT lab -->
-          <div class="row g-4 filters-block">
+          <div class="row g-2 filters-block">
             {% for title, options, name in filter_groups|slice:'1:' %}
               {% if name != 'lab' %}
                 <div class="col-md-4 mb-3">
@@ -323,5 +308,29 @@
                 }
             });
         });
-    });
+
+        // Script to dynamically adjust max-height
+        const filterCollapse = document.getElementById('filterOverlayWrapper');
+        const filterContent = document.getElementById('filterOverlay');
+
+        function setMaxHeight() {
+            if (filterCollapse.classList.contains('active')) {
+                filterCollapse.style.maxHeight = filterContent.scrollHeight + 'px';
+            } else {
+                filterCollapse.style.maxHeight = '0';
+            }
+        }
+
+        // Set initial max-height if active on load
+        setMaxHeight();
+
+        // Update max-height when the filter overlay is toggled
+        const toggleButton = document.getElementById('filterToggleButton'); // Assuming you have a button with this ID to toggle the overlay
+        if (toggleButton) {
+            toggleButton.addEventListener('click', setMaxHeight);
+        }
+
+        // Update max-height on window resize
+        window.addEventListener('resize', setMaxHeight);
+    }); // closing the DOMContentLoaded listener
 </script>

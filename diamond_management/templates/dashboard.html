@@ -285,10 +285,10 @@
         {# First + Prev #}
       {% if page_obj.has_previous %}
       <li class="page-item">
-        <a class="page-link" href="?page=1{% if get_params %}&{{ get_params }}{% endif %}">« First</a>
+ <a class="page-link" href="?page=1">« First</a>
       </li>
       <li class="page-item">
-        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if get_params %}&{{ get_params }}{% endif %}">‹ Prev</a>
+ <a class="page-link" href="?page={{ page_obj.previous_page_number }}">‹ Prev</a>
       </li>
     {% else %}
       <li class="page-item disabled"><span class="page-link">« First</span></li>
@@ -304,10 +304,10 @@
     {# Next + Last #}
     {% if page_obj.has_next %}
       <li class="page-item">
-        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if get_params %}&{{ get_params }}{% endif %}">Next ›</a>
+ <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next ›</a>
       </li>
       <li class="page-item">
-        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if get_params %}&{{ get_params }}{% endif %}">Last »</a>
+ <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last »</a>
       </li>
     {% else %}
       <li class="page-item disabled"><span class="page-link">Next ›</span></li>
@@ -345,7 +345,7 @@
                 <li><a class="dropdown-item" href="{{ request.get_full_path|add_sort:'clarity_desc' }}">High-to-Low</a></li>
             </ul>
         </div>   
-        <button class="btn btn-filter equal-button" type="button" onclick="toggleFilterOverlay()">Filter</button>     
+        <button id="filterToggleButton" class="btn btn-filter equal-button" type="button" onclick="toggleFilterOverlay()">Filter</button>     
     </div>
 </div>
 
@@ -441,14 +441,14 @@
   
       {# First + Prev #}
       {% if page_obj.has_previous %}
-        <li class="page-item">
-          <a class="page-link" href="?page=1{% if get_params %}&{{ get_params }}{% endif %}">« First</a>
+ <li class="page-item">
+ <a class="page-link" href="?page=1">« First</a>
         </li>
         <li class="page-item">
-          <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if get_params %}&{{ get_params }}{% endif %}">‹ Prev</a>
+ <a class="page-link" href="?page={{ page_obj.previous_page_number }}">‹ Prev</a>
         </li>
-      {% else %}
-        <li class="page-item disabled"><span class="page-link">« First</span></li>
+ {% else %}
+ <li class="page-item disabled"><span class="page-link">« First</span></li>
         <li class="page-item disabled"><span class="page-link">‹ Prev</span></li>
       {% endif %}
   
@@ -466,11 +466,11 @@
   
       {# Next + Last #}
       {% if page_obj.has_next %}
-        <li class="page-item">
-          <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if get_params %}&{{ get_params }}{% endif %}">Next ›</a>
+ <li class="page-item">
+ <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next ›</a>
         </li>
-        <li class="page-item">
-          <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if get_params %}&{{ get_params }}{% endif %}">Last »</a>
+ <li class="page-item">
+ <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last »</a>
         </li>
       {% else %}
         <li class="page-item disabled"><span class="page-link">Next ›</span></li>

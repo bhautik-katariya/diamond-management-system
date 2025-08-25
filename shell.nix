@@ -9,19 +9,18 @@ pkgs.mkShell {
   ];
 
   shellHook = ''
-    export PIP_DISABLE_PIP_VERSION_CHECK=1
-    export PYTHONPATH=$PYTHONPATH:$(pwd)
+  export PIP_DISABLE_PIP_VERSION_CHECK=1
+  export PYTHONPATH=$PYTHONPATH:$(pwd)
 
-    if [ ! -d .venv ]; then
-      echo "Creating virtual environment..."
-      python -m venv .venv
-      source .venv/bin/activate
-      pip install --upgrade pip
-      pip install -r requirements.txt
-    else
-      source .venv/bin/activate
-    fi
+  if [ ! -d .venv ]; then
+    echo "Creating virtual environment..."
+    python -m venv .venv
+  fi
 
-    echo "Virtual environment ready. Python $(python --version)"
-  '';
+  source .venv/bin/activate
+  pip install --upgrade pip
+  pip install -r requirements.txt
+
+  echo "Virtual environment ready. Python $(python --version)"
+'';
 }
