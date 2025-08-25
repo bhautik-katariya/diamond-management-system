@@ -279,54 +279,57 @@
     </div>
 </div>
 
-<!-- Controls (Sort/Filter/Download + top pagination) -->
-<div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+<!-- === AJAX Wrapper (everything inside reloads) === -->
+<div id="diamondTableWrapper">
+    <!-- Top Pagination -->
     <div id="top-pagination">
-        {% include "includes/_pagination.html" %}
+        {% include "includes/pagination.html" %}
     </div>
 
-    <!-- Right Side: Download / Sort / Filter -->
-    <div class="d-flex gap-2">
-        <form id="download-form" method="post" action="{% url 'diamond_download_excel' %}" style="display:inline;">
-            {% csrf_token %}
-            <input type="hidden" name="diamond_ids" id="diamond-ids-input">
-            <button type="button" class="btn equal-button" id="download-btn">Download</button>
-        </form>
-        <div class="dropdown">
-            <button class="btn btn-sort equal-button dropdown-toggle" type="button" id="sortDropdownButton" data-bs-toggle="dropdown" aria-expanded="false">
-                Sort
-            </button>
-            <ul class="dropdown-menu text-small" aria-labelledby="sortDropdownButton">
-                <li class="dropdown-header">Price</li>
-                <li><a class="dropdown-item ajax-link" href="{{ request.get_full_path|add_sort:'price_asc' }}">Low-to-high</a></li>
-                <li><a class="dropdown-item ajax-link" href="{{ request.get_full_path|add_sort:'price_desc' }}">High-to-Low</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li class="dropdown-header">Carat</li>
-                <li><a class="dropdown-item ajax-link" href="{{ request.get_full_path|add_sort:'carat_asc' }}">Low-to-high</a></li>
-                <li><a class="dropdown-item ajax-link" href="{{ request.get_full_path|add_sort:'carat_desc' }}">High-to-Low</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li class="dropdown-header">Color</li>
-                <li><a class="dropdown-item ajax-link" href="{{ request.get_full_path|add_sort:'color_asc' }}">Low-to-high</a></li>
-                <li><a class="dropdown-item ajax-link" href="{{ request.get_full_path|add_sort:'color_desc' }}">High-to-Low</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li class="dropdown-header">Clarity</li>
-                <li><a class="dropdown-item ajax-link" href="{{ request.get_full_path|add_sort:'clarity_asc' }}">Low-to-high</a></li>
-                <li><a class="dropdown-item ajax-link" href="{{ request.get_full_path|add_sort:'clarity_desc' }}">High-to-Low</a></li>
-            </ul>
+    <!-- Controls (Sort/Filter/Download) -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+        <!-- Right Side: Download / Sort / Filter -->
+        <div class="d-flex gap-2">
+            <form id="download-form" method="post" action="{% url 'diamond_download_excel' %}" style="display:inline;">
+                {% csrf_token %}
+                <input type="hidden" name="diamond_ids" id="diamond-ids-input">
+                <button type="button" class="btn equal-button" id="download-btn">Download</button>
+            </form>
+            <div class="dropdown">
+                <button class="btn btn-sort equal-button dropdown-toggle" type="button" id="sortDropdownButton" data-bs-toggle="dropdown" aria-expanded="false">
+                    Sort
+                </button>
+                <ul class="dropdown-menu text-small" aria-labelledby="sortDropdownButton">
+                    <li class="dropdown-header">Price</li>
+                    <li><a class="dropdown-item ajax-link" href="{{ request.get_full_path|add_sort:'price_asc' }}">Low-to-high</a></li>
+                    <li><a class="dropdown-item ajax-link" href="{{ request.get_full_path|add_sort:'price_desc' }}">High-to-Low</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li class="dropdown-header">Carat</li>
+                    <li><a class="dropdown-item ajax-link" href="{{ request.get_full_path|add_sort:'carat_asc' }}">Low-to-high</a></li>
+                    <li><a class="dropdown-item ajax-link" href="{{ request.get_full_path|add_sort:'carat_desc' }}">High-to-Low</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li class="dropdown-header">Color</li>
+                    <li><a class="dropdown-item ajax-link" href="{{ request.get_full_path|add_sort:'color_asc' }}">Low-to-high</a></li>
+                    <li><a class="dropdown-item ajax-link" href="{{ request.get_full_path|add_sort:'color_desc' }}">High-to-Low</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li class="dropdown-header">Clarity</li>
+                    <li><a class="dropdown-item ajax-link" href="{{ request.get_full_path|add_sort:'clarity_asc' }}">Low-to-high</a></li>
+                    <li><a class="dropdown-item ajax-link" href="{{ request.get_full_path|add_sort:'clarity_desc' }}">High-to-Low</a></li>
+                </ul>
+            </div>
+            <button id="filterToggleButton" class="btn btn-filter equal-button" type="button" onclick="toggleFilterOverlay()">Filter</button>
         </div>
-        <button id="filterToggleButton" class="btn btn-filter equal-button" type="button" onclick="toggleFilterOverlay()">Filter</button>
     </div>
-</div>
 
-<!-- Filter Overlay -->
-<div id="filterOverlayWrapper" class="filter-collapse">
-    {% include "includes/filter_overlay.html" %}
-</div>
+    <!-- Filter Overlay -->
+    <div id="filterOverlayWrapper" class="filter-collapse">
+        {% include "includes/filter_overlay.html" %}
+    </div>
 
-<!-- Diamond Table (AJAX target container) -->
-<div id="diamond-table-container">
+    <!-- Diamond Table -->
     {% include "includes/_diamond_table.html" %}
 </div>
+
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -338,8 +341,8 @@
             })
             .then(resp => resp.json())
             .then(data => {
-                document.getElementById('diamond-table-container').innerHTML = data.table_html;
-                rebindTableEvents(); // rebind events after ajax replace
+                document.getElementById('diamondTableWrapper').innerHTML = data.table_html;
+                rebindTableEvents(); // rebind after ajax replace
                 adjustTableHeight();
             });
         }

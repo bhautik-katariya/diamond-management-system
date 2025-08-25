@@ -241,8 +241,6 @@ def dashboard(request):
         ("Lab", Diamond.LAB, "lab"),
     ]
 
-    get_params = request.GET.urlencode()
-
     context = {
         'diamonds': page_obj.object_list,
         'page_obj': page_obj,
@@ -251,15 +249,15 @@ def dashboard(request):
         'total_stock': total_stock,
         'total_carat': total_carat,
         'total_amount': total_amount,
-        'get_params': get_params,
+        'get_params': request.GET.urlencode(),
     }
 
-    # --- AJAX partial render ---
+    # === AJAX Partial Render ===
     if request.headers.get("x-requested-with") == "XMLHttpRequest":
-        table_html = render_to_string("includes/_diamond_table.html", context, request=request)
-        return JsonResponse({"table_html": table_html})
+        wrapper_html = render_to_string("includes/dashboard_partial.html", context, request=request)
+        return JsonResponse({"table_html": wrapper_html})
 
-    # --- Full page render ---
+    # === Full Page Render ===
     return render(request, "dashboard.html", context)
 
 
