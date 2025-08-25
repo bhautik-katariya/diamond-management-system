@@ -13,3 +13,9 @@ def add_sort(current_url, sort_value):
     query_dict = parse_qs(url_parts.query)
     query_dict['sort'] = [sort_value]
     return f"{url_parts.path}?{urlencode(query_dict, doseq=True)}"
+
+@register.filter
+def page_url(request, page_number):
+    params = request.GET.copy()
+    params['page'] = page_number
+    return '?' + params.urlencode()

@@ -324,135 +324,194 @@
     <!-- Filter Overlay -->
     <div id="filterOverlayWrapper" class="filter-collapse">
         {% include "includes/filter_overlay.html" %}
-    </div>
+    </div> 
 
     <!-- Diamond Table -->
-    {% include "includes/dashboard_partial.html" %}
+    {% include "includes/diamond_table.html" %}
 </div>
 
 
+
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-    
-        // === AJAX Loader for Table ===
-        function loadTable(url) {
-            fetch(url, {
-                headers: { "X-Requested-With": "XMLHttpRequest" }
-            })
-            .then(resp => resp.json())
-            .then(data => {
-                document.getElementById('diamondTableWrapper').innerHTML = data.table_html;
-                rebindTableEvents(); // rebind after ajax replace
-                adjustTableHeight();
-            });
-        }
-    
-        // === Rebind all dynamic events after ajax ===
-        function rebindTableEvents() {
-            const selectAllCheckbox = document.getElementById('select-all');
-    
-            // --- Checkbox Logic ---
-            if (selectAllCheckbox) {
-                const rowCheckboxes = document.querySelectorAll('.row-checkbox');
-                const rowCheckboxArray = Array.from(rowCheckboxes);
-    
-                selectAllCheckbox.addEventListener('change', function () {
-                    rowCheckboxArray.forEach(cb => cb.checked = this.checked);
-                });
-    
-                rowCheckboxArray.forEach(cb => {
-                    cb.addEventListener('change', function () {
-                        const allChecked = rowCheckboxArray.every(cb => cb.checked);
-                        const anyChecked = rowCheckboxArray.some(cb => cb.checked);
-    
-                        selectAllCheckbox.checked = allChecked;
-                        selectAllCheckbox.indeterminate = !allChecked && anyChecked;
-                    });
-                });
-            }
-    
-            // --- Download Button Logic ---
-            const downloadBtn = document.getElementById('download-btn');
-            if (downloadBtn) {
-                downloadBtn.addEventListener('click', function () {
-                    const checkboxes = document.querySelectorAll('.row-checkbox');
-                    let selected = [];
-                    checkboxes.forEach(cb => { if (cb.checked) selected.push(cb.value); });
-                    if (selected.length === 0) {
-                        checkboxes.forEach(cb => selected.push(cb.value));
-                    }
-                    document.getElementById('diamond-ids-input').value = selected.join(',');
-                    document.getElementById('download-form').submit();
-                });
-            }
-    
-            // --- Pagination Input Logic ---
-            document.querySelectorAll('.page-input').forEach(function (pageInput) {
-                pageInput.addEventListener('keypress', function (e) {
-                    if (e.key === 'Enter') goToPage(this);
-                });
-                pageInput.addEventListener('blur', function () {
-                    goToPage(this);
-                });
-            });
-    
-            function goToPage(inputEl) {
-                if (!inputEl) return;
-                let pageNum = parseInt(inputEl.value);
-                const maxPages = parseInt(inputEl.getAttribute('max'));
-    
-                if (isNaN(pageNum) || pageNum < 1) pageNum = 1;
-                else if (pageNum > maxPages) pageNum = maxPages;
-    
-                let currentUrl = new URL(window.location.href);
-                currentUrl.searchParams.set('page', pageNum);
-                loadTable(currentUrl.toString());
-            }
-    
-            // --- Ajax Link Intercepts (pagination/sort/filter) ---
-            document.querySelectorAll('a.ajax-link').forEach(link => {
-                link.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    loadTable(this.href);
-                    history.pushState({}, "", this.href);
-                });
-            });
-
-            const applyBtn = document.getElementById('applyFilters');
-            if (applyBtn) {
-                applyBtn.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    const form = document.getElementById('filterForm');
-                    const params = new URLSearchParams(new FormData(form)).toString();
-                    const url = window.location.pathname + '?' + params;
-                    loadTable(url);
-                    history.pushState({}, "", url);
-                    toggleFilterOverlay();
-                });
-            }
-
-        }
-    
-        // --- Initial Binding ---
-        rebindTableEvents();
-    
-        // --- Handle browser back/forward with pushState ---
-        window.addEventListener("popstate", function () {
-            loadTable(location.href);
+    // === AJAX Loader for Table ===
+    function loadTable(url) {
+        fetch(url, {
+            headers: { "X-Requested-With": "XMLHttpRequest" }
+        })
+        .then(resp => resp.json())
+        .then(data => {
+            document.getElementById('diamondTableWrapper').innerHTML = data.table_html;
+            rebindTableEvents(); // rebind after ajax replace
+            adjustTableHeight();
         });
-    
-        // === Table Height Adjustments ===
-        window.addEventListener('load', adjustTableHeight);
-        window.addEventListener('resize', adjustTableHeight);
-    
-        const wrapper = document.getElementById('filterOverlayWrapper');
-        if (wrapper && window.MutationObserver) {
-            const mo = new MutationObserver(adjustTableHeight);
-            mo.observe(wrapper, { attributes: true, attributeFilter: ['class', 'style'] });
+    }
+
+    // === Rebind all dynamic events after ajax ===
+    function rebindTableEvents() {
+        const selectAllCheckbox = document.getElementById('select-all');
+
+        // --- Checkbox Logic ---
+        if (selectAllCheckbox) {
+            const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+            const rowCheckboxArray = Array.from(rowCheckboxes);
+
+            selectAllCheckbox.addEventListener('change', function () {
+                rowCheckboxArray.forEach(cb => cb.checked = this.checked);
+            });
+
+            rowCheckboxArray.forEach(cb => {
+                cb.addEventListener('change', function () {
+                    const allChecked = rowCheckboxArray.every(cb => cb.checked);
+                    const anyChecked = rowCheckboxArray.some(cb => cb.checked);
+
+                    selectAllCheckbox.checked = allChecked;
+                    selectAllCheckbox.indeterminate = !allChecked && anyChecked;
+                });
+            });
         }
-    });
-    
-    // === Adjust Table Height ===
+
+        // --- Download Button Logic ---
+        const downloadBtn = document.getElementById('download-btn');
+        if (downloadBtn) {
+            downloadBtn.addEventListener('click', function () {
+                const checkboxes = document.querySelectorAll('.row-checkbox');
+                let selected = [];
+                checkboxes.forEach(cb => { if (cb.checked) selected.push(cb.value); });
+                if (selected.length === 0) {
+                    checkboxes.forEach(cb => selected.push(cb.value));
+                }
+                document.getElementById('diamond-ids-input').value = selected.join(',');
+                document.getElementById('download-form').submit();
+            });
+        }
+
+        // --- Pagination Input Logic ---
+        document.querySelectorAll('.page-input').forEach(function (pageInput) {
+            pageInput.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') goToPage(this);
+            });
+            pageInput.addEventListener('blur', function () {
+                goToPage(this);
+            });
+        });
+
+        function goToPage(inputEl) {
+            if (!inputEl) return;
+            let pageNum = parseInt(inputEl.value);
+            const maxPages = parseInt(inputEl.getAttribute('max'));
+
+            if (isNaN(pageNum) || pageNum < 1) pageNum = 1;
+            else if (pageNum > maxPages) pageNum = maxPages;
+
+            let currentUrl = new URL(window.location.href);
+            currentUrl.searchParams.set('page', pageNum);
+            loadTable(currentUrl.toString());
+            history.pushState({}, "", currentUrl.toString());
+        }
+
+        // --- Ajax Link Intercepts (pagination/sort/filter) ---
+        document.querySelectorAll('a.ajax-link').forEach(link => {
+            link.addEventListener('click', function (e) {
+                e.preventDefault();
+                loadTable(this.href);
+                history.pushState({}, "", this.href);
+            });
+        });
+
+        // --- Apply Filters ---
+        const applyBtn = document.getElementById('applyFilters');
+        if (applyBtn) {
+            applyBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                const form = document.getElementById('filterForm');
+                const params = new URLSearchParams(new FormData(form)).toString();
+                const url = window.location.pathname + '?' + params;
+                loadTable(url);
+                history.pushState({}, "", url);
+                toggleFilterOverlay();
+            });
+        }
+
+        // ✅ Rebind filter overlay logic here
+        bindFilterOverlayEvents();
+    }
+
+    // === Filter Overlay Events ===
+    function bindFilterOverlayEvents() {
+        const rangeGroups = new Set(['color', 'clarity']);
+        const groups = document.querySelectorAll('.filter-button-group[data-name]');
+
+        groups.forEach(group => {
+            const name = group.getAttribute('data-name');
+            if (!rangeGroups.has(name)) return;
+
+            const inputs = Array.from(group.querySelectorAll('input.hidden-check'));
+            const labels = Array.from(group.querySelectorAll('label.filter-toggle'));
+
+            let anchorIndex = null;
+            let lastRange = null;
+
+            function setCheckedRange(start, end, checked) {
+                const [lo, hi] = start <= end ? [start, end] : [end, start];
+                for (let i = lo; i <= hi; i++) inputs[i].checked = checked;
+            }
+
+            labels.forEach((label, idx) => {
+                label.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const alreadyChecked = inputs[idx].checked;
+
+                    if (anchorIndex === null && lastRange) {
+                        inputs.forEach(i => i.checked = false);
+                        lastRange = null;
+                        inputs[idx].checked = true;
+                        anchorIndex = idx;
+                        return;
+                    }
+
+                    if (anchorIndex === null) {
+                        inputs[idx].checked = !alreadyChecked;
+                        anchorIndex = idx;
+                    } else if (anchorIndex === idx) {
+                        inputs[idx].checked = !alreadyChecked;
+                        anchorIndex = null;
+                        lastRange = null;
+                    } else {
+                        setCheckedRange(anchorIndex, idx, true);
+                        lastRange = { lo: Math.min(anchorIndex, idx), hi: Math.max(anchorIndex, idx) };
+                        anchorIndex = null;
+                    }
+                });
+            });
+
+            document.addEventListener('click', function(ev) {
+                if (!group.contains(ev.target)) {
+                    anchorIndex = null;
+                }
+            });
+        });
+
+        // Collapse / expand overlay height
+        const filterCollapse = document.getElementById('filterOverlayWrapper');
+        const filterContent = document.getElementById('filterOverlay');
+
+        function setMaxHeight() {
+            if (filterCollapse.classList.contains('active')) {
+                filterCollapse.style.maxHeight = filterContent.scrollHeight + 'px';
+            } else {
+                filterCollapse.style.maxHeight = '0';
+            }
+        }
+
+        setMaxHeight();
+
+        const toggleButton = document.getElementById('filterToggleButton');
+        if (toggleButton) toggleButton.addEventListener('click', setMaxHeight);
+
+        window.addEventListener('resize', setMaxHeight);
+    }
+
+    // === Table Height ===
     function adjustTableHeight() {
         const tableContainer = document.getElementById('tableContainer');
         if (!tableContainer) return;
@@ -461,8 +520,30 @@
         const minHeight = 220;
         tableContainer.style.maxHeight = (available > minHeight ? available : minHeight) + 'px';
     }
-    </script>
-    
-    
-       
+
+    // === Overlay Toggle ===
+    function toggleFilterOverlay() {
+        const wrapper = document.getElementById('filterOverlayWrapper');
+        wrapper.classList.toggle('active');
+    }
+
+    // --- Initial binding ---
+    document.addEventListener('DOMContentLoaded', function () {
+        rebindTableEvents();
+        window.addEventListener("popstate", function () {
+            loadTable(location.href);
+        });
+        window.addEventListener('load', adjustTableHeight);
+        window.addEventListener('resize', adjustTableHeight);
+
+        if (window.MutationObserver) {
+            const wrapper = document.getElementById('filterOverlayWrapper');
+            if (wrapper) {
+                const mo = new MutationObserver(adjustTableHeight);
+                mo.observe(wrapper, { attributes: true, attributeFilter: ['class', 'style'] });
+            }
+        }
+    });
+</script>
+
 {% endblock %}

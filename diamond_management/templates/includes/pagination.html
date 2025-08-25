@@ -1,12 +1,15 @@
+{% load static %}
+{% load custom_filters %}
+
 <ul class="pagination justify-content-center align-items-center" style="gap: 10px;">
 
     {# First + Prev #}
     {% if page_obj.has_previous %}
       <li class="page-item">
-        <a class="page-link ajax-link" href="?page=1">« First</a>
+        <a class="page-link ajax-link" href="{{ request|page_url:1 }}">« First</a>
       </li>
       <li class="page-item">
-        <a class="page-link ajax-link" href="?page={{ page_obj.previous_page_number }}">‹ Prev</a>
+        <a class="page-link ajax-link" href="{{ request|page_url:page_obj.previous_page_number }}">‹ Prev</a>
       </li>
     {% else %}
       <li class="page-item disabled"><span class="page-link">« First</span></li>
@@ -27,10 +30,10 @@
     {# Next + Last #}
     {% if page_obj.has_next %}
       <li class="page-item">
-        <a class="page-link ajax-link" href="?page={{ page_obj.next_page_number }}">Next ›</a>
+        <a class="page-link ajax-link" href="{{ request|page_url:page_obj.next_page_number }}">Next ›</a>
       </li>
       <li class="page-item">
-        <a class="page-link ajax-link" href="?page={{ page_obj.paginator.num_pages }}">Last »</a>
+        <a class="page-link ajax-link" href="{{ request|page_url:page_obj.paginator.num_pages }}">Last »</a>
       </li>
     {% else %}
       <li class="page-item disabled"><span class="page-link">Next ›</span></li>

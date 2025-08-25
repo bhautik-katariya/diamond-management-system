@@ -220,14 +220,14 @@
       
           <div class="d-flex justify-content-between mt-3">
             <button type="button" id="applyFilters" class="btn btn-filter equal-button" onclick="toggleFilterOverlay()">Apply</button>
-            <a href="?" class="btn btn-sort equal-button ajax-link">Reset</a>
+            <a href="/" class="btn btn-sort equal-button ajax-link">Reset</a>
           </div>
       
         </div>
       </form>    
 </div>
 
-<script>
+{% comment %} <script>
     function toggleFilterOverlay() {
         const wrapper = document.getElementById('filterOverlayWrapper');
         wrapper.classList.toggle('active');
@@ -332,4 +332,4 @@
         // Update max-height on window resize
         window.addEventListener('resize', setMaxHeight);
     }); // closing the DOMContentLoaded listener
-</script>
+</script> {% endcomment %}
