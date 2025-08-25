@@ -43,6 +43,7 @@ EXTERNAL_APPS = [
     'customer',
     'vendor',
     'widget_tweaks',
+    'channels',
 ]
 
 INSTALLED_APPS += EXTERNAL_APPS 
@@ -82,6 +83,14 @@ TEMPLATES = [
         },
     },
 ]
+
+ASGI_APPLICATION = 'diamond_management.asgi.application'
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}
 
 WSGI_APPLICATION = 'diamond_management.wsgi.application'
 

@@ -6,18 +6,19 @@
     <style>
         .table th, .table td { 
             vertical-align: middle; 
+            text-align: center;
         }
 
-        .btn-primary {
-            min-width: 70px !important;   /* reduced from 90px */
-            height: 28px !important;      /* reduced from 36px */
-            font-size: 0.8rem !important; /* smaller font size */
-            padding: 3px 8px;             /* reduced padding */
+        .btn-equal {
+            min-width: 70px !important;   
+            height: 28px !important;     
+            font-size: 0.8rem !important; 
+            padding: 3px 8px;             
             white-space: nowrap;
             background: rgb(11, 25, 55);
             color: rgb(255, 255, 255) !important;
             border: none;
-            border-radius: 14px;          /* smaller radius to match new size */
+            border-radius: 14px;          
             font-weight: 500;
             box-shadow: 0 2px 6px rgba(11, 25, 55, 0.25);
             transition: background 0.3s, color 0.3s;
@@ -27,17 +28,17 @@
             text-align: center;
         }
 
-        .btn-primary:hover {
+        .btn-equal:hover {
             background: rgb(255, 255, 255);
             color: rgb(11, 25, 55) !important;
             border: 1px solid rgb(11, 25, 55);
         }
 
         .page-link {
-            min-width: 60px;            /* smaller width */
-            height: 28px;               /* smaller height */
-            border-radius: 14px !important; /* adjusted radius */
-            font-size: 0.8rem;          /* smaller text */
+            min-width: 60px;            
+            height: 28px;               
+            border-radius: 14px !important; 
+            font-size: 0.8rem;         
             font-weight: 500;
             background: rgb(11, 25, 55);
             color: white !important;
@@ -68,8 +69,8 @@
     
         /* Pagination Input + Text */
         .page-input {
-            height: 28px;               /* match button height */
-            width: 50px;                /* compact */
+            height: 28px;              
+            width: 50px;                
             font-size: 0.8rem;
             text-align: center;
             border-radius: 14px;
@@ -79,15 +80,15 @@
     
         .page-total {
             font-size: 0.8rem;
-            line-height: 28px;          /* vertically aligned */
-            color: #6c757d;             /* muted text color */
+            line-height: 28px;          
+            color: #6c757d;             
         }
     
         .pagination {
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 10px; /* spacing between elements */
+            gap: 10px; 
         }
         
         .pagination .form-control-sm {
@@ -105,7 +106,8 @@
         }
 
     </style>
-    <table class="table table-bordered table-striped">
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
         <thead>
             <tr>
                 <th><input type="checkbox" id="select-all"></th>
@@ -140,13 +142,13 @@
                 <td>${{ oi.item.price_per_carat }}</td>
                 <td>${{ oi.item.line_total|floatformat:2 }}</td>
                 <td>
-                    <a href="{% url 'diamond_detail' oi.item.diamond.id %}?from_order=true" class="btn btn-primary btn-sm">View</a>
+                    <a href="{% url 'diamond_detail' oi.item.diamond.id %}?from_order=true" class="btn btn-equal btn-sm">View</a>
                 </td>
                 <td>
                     {% if oi.order.status == "Pending" %}
                       <form method="post" action="{% url 'vendor:process_order' oi.order.id %}" style="display:inline;">
                         {% csrf_token %}
-                        <button type="submit" class="btn btn-success btn-sm">Mark as Processed</button>
+                        <button type="submit" class="btn btn-equal btn-sm">Mark as Processed</button>
                       </form>
                     {% else %}
                       <span class="badge bg-secondary">{{ oi.order.status }}</span>
@@ -158,6 +160,7 @@
             {% endfor %}
         </tbody>        
     </table>
+</div>
 </div>
 
 {% if page_obj %}

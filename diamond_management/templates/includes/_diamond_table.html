@@ -1,0 +1,86 @@
+<!-- Table -->
+<div id="tableContainer" class="table-responsive" style="overflow-x: auto;">
+    <table class="diamond-table table table-bordered w-100">
+        <thead>
+            <tr>
+                <th><input type="checkbox" id="select-all"></th>
+                <th>Sr No</th>
+                <th>Stock Id</th>
+                <th>Type</th>
+                <th>Lab</th>
+                <th>Shape</th>
+                <th>Carat</th>
+                <th>Color</th>
+                <th>Clarity</th>
+                <th>Cut</th>
+                <th>Polish</th>
+                <th>Symmetry</th>
+                <th>Measurement (W x L x H)</th>
+                <th>Price/Carat</th>
+                <th>View</th>
+                <th>Cart</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for diamond in diamonds %}
+            <tr>
+                <td><input type="checkbox" class="row-checkbox" value="{{ diamond.id }}"></td>
+                <td>{{ forloop.counter0|add:page_obj.start_index }}</td>
+                <td>{{ diamond.stock_id }}</td>
+                <td>{{ diamond.type }}</td>
+                <td>{{ diamond.lab }}</td>
+                <td>
+                    {% if diamond.shape == 'AS' %}
+                        <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651456/asscher_xwkvvy.svg" width="40" height="40" alt="Asscher Shape">
+                    {% elif diamond.shape == 'BG' %}
+                        <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651456/baguette_gryjpl.svg" width="32" height="40" alt="Emerald Shape">
+                    {% elif diamond.shape == 'CS' %}
+                        <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651456/cushion_mmnoab.svg" width="40" height="40" alt="Cushion Shape">
+                    {% elif diamond.shape == 'EM' %}
+                        <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651456/emerald_sr9e0f.svg" width="32" height="40" alt="Emerald Shape">
+                    {% elif diamond.shape == 'HT' %}
+                        <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651457/heart_piv4mu.svg" width="40" height="40" alt="Heart Shape">
+                    {% elif diamond.shape == 'MQ' %}
+                        <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651457/marquise_ljlq2v.svg" width="32" height="40" alt="Marquise Shape">
+                    {% elif diamond.shape == 'OLD' %}
+                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651458/old_vyq23i.svg" width="40" height="40" alt="Old Shape">
+                    {% elif diamond.shape == 'OVL' %}
+                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651458/oval_epynny.svg" width="32" height="40" alt="Oval Shape">
+                    {% elif diamond.shape == 'PR' %}
+                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651459/pear_vdpfgq.svg" width="32" height="40" alt="Pear Shape">
+                    {% elif diamond.shape == 'PRS' %}
+                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651459/princess_fh3oqx.svg" width="40" height="40" alt="Princess Shape">
+                    {% elif diamond.shape == 'RD' %}
+                        <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651461/round_phykmr.svg" width="40" height="40" alt="Round Shape">
+                    {% elif diamond.shape == 'RDNT' %}
+                        <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651460/radiant_jhgoyd.svg" width="32" height="40" alt="Radiant Shape">
+                    {% elif diamond.shape == 'SQ' %}
+                        <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651461/square_x76biu.svg" width="40" height="40" alt="Square Shape">
+                    {% elif diamond.shape == 'TP' %}
+                        <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651461/tapered_i6pqjb.svg" width="32" height="40" alt="Taper Shape">
+                    {% elif diamond.shape == 'TR' %}
+                        <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651462/trilliant_hwawud.svg" width="32" height="40" alt="Trillion Shape">
+                    {% else %}
+                        <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651458/other_n3otbi.svg" width="40" height="40" alt="Other Shape">
+                    {% endif %}
+                </td>
+                <td>{{ diamond.carat }}</td>
+                <td>{{ diamond.get_color_display }}</td>
+                <td>{{ diamond.clarity }}</td>
+                <td>{{ diamond.get_cut_display }}</td>
+                <td>{{ diamond.get_polish_display }}</td>
+                <td>{{ diamond.get_symmetry_display }}</td>
+                <td>{{ diamond.measurements }}</td>
+                <td>${{ diamond.price_per_carat }}</td>
+                <td><a href="{% url 'diamond_detail' diamond.id %}" class="btn equal-button">View</a></td>
+                <td><a href="{% url 'customer:add_to_cart' diamond.id %}?next={{ request.get_full_path|urlencode }}" class="btn equal-button">Cart</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+
+<!-- Bottom Pagination -->
+<nav aria-label="Diamond pagination" class="mt-4">
+{% include "includes/_pagination.html" %}
+</nav>

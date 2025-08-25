@@ -9,8 +9,8 @@
         background-color: #f8fafc;
     }
     .register-container {
-        max-width: 700px;
-        margin: 20px auto;   /* navbar niche 20px margin */
+        max-width: 600px;   /* nanu box - login size jetlu */
+        margin: 40px auto;
         padding: 30px;
         background: #fff;
         border-radius: 8px;
@@ -21,28 +21,15 @@
         margin-bottom: 20px;
         text-align: center;
     }
-    .extra-links {
-        margin-top: 15px;
-        text-align: center;
-    }
-    .extra-links a {
-        margin: 0 10px;
-        text-decoration: none;
-        font-weight: 500;
-        color: #0d6efd;
-    }
-    .extra-links a:hover {
-        text-decoration: underline;
-    }
 </style>
 
-<div class="container register-container">
+<div class="register-container">
     {% if is_vendor_register %} 
-        <h2 class="mb-4 text-center">Vendor Register</h2> 
+        <h2 class="register-title">Vendor Register</h2> 
     {% else %} 
-        <h2 class="mb-4 text-center">Register</h2> 
+        <h2 class="register-title">Register</h2> 
     {% endif %}
-</div>
+
     <form method="post">
         {% csrf_token %}
         <div class="row mb-3">
@@ -85,7 +72,13 @@
             <button type="submit" class="btn btn-primary">Register</button>
         </div>
     </form>
+
     <div class="text-center mt-3">
-    {% if is_vendor_register %} <p class="mb-0">Register as a customer? <a href="{% url 'register' %}" class="text-decoration-none">Customer Registration</a></p> {% else %} <p class="mb-0">Register as a vendor? <a href="{% url 'vendor_register' %}" class="text-decoration-none">Vendor Registration</a></p> {% endif %}
+        {% if is_vendor_register %}
+            <p class="mb-0">Register as a customer? <a href="{% url 'register' %}" class="text-decoration-none">Customer Registration</a></p>
+        {% else %}
+            <p class="mb-0">Register as a vendor? <a href="{% url 'vendor_register' %}" class="text-decoration-none">Vendor Registration</a></p>
+        {% endif %}
+    </div>
 </div>
 {% endblock %}

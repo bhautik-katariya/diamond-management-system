@@ -133,12 +133,8 @@ def view_orders(request):
         return redirect('login')
 
     vendor_id = request.session['user_id']
-    orders_qs = (
-        Order.objects
-        .filter(vendor_id=vendor_id)
-        .order_by('-created_at')
-        .prefetch_related('items__diamond', 'customer')
-    )
+    orders_qs = (Order.objects.filter(vendor_id=vendor_id).order_by('-created_at').prefetch_related('items__diamond', 'customer'))
+    orders_qs.filter(status="Pending", seen=False).update(seen=True)
 
     # Flatten into order_items
     order_items = []
@@ -618,15 +614,15 @@ def pending_orders_count(request):
     if request.session.get('user_type') != 'vendor' or 'user_id' not in request.session:
         return redirect('login')
 
-    vendor_id = request.session.get("user_id")  # vendor id stored in session
-    count = Order.objects.filter(vendor_id=vendor_id, status="Pending").count()
+    vendor_id = request.session.get("user_id") 
+    count = Order.objects.filter(vendor_id=vendor_id, status="Pending", seen=False).count()
     return JsonResponse({"count": count})
 
 
 def process_order(request, order_id):
     order = get_object_or_404(Order, id=order_id, vendor=request.user.vendor)
     if request.method == "POST":
-        order.status = "Completed"   # or "Accepted"
+        order.status = "Completed"   
         order.save()
         messages.success(request, f"Order #{order.id} marked as processed.")
     return redirect('vendor:view_orders')

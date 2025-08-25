@@ -83,13 +83,11 @@
                         <li class="nav-item position-relative">
                             <a class="nav-link position-relative" href="{% url 'vendor:view_orders' %}">
                                 Orders
-                                <span id="orderBadge"
-                                      class="badge-notify"
-                                      style="{% if pending_orders_count == 0 %}display:none;{% endif %}">
+                                <span id="orderBadge" class="badge-notify" style="{% if pending_orders_count == 0 %}display:none;{% endif %}">
                                     {{ pending_orders_count }}
                                 </span>
                             </a>
-                        </li>                                                          
+                        </li>                                                    
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'edit_profile' %}">Edit Profile</a>
                         </li>
@@ -161,26 +159,32 @@
             });
         }); 
 
-        function updateOrderBadge() {
-            fetch("{% url 'vendor:pending_orders_count' %}")
-                .then(res => res.json())
-                .then(data => {
-                    const badge = document.getElementById("orderBadge");
-                    if (!badge) return;
+        document.addEventListener("DOMContentLoaded", function () {
+            const vendorId = "{{ request.session.user_id }}";
+            const badge = document.getElementById("orderBadge");
         
-                    if (data.count > 0) {
-                        badge.style.display = "inline-block";
-                        badge.textContent = data.count;
-                    } else {
-                        badge.style.display = "none";
-                    }
-                })
-                .catch(err => console.error("Badge fetch failed:", err));
-        }
+            // WebSocket connection
+            const socket = new WebSocket(
+                "ws://" + window.location.host + "/ws/vendor/orders/" + vendorId + "/"
+            );
         
-        // keep polling for updates
-        document.addEventListener("DOMContentLoaded", function() {
-            setInterval(updateOrderBadge, 10000); // refresh every 10s
+            socket.onmessage = function(e) {
+                const data = JSON.parse(e.data);
+                if (data.count > 0) {
+                    badge.style.display = "inline-block";
+                    badge.textContent = data.count;
+                } else {
+                    badge.style.display = "none";
+                }
+            };
+        
+            // Hide instantly when clicking Orders
+            const ordersLink = document.querySelector("a[href='{% url 'vendor:view_orders' %}']");
+            if (ordersLink && badge) {
+                ordersLink.addEventListener("click", function() {
+                    badge.style.display = "none";
+                });
+            }
         });
     </script>
 

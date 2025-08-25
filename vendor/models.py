@@ -151,8 +151,9 @@ class Diamond(models.Model):
 class Order(models.Model):
     customer = models.ForeignKey('customer.Customer', on_delete=models.CASCADE, related_name='orders')
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE, related_name='orders')
-    created_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=20, default='Pending')
+    seen = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Order #{self.id} by {self.customer.username} for {self.vendor.username}"

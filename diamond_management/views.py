@@ -15,7 +15,8 @@ from vendor.models import Diamond
 from django.views.decorators.csrf import csrf_exempt
 import datetime
 from django.contrib.auth.views import LogoutView
-from urllib.parse import urlencode
+from django.http import JsonResponse
+from django.template.loader import render_to_string
 
 
 def register(request):
@@ -158,10 +159,14 @@ def edit_profile(request):
     return render(request, 'edit_profile.html', {'form': form, 'user_type':user_type})
 
 
+from django.shortcuts import render
+from django.db.models import Sum
+from django.core.paginator import Paginator
+
 def dashboard(request):
-    diamonds = Diamond.objects.all().order_by('-created_at')
-    
-    # Get filters from query params
+    diamonds = Diamond.objects.all()
+
+    # --- Filters ---
     shape = request.GET.getlist('shape')
     color = request.GET.getlist('color')
     clarity = request.GET.getlist('clarity')
@@ -169,8 +174,9 @@ def dashboard(request):
     lab = request.GET.getlist('lab')
     min_carat = request.GET.get('min_carat')
     max_carat = request.GET.get('max_carat')
+    min_price = request.GET.get('min_price')
+    max_price = request.GET.get('max_price')
 
-    # Apply filters
     if shape:
         diamonds = diamonds.filter(shape__in=shape)
     if color:
@@ -185,37 +191,40 @@ def dashboard(request):
         diamonds = diamonds.filter(carat__gte=min_carat)
     if max_carat:
         diamonds = diamonds.filter(carat__lte=max_carat)
+    if min_price:
+        diamonds = diamonds.filter(total_amount__gte=min_price)
+    if max_price:
+        diamonds = diamonds.filter(total_amount__lte=max_price)
 
-    # Sorting
+    # --- Sorting ---
     sort = request.GET.get('sort')
-    if sort == 'price_asc':
-        diamonds = diamonds.order_by('price_per_carat')
-    elif sort == 'price_desc':
-        diamonds = diamonds.order_by('-price_per_carat')
-    elif sort == 'carat_asc':
-        diamonds = diamonds.order_by('carat')
-    elif sort == 'carat_desc':
-        diamonds = diamonds.order_by('-carat')
-    elif sort == 'color_asc':
-        diamonds = diamonds.order_by('color')
-    elif sort == 'color_desc':
-        diamonds = diamonds.order_by('-color')
-    elif sort == 'clarity_asc':
-        diamonds = diamonds.order_by('clarity')
-    elif sort == 'clarity_desc':
-        diamonds = diamonds.order_by('-clarity')
+    sort_map = {
+        'price_asc': 'price_per_carat',
+        'price_desc': '-price_per_carat',
+        'carat_asc': 'carat',
+        'carat_desc': '-carat',
+        'color_asc': 'color',
+        'color_desc': '-color',
+        'clarity_asc': 'clarity',
+        'clarity_desc': '-clarity',
+    }
+    if sort in sort_map:
+        diamonds = diamonds.order_by(sort_map[sort])
+    else:
+        diamonds = diamonds.order_by('-created_at')
 
-    # Stats
+    # --- Stats ---
     total_stock = diamonds.count()
-    total_carat = diamonds.aggregate(Sum('carat'))['carat__sum'] or 0
-    total_amount = diamonds.aggregate(Sum('total_amount'))['total_amount__sum'] or 0
+    aggs = diamonds.aggregate(total_carat=Sum('carat'), total_amount=Sum('total_amount'))
+    total_carat = round(aggs['total_carat'] or 0, 2)
+    total_amount = round(aggs['total_amount'] or 0, 2)
 
-    # Pagination
+    # --- Pagination ---
     paginator = Paginator(diamonds, 50)
-    page_number = request.GET.get('page')
+    page_number = request.GET.get('page') or 1
     page_obj = paginator.get_page(page_number)
 
-    # Active filters for checkbox state
+    # --- Active filters ---
     active_filters = {
         "shape": shape,
         "color": color,
@@ -224,7 +233,6 @@ def dashboard(request):
         "lab": lab,
     }
 
-    # Filter groups to loop over in template
     filter_groups = [
         ("Shape", Diamond.SHAPE, "shape"),
         ("Color", Diamond.COLOUR, "color"),
@@ -233,7 +241,6 @@ def dashboard(request):
         ("Lab", Diamond.LAB, "lab"),
     ]
 
-    # Keep raw params (no backend cleaning)
     get_params = request.GET.urlencode()
 
     context = {
@@ -242,12 +249,19 @@ def dashboard(request):
         'active_filters': active_filters,
         'filter_groups': filter_groups,
         'total_stock': total_stock,
-        'total_carat': round(total_carat, 2),
-        'total_amount': round(total_amount, 2),
+        'total_carat': total_carat,
+        'total_amount': total_amount,
         'get_params': get_params,
     }
 
-    return render(request, 'dashboard.html', context)
+    # --- AJAX partial render ---
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
+        table_html = render_to_string("includes/_diamond_table.html", context, request=request)
+        return JsonResponse({"table_html": table_html})
+
+    # --- Full page render ---
+    return render(request, "dashboard.html", context)
+
 
 def diamond_detail(request, id):
     diamond = get_object_or_404(Diamond, pk=id)

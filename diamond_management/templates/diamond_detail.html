@@ -3,39 +3,39 @@
 
 {% block content %}
 <style>
-    .btn-cart {
-        min-width: 150px;
-        max-width: 200px;
-        height: 40px;
+    .btn-equal {
+        min-width: 70px !important;   /* reduced from 90px */
+        height: 28px !important;      /* reduced from 36px */
+        font-size: 0.8rem !important; /* smaller font size */
+        padding: 3px 8px;             /* reduced padding */
         white-space: nowrap;
         background: rgb(11, 25, 55);
-        color: rgb(255, 255, 255);
+        color: rgb(255, 255, 255) !important;
         border: none;
-        border-radius: 20px;
+        border-radius: 14px;          /* smaller radius to match new size */
         font-weight: 500;
-        box-shadow: 0 2px 8px rgba(11, 25, 55, 0.3);
+        box-shadow: 0 2px 6px rgba(11, 25, 55, 0.25);
         transition: background 0.3s, color 0.3s;
-        display: inline-flex;
+        display: inline-block;
         align-items: center;
         justify-content: center;
-        text-decoration: none;
-        margin: 0 10px;
+        text-align: center;
     }
-    .btn-cart:hover {
+    .btn-equal:hover {
         background: rgb(255, 255, 255);
-        color: rgb(11, 25, 55);
+        color: rgb(11, 25, 55) !important;
         border: 1px solid rgb(11, 25, 55);
     }
 </style>
-<div class="container-fluid py-4">
-    <h1 class="text-center mb-5" style="color:rgb(11, 25, 55); font-weight:bold; text-decoration:underline;">
+<div class="container-fluid">
+    <h1 class="text-center mb-3" style="color:rgb(11, 25, 55); font-weight:bold; text-decoration:underline;">
         Diamond {{ diamond.stock_id }}
     </h1>
 
     <div class="row justify-content-center gx-4 gy-4">
         <!-- Diamond Details Table -->
         <div class="col-lg-6 col-md-12">
-            <div class="card shadow-sm h-100">
+            <div class="card shadow-sm h-50">
                 <div class="card-header text-center" style="background: #f8f9fa; font-weight: 500; font-size: 1.5rem; color: black;">
                     Details
                 </div>
@@ -96,13 +96,13 @@
     </div>
 </div>
 
-<div class="text-center mt-4">
+<div class="text-center py-4">
     {% if from_order %}
-        <a href="{% url 'vendor:view_orders' %}" class="btn btn-danger btn-lg">Back to Orders</a>
+        <a href="{% url 'vendor:view_orders' %}" class="btn btn-equal btn-lg">Back to Orders</a>
     {% elif not from_order %}
-        <div class="d-flex justify-content-center align-items-center gap-3">
-            <a href="javascript:history.back()" class="btn btn-cart btn-lg">Back</a>
-            <a href="{% url 'customer:add_to_cart' diamond.id %}?next={{ request.get_full_path|urlencode }}" class="btn btn-cart btn-lg">Add to Cart</a>
+        <div class="d-flex justify-content-center align-items-center gap-2">
+            <a href="javascript:history.back()" class="btn btn-equal btn-lg">Back</a>
+            <a href="{% url 'customer:add_to_cart' diamond.id %}?next={{ request.get_full_path|urlencode }}" class="btn btn-equal btn-lg">Add to Cart</a>
         </div>
     {% endif %}
 </div>
