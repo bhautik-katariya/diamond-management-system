@@ -22,25 +22,32 @@
         min-height: 100px;     /* adjust as you like */
     }
 
-    .dashboard-header .row {
-        margin: 0; /* remove default bootstrap row margin */
-    }
-    
-    .dashboard-header .col-md-4 {
-        padding: 5px; /* remove default bootstrap col padding */
-    }
-    
     .stat-box {
-        background-color: #e6f4fa;
-        padding: 15px;
-        border-radius: 10px;
-        text-align: center;
-        color: rgb(11, 25, 55);
-        font-size: 18px;
-        font-weight: bold;
-        border: 1px solid #b6e0f7;
-        margin-bottom: 20px;
-    }
+      background-color: #e6f4fa;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      color: rgb(11, 25, 55);
+      font-size: 16px;
+      font-weight: bold;
+      border: 1px solid #b6e0f7;
+  
+      height: 120px;              /* Fixed equal height */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;    /* Center vertically */
+      align-items: center;        /* Center horizontally */
+  }
+  
+  /* Make them equal width in one line */
+  .dashboard-header .row {
+      display: flex;
+      justify-content: space-between;
+  }
+  .dashboard-header .col-md-4 {
+      flex: 1;          /* equal width */
+      padding: 5px;
+  }
 
     #tableContainer {
         overflow-x: auto;
@@ -250,16 +257,27 @@
 </style>
 
 <!-- Stats -->
-<div class="row g-3 dashboard-header mb-4">
-    <div class="col-md-4">
-        <div class="stat-box">Total Stock<br>{{ total_stock }}</div>
-    </div>
-    <div class="col-md-4">
-        <div class="stat-box">Total Carat<br>{{ total_carat }}</div>
-    </div>
-    <div class="col-md-4">
-        <div class="stat-box">Total Amount<br>$ {{ total_amount }}</div>
-    </div>
+<div class="dashboard-header mb-3">
+  <div class="row g-2 w-100">
+      <div class="col-12 col-md-4">
+          <div class="stat-box">
+              <div>Stock</div>
+              <div>{{ total_stock }}</div>
+          </div>
+      </div>
+      <div class="col-12 col-md-4">
+          <div class="stat-box">
+              <div>Carat</div>
+              <div>{{ total_carat }}</div>
+          </div>
+      </div>
+      <div class="col-12 col-md-4">
+          <div class="stat-box">
+              <div>Amount</div>
+              <div>$ {{ total_amount }}</div>
+          </div>
+      </div>
+  </div>
 </div>
 
 <div class="container-fluid mt-3">
@@ -299,7 +317,7 @@
     </div>
   
     <!-- ===== FILTER OVERLAY ===== -->
-    <div id="filterOverlayWrapper" class="filter-collapse mb-3">
+    <div id="filterOverlayWrapper" class="filter-collapse mb-3" style="max-height:0; overflow:hidden;">
       {% include "includes/filter_overlay.html" %}
     </div>
   
@@ -310,145 +328,161 @@
 </div>
 
 <script>
-function loadTable(url) {
-  const wrapperBefore = document.getElementById('filterOverlayWrapper');
-  const wasFilterOpen = wrapperBefore && wrapperBefore.classList.contains('active');
-
-  fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" } })
-    .then(resp => resp.json())
-    .then(data => {
-      document.getElementById('diamondTableWrapper').innerHTML = data.table_html;
-
-      if (wasFilterOpen) {
-        const wrapperAfter = document.getElementById('filterOverlayWrapper');
-        const content = document.getElementById('filterOverlay');
-        if (wrapperAfter && content) {
-          wrapperAfter.classList.add('active');
-          wrapperAfter.style.maxHeight = content.scrollHeight + 'px';
-        }
-      }
-      rebindTableEvents();
-    })
-    .catch(err => console.error('loadTable error', err));
-}
-
-function rebindTableEvents() {
-  // --- Download selected ---
-  const downloadBtn = document.getElementById('download-btn');
-  if (downloadBtn) {
-    downloadBtn.addEventListener('click', () => {
-      const checkboxes = document.querySelectorAll('.row-checkbox');
-      let selected = [];
-      checkboxes.forEach(cb => { if (cb.checked) selected.push(cb.value); });
-      if (selected.length === 0) checkboxes.forEach(cb => selected.push(cb.value));
-      document.getElementById('diamond-ids-input').value = selected.join(',');
-      document.getElementById('download-form').submit();
-    });
-  }
-
-  // --- Ajax link interception ---
-  document.querySelectorAll('a.ajax-link').forEach(link => {
-    link.addEventListener('click', e => {
+  document.addEventListener("DOMContentLoaded", () => {
+  
+    // ------------------- Utility: Load Table via AJAX -------------------
+    function loadTable(url) {
+      const wrapperBefore = document.getElementById('filterOverlayWrapper');
+      const wasFilterOpen = wrapperBefore && wrapperBefore.classList.contains('active');
+  
+      fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" } })
+        .then(resp => resp.json())
+        .then(data => {
+          document.getElementById('diamondTableWrapper').innerHTML = data.table_html;
+  
+          if (wasFilterOpen) {
+            const wrapperAfter = document.getElementById('filterOverlayWrapper');
+            const content = document.getElementById('filterOverlay');
+            if (wrapperAfter && content) {
+              wrapperAfter.classList.add('active');
+              wrapperAfter.style.maxHeight = content.scrollHeight + 'px';
+            }
+          }
+        })
+        .catch(err => console.error('loadTable error', err));
+    }
+  
+    // ------------------- Delegated AJAX Links -------------------
+    document.addEventListener('click', e => {
+      const link = e.target.closest('a.ajax-link');
+      if (!link) return;
       e.preventDefault();
       loadTable(link.href);
       history.pushState({}, "", link.href);
     });
-  });
-
-  /* ---------- Auto Apply Filters ---------- */
-  const filterForm = document.getElementById('filterForm');
-  if (filterForm) {
-    function scheduleApply() {
-      clearTimeout(window._filterTimer);
-      window._filterTimer = setTimeout(() => {
-        const params = new URLSearchParams(new FormData(filterForm)).toString();
-        const url = window.location.pathname + (params ? '?' + params : '');
-        loadTable(url);
-        history.pushState({}, "", url);
-      }, 200);
-    }
-
-    // Ensure label clicks trigger change
-    document.querySelectorAll('.filter-button-group label').forEach(label => {
-      label.addEventListener('click', () => {
-        const inputId = label.getAttribute('for');
-        if (!inputId) return;
-        const input = document.getElementById(inputId);
-        if (input) {
-          setTimeout(() => {
-            input.dispatchEvent(new Event('change', { bubbles: true }));
-          }, 0);
-        }
-      });
-    });
-
-    // Checkboxes & selects
-    filterForm.querySelectorAll('input[type="checkbox"], select').forEach(el => {
-      el.addEventListener('change', scheduleApply);
-    });
-
-    // Number fields
-    filterForm.querySelectorAll('input[type="number"]').forEach(el => {
-      el.addEventListener('blur', scheduleApply);
-      el.addEventListener('keypress', e => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          scheduleApply();
-        }
-      });
-    });
-
-    // --- Sync filter form with current URL query params ---
-    const params = new URLSearchParams(window.location.search);
-    filterForm.querySelectorAll('input, select').forEach(el => {
-      if (el.type === 'checkbox') {
-        el.checked = params.getAll(el.name).includes(el.value);
-      } else if (el.type === 'number' || el.tagName === 'SELECT') {
-        el.value = params.get(el.name) || '';
-      }
-    });
-  }
-
-  /* ---------- Close button ---------- */
-  const closeBtn = document.getElementById('closeFilterOverlay');
-  if (closeBtn) {
-    closeBtn.addEventListener('click', () => {
-      const wrapper = document.getElementById('filterOverlayWrapper');
-      if (wrapper) {
-        wrapper.classList.remove('active');
-        wrapper.style.maxHeight = '0';
-      }
-    });
-  }
-
-  /* ---------- Reset button ---------- */
-  const resetBtn = document.getElementById('resetFilters');
-  if (resetBtn && filterForm) {
-    resetBtn.addEventListener('click', () => {
-      filterForm.reset();
-      filterForm.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
-      const url = window.location.pathname;
-      loadTable(url);
+  
+    // ------------------- Delegated AJAX Page Input -------------------
+    document.addEventListener('change', e => {
+      if (!e.target.classList.contains('ajax-page-input')) return;
+      let page = parseInt(e.target.value);
+      if (page < 1) page = 1;
+      if (page > parseInt(e.target.max)) page = e.target.max;
+  
+      const url = new URL(window.location.href);
+      url.searchParams.set('page', page);
+      loadTable(url.toString());
       history.pushState({}, "", url);
     });
-  }
-
-  /* ---------- Filter toggle ---------- */
-  const toggleButton = document.getElementById('filterToggleButton');
-  if (toggleButton) {
-    toggleButton.addEventListener('click', () => {
-      const wrapper = document.getElementById('filterOverlayWrapper');
-      const content = document.getElementById('filterOverlay');
-      if (!wrapper) return;
-      const isActive = wrapper.classList.toggle('active');
-      wrapper.style.maxHeight = isActive ? content.scrollHeight + 'px' : '0';
-    });
-  }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  rebindTableEvents();
-  window.addEventListener("popstate", () => loadTable(location.href));
-});
+  
+    // ------------------- Download Selected -------------------
+    const downloadBtn = document.getElementById('download-btn');
+    if (downloadBtn) {
+      downloadBtn.addEventListener('click', () => {
+        const checkboxes = document.querySelectorAll('.row-checkbox');
+        let selected = [];
+        checkboxes.forEach(cb => { if (cb.checked) selected.push(cb.value); });
+        if (selected.length === 0) checkboxes.forEach(cb => selected.push(cb.value));
+        document.getElementById('diamond-ids-input').value = selected.join(',');
+        document.getElementById('download-form').submit();
+      });
+    }
+  
+    // ------------------- Filter Overlay -------------------
+    const filterForm = document.getElementById('filterForm');
+    if (filterForm) {
+      function scheduleApply() {
+        clearTimeout(window._filterTimer);
+        window._filterTimer = setTimeout(() => {
+          const params = new URLSearchParams(new FormData(filterForm)).toString();
+          const url = window.location.pathname + (params ? '?' + params : '');
+          loadTable(url);
+          history.pushState({}, "", url);
+        }, 200);
+      }
+  
+      // checkbox & select change
+      filterForm.querySelectorAll('input[type="checkbox"], select').forEach(el => el.addEventListener('change', scheduleApply));
+  
+      // number input change or Enter
+      filterForm.querySelectorAll('input[type="number"]').forEach(el => {
+        el.addEventListener('blur', scheduleApply);
+        el.addEventListener('keypress', e => {
+          if (e.key === 'Enter') { e.preventDefault(); scheduleApply(); }
+        });
+      });
+  
+      // label clicks trigger checkbox change
+      filterForm.querySelectorAll('.filter-button-group label').forEach(label => {
+        label.addEventListener('click', () => {
+          const input = document.getElementById(label.getAttribute('for'));
+          if (input) setTimeout(() => input.dispatchEvent(new Event('change', { bubbles: true })), 0);
+        });
+      });
+  
+      // ------------------- Reset Button -------------------
+      const resetBtn = document.getElementById('resetFilters');
+      if (resetBtn) {
+        resetBtn.addEventListener('click', () => {
+          filterForm.reset();
+          filterForm.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+          loadTable(window.location.pathname);
+          history.pushState({}, "", window.location.pathname);
+        });
+      }
+    }
+  
+    // ------------------- Filter Toggle -------------------
+    const toggleButton = document.getElementById('filterToggleButton');
+    if (toggleButton) {
+      toggleButton.addEventListener('click', () => {
+        const wrapper = document.getElementById('filterOverlayWrapper');
+        const content = document.getElementById('filterOverlay');
+        if (!wrapper || !content) return;
+        const isActive = wrapper.classList.toggle('active');
+        wrapper.style.maxHeight = isActive ? content.scrollHeight + 'px' : '0';
+      });
+    }
+  
+    // ------------------- Close Filter -------------------
+    const closeBtn = document.getElementById('closeFilterOverlay');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => {
+        const wrapper = document.getElementById('filterOverlayWrapper');
+        if (wrapper) {
+          wrapper.classList.remove('active');
+          wrapper.style.maxHeight = '0';
+        }
+      });
+    }
+  
+    // ------------------- Color/Clarity Range Selection -------------------
+    function enableRangeSelection(groupSelector, inputClass) {
+      let startIndex = null;
+      const group = document.querySelector(groupSelector);
+      if (!group) return;
+      const checkboxes = Array.from(group.querySelectorAll("." + inputClass));
+      checkboxes.forEach((cb, index) => {
+        cb.addEventListener("click", () => {
+          if (startIndex === null) {
+            startIndex = index;
+            checkboxes.forEach(c => c.checked = false);
+            cb.checked = true;
+          } else {
+            const endIndex = index;
+            const [from, to] = [Math.min(startIndex, endIndex), Math.max(startIndex, endIndex)];
+            checkboxes.forEach((c, i) => c.checked = (i >= from && i <= to));
+            startIndex = null;
+          }
+        });
+      });
+    }
+  
+    enableRangeSelection("#color-group", "color-check");
+    enableRangeSelection("#clarity-group", "clarity-check");
+  
+    // ------------------- Handle browser back/forward -------------------
+    window.addEventListener("popstate", () => loadTable(location.href));
+  
+  });
 </script>    
 {% endblock %}

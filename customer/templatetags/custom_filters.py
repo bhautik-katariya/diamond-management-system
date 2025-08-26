@@ -16,6 +16,6 @@ def add_sort(current_url, sort_value):
 
 @register.filter
 def page_url(request, page_number):
-    params = request.GET.copy()
-    params['page'] = page_number
-    return '?' + params.urlencode()
+    query = request.GET.copy()   # copy current query params
+    query['page'] = page_number  # replace only the page param
+    return f"{request.path}?{query.urlencode()}"

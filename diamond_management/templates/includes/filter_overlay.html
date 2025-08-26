@@ -2,227 +2,233 @@
 {% load custom_filters %}
 
 <!-- Filter Overlay -->
- 
 <style>
-    .filter-collapse {
-        overflow: hidden;
-    }
-
-    #filterOverlayWrapper.active {
-        margin-bottom: 15px; /* only when expanded */
-    }
-
-    #filterOverlay {
-        background: #fff;
-        border-radius: 8px;
-        padding: 10px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-        margin-bottom: 15px;
-    }
-    .filter-section {
-        margin-bottom: 2px;  /* adjust as needed */
-    }    
-    .shape-row {
-        border: 1.5px solid #eee;
-        margin-bottom: 10px;}
-    /* ensure buttons wrap and rows leave space before the table */
-    .filter-button-group { 
-        display: flex; 
-        flex-wrap: wrap; 
-        gap: 0.5rem; 
-    }
-
-    .filters-block { margin-bottom: 0.5rem; }  /* prevents overlap with table when zoomed */
-    .shape-row {
-      display: flex;
-      flex-wrap: wrap;          /* wrap allow */
-      gap: 2px;                /* spacing */
-      justify-content: flex-start; /* left align */
+  .filter-collapse {
+    overflow: hidden;
   }
-  
-  .shape-row .btn,
-  .shape-row label {
-      flex: 0 0 auto;           /* buttons ni width content jetli j */
-      white-space: nowrap;      /* text break na thai */
-      max-width: 100%;          /* parent thi bahar na jai */
+
+  #filterOverlayWrapper.active {
+    margin-bottom: 15px; /* only when expanded */
+  }
+
+  #filterOverlay {
+    background: #fff;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    margin-bottom: 15px;
+  }
+
+  .form-label {
+    font-weight: bold;
+    font-size: 15px;
+    color: #222;
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  /* Shape buttons */
+  .shape-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: flex-start;
+    background:#fff;
+    border-radius:12px;
+    padding:18px 10px 10px 10px;
+    box-shadow:0 2px 8px #eee;
   }
 
   .shape-icon-label {
-      flex: 0 1 auto;  /* responsive */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 8px 10px;
+    border-radius: 12px;
+    transition: box-shadow 0.1s, border 0.1s;
+    border: 2px solid transparent;
+    background: #fff;
+    min-width: 70px;
+    min-height: 80px;
+    box-sizing: border-box;
   }
 
-    .shape-icon-label {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        padding: 8px 10px;
-        border-radius: 12px;
-        transition: box-shadow 0.1s, border 0.1s;
-        border: 2px solid transparent;
-        background: #fff;
-        min-width: 70px;
-        min-height: 80px;
-        box-sizing: border-box;
-    }
-    .shape-icon-label .shape-svg {
-        width: 40px;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    .shape-label {
-        font-size: 0.7rem;
-        color: #222;
-        margin-top: 6px;
-        font-weight: 500;
-    }
-    .btn-check:checked + .shape-icon-label {
-        border: 2.5px solid #222;
-        box-shadow: 0 2px 8px #bbb;
-        background: #f8f8f8;
-    }
-    .btn-outline-dark {
-        border-width: 2px;
-        background: #fff;
-        color: #222;
-    }
-    .btn-outline-dark:hover, .btn-outline-dark:focus {
-        background: #222;
-        color: #fff;
-    }
-    .btn-group .btn {
-        margin-bottom: 4px;
-    }
-    .form-label {
-        font-weight: bold;
-        font-size: 16px;
-        color: #222;
-        margin-bottom: 6px;
-        display: block;
-    }
+  .shape-icon-label .shape-svg {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
+  .shape-label {
+    font-size: 0.7rem;
+    color: #222;
+    margin-top: 6px;
+    font-weight: 500;
+  }
+
+  .btn-check:checked + .shape-icon-label {
+    border: 2.5px solid #222;
+    box-shadow: 0 2px 8px #bbb;
+    background: #f8f8f8;
+  }
+
+  /* General filter buttons */
+  .filter-button-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .filter-toggle {
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 6px 12px;
+    cursor: pointer;
+    background: #fff;
+    font-size: 0.85rem;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .hidden-check {
+    display: none;
+  }
+
+  .hidden-check:checked + .filter-toggle {
+    border: 1.5px solid #393b39;
+    box-shadow: 0 2px 8px #bbb;
+    background: #f8f8f8;
+  }
 </style>
+
 <div id="filterOverlay">
-    <h4 style="color:#222;">Filter Options</h4>
-    <form method="get" id="filterForm">
-        <div class="row">
-      
-          <!-- Shape -->
-          <div class="col-12">
-            <label class="form-label" style="color:#222;"></label>
-            <div class="d-flex flex-row flex-wrap justify-content-start align-items-center shape-row"
-            style="background:#fff; border-radius:12px; padding:18px 10px 10px 10px; box-shadow:0 2px 8px #eee;">
-              {% for code, label in filter_groups.0.1 %}
-                <input type="checkbox" class="btn-check" name="shape" id="shape-{{ code }}" value="{{ code }}" autocomplete="off"
-                       {% if code in active_filters.shape %}checked{% endif %}>
-                <label class="shape-icon-label mx-2" for="shape-{{ code }}">
-                  <span class="shape-svg">
-                    {# your SVG <img> if/elif block unchanged #}
-                    {% if label == 'ASSCHER' %}
-                      <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651456/asscher_xwkvvy.svg" width="40" height="40" alt="Asscher Shape">
-                    {% elif label == 'BAGUETTE' %}
-                      <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651456/baguette_gryjpl.svg" width="32" height="40" alt="Emerald Shape">
-                    {% elif label == 'CUSHION' %}
-                      <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651456/cushion_mmnoab.svg" width="40" height="40" alt="Cushion Shape">
-                    {% elif label == 'EMERALD' %}
-                      <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651456/emerald_sr9e0f.svg" width="32" height="40" alt="Emerald Shape">
-                    {% elif label == 'HEART' %}
-                      <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651457/heart_piv4mu.svg" width="40" height="40" alt="Heart Shape">
-                    {% elif label == 'MARQUISE' %}
-                      <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651457/marquise_ljlq2v.svg" width="32" height="40" alt="Marquise Shape">
-                    {% elif label == 'OLD' %}
-                      <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651458/old_vyq23i.svg" width="40" height="40" alt="Old Shape">
-                    {% elif label == 'OVAL' %}
-                      <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651458/oval_epynny.svg" width="32" height="40" alt="Oval Shape">
-                    {% elif label == 'PEAR' %}
-                      <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651459/pear_vdpfgq.svg" width="32" height="40" alt="Pear Shape">
-                    {% elif label == 'PRINCESS' %}
-                      <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651459/princess_fh3oqx.svg" width="40" height="40" alt="Princess Shape">
-                    {% elif label == 'RADIANT' %}
-                      <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651460/radiant_jhgoyd.svg" width="32" height="40" alt="Radiant Shape">
-                    {% elif label == 'ROUND' %}
-                      <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651461/round_phykmr.svg" width="40" height="40" alt="Round Shape">
-                    {% elif label == 'SQUARE' %}
-                      <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651461/square_x76biu.svg" width="40" height="40" alt="Square Shape">
-                    {% elif label == 'TAPERED' %}
-                      <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651461/tapered_i6pqjb.svg" width="32" height="40" alt="Taper Shape">
-                    {% elif label == 'TRILLIANT' %}
-                      <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651462/trilliant_hwawud.svg" width="32" height="40" alt="Trillion Shape">
-                    {% else %}
-                      <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651458/other_n3otbi.svg" width="40" height="40" alt="Other Shape">
-                    {% endif %}
-                  </span>
-                  <span class="shape-label">{{ label }}</span>
-                </label>
-              {% endfor %}
-            </div>
-          </div>
-      
-          <!-- Carat + Budget + Lab on one row -->
-          <div class="row align-items-end">
-            <!-- Carat -->
-            <div class="col-lg-4 col-md-6">
-              <label class="form-label" style="color:#222;">Carat</label>
-              <div class="d-flex align-items-center gap-2 flex-wrap">
-                <input type="number" step="0.01" min="0" name="min_carat" class="form-control" style="max-width:100px;" placeholder="Min" value="{{ request.GET.min_carat }}">
-                <span>-</span>
-                <input type="number" step="0.01" min="0" name="max_carat" class="form-control" style="max-width:100px;" placeholder="Max" value="{{ request.GET.max_carat }}">
-              </div>
-            </div>
-      
-            <!-- Budget -->
-            <div class="col-lg-4 col-md-6">
-              <label class="form-label" style="color:#222;">Budget</label>
-              <div class="d-flex align-items-center gap-2 flex-wrap">
-                <input type="number" step="1" min="0" name="min_price" class="form-control" style="max-width:120px;" placeholder="Min $" value="{{ request.GET.min_price }}">
-                <span>-</span>
-                <input type="number" step="1" min="0" name="max_price" class="form-control" style="max-width:120px;" placeholder="Max $" value="{{ request.GET.max_price }}">
-              </div>
-            </div>
-      
-            <!-- Lab (correctly sourced from the 'lab' group) -->
-            <div class="col-lg-4 col-12">
-              <label class="form-label" style="color:#222;">Lab</label>
-              <div class="filter-button-group" role="group" aria-label="Lab" data-name="lab">
-                {% for title, options, name in filter_groups %}
-                  {% if name == 'lab' %}
-                    {% for code, label in options %}
-                      <input type="checkbox" class="hidden-check" name="lab" id="lab-{{ code }}" value="{{ code }}"
-                             {% if code in active_filters.lab %}checked{% endif %}>
-                      <label class="filter-toggle" for="lab-{{ code }}">{{ label }}</label>
-                    {% endfor %}
-                  {% endif %}
-                {% endfor %}
-              </div>
-            </div>
-          </div>
-      
-          <!-- Remaining groups EXCEPT lab -->
-          <div class="row g-2 filters-block">
-            {% for title, options, name in filter_groups|slice:'1:' %}
-              {% if name != 'lab' %}
-                <div class="col-md-4 mb-3">
-                  <label class="form-label" style="color:#222;">{{ title }}</label>
-                  <div class="filter-button-group" role="group" aria-label="{{ title }}" data-name="{{ name }}">
-                    {% for code, label in options %}
-                      <input type="checkbox" class="hidden-check" name="{{ name }}" id="{{ name }}-{{ code }}" value="{{ code }}"
-                             {% if code in active_filters|get_item:name %}checked{% endif %}>
-                      <label class="filter-toggle" for="{{ name }}-{{ code }}">{{ label }}</label>
-                    {% endfor %}
-                  </div>
-                </div>
-              {% endif %}
-            {% endfor %}
-          </div>
-      
-          <div class="d-flex justify-content-between mt-3">
-            <button type="button" id="applyFilters" class="btn btn-filter equal-button" onclick="toggleFilterOverlay()">Apply</button>
-            <a href="/" class="btn btn-sort equal-button ajax-link">Reset</a>
-          </div>
-      
+  <h4 style="color:#222;">Filter Options</h4>
+  <form method="get" id="filterForm">
+
+    <!-- 1st Row: Shape -->
+    <div class="row mb-3">
+      <div class="col-12">
+        <label class="form-label">Shape</label>
+        <div class="shape-row">
+          {% for code, label in filter_groups.0.1 %}
+            <input type="checkbox" class="btn-check" name="shape" id="shape-{{ code }}" value="{{ code }}"
+                   {% if code in active_filters.shape %}checked{% endif %}>
+            <label class="shape-icon-label mx-2" for="shape-{{ code }}">
+              <span class="shape-svg">
+                {# === SVG icons (unchanged) === #}
+                {% if label == 'ASSCHER' %}
+                  <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651456/asscher_xwkvvy.svg" width="40" height="40">
+                {% elif label == 'BAGUETTE' %}
+                  <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651456/baguette_gryjpl.svg" width="32" height="40">
+                {% elif label == 'CUSHION' %}
+                  <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651456/cushion_mmnoab.svg" width="40" height="40">
+                {% elif label == 'EMERALD' %}
+                  <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651456/emerald_sr9e0f.svg" width="32" height="40">
+                {% elif label == 'HEART' %}
+                  <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651457/heart_piv4mu.svg" width="40" height="40">
+                {% elif label == 'MARQUISE' %}
+                  <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651457/marquise_ljlq2v.svg" width="32" height="40">
+                {% elif label == 'OLD' %}
+                  <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651458/old_vyq23i.svg" width="40" height="40">
+                {% elif label == 'OVAL' %}
+                  <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651458/oval_epynny.svg" width="32" height="40">
+                {% elif label == 'PEAR' %}
+                  <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651459/pear_vdpfgq.svg" width="32" height="40">
+                {% elif label == 'PRINCESS' %}
+                  <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651459/princess_fh3oqx.svg" width="40" height="40">
+                {% elif label == 'RADIANT' %}
+                  <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651460/radiant_jhgoyd.svg" width="32" height="40">
+                {% elif label == 'ROUND' %}
+                  <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651461/round_phykmr.svg" width="40" height="40">
+                {% elif label == 'SQUARE' %}
+                  <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651461/square_x76biu.svg" width="40" height="40">
+                {% elif label == 'TAPERED' %}
+                  <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651461/tapered_i6pqjb.svg" width="32" height="40">
+                {% elif label == 'TRILLIANT' %}
+                  <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651462/trilliant_hwawud.svg" width="32" height="40">
+                {% else %}
+                  <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651458/other_n3otbi.svg" width="40" height="40">
+                {% endif %}
+              </span>
+              <span class="shape-label">{{ label }}</span>
+            </label>
+          {% endfor %}
         </div>
-      </form>    
+      </div>
+    </div>
+
+    <!-- 2nd Row: Carat / Budget / Lab -->
+    <div class="row mb-3">
+      <div class="col-md-4 col-sm-12">
+        <label class="form-label">Carat</label>
+        <div class="d-flex gap-2">
+          <input type="number" step="0.01" min="0" name="min_carat" class="form-control" placeholder="Min" value="{{ request.GET.min_carat }}">
+          <span>-</span>
+          <input type="number" step="0.01" min="0" name="max_carat" class="form-control" placeholder="Max" value="{{ request.GET.max_carat }}">
+        </div>
+      </div>
+      <div class="col-md-4 col-sm-12">
+        <label class="form-label">Budget</label>
+        <div class="d-flex gap-2">
+          <input type="number" step="1" min="0" name="min_price" class="form-control" placeholder="Min $" value="{{ request.GET.min_price }}">
+          <span>-</span>
+          <input type="number" step="1" min="0" name="max_price" class="form-control" placeholder="Max $" value="{{ request.GET.max_price }}">
+        </div>
+      </div>
+      <div class="col-md-4 col-sm-12">
+        <label class="form-label">Lab</label>
+        <div class="filter-button-group">
+          {% for code, label in filter_groups.4.1 %}
+            <input type="checkbox" class="hidden-check" name="lab" id="lab-{{ code }}" value="{{ code }}"
+                   {% if code in active_filters.lab %}checked{% endif %}>
+            <label class="filter-toggle" for="lab-{{ code }}">{{ label }}</label>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- 3rd Row: Color / Clarity / Cut -->
+    <div class="row mb-3">
+      <div class="col-md-4 col-sm-12">
+        <label class="form-label">Color</label>
+        <div class="filter-button-group" id="color-group">
+          {% for code, label in filter_groups.1.1 %}
+            <input type="checkbox" class="hidden-check color-check" name="color" id="color-{{ code }}" value="{{ code }}"
+                   {% if code in active_filters.color %}checked{% endif %}>
+            <label class="filter-toggle" for="color-{{ code }}">{{ label }}</label>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="col-md-4 col-sm-12">
+        <label class="form-label">Clarity</label>
+        <div class="filter-button-group" id="clarity-group">
+          {% for code, label in filter_groups.2.1 %}
+            <input type="checkbox" class="hidden-check clarity-check" name="clarity" id="clarity-{{ code }}" value="{{ code }}"
+                   {% if code in active_filters.clarity %}checked{% endif %}>
+            <label class="filter-toggle" for="clarity-{{ code }}">{{ label }}</label>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="col-md-4 col-sm-12">
+        <label class="form-label">Cut</label>
+        <div class="filter-button-group">
+          {% for code, label in filter_groups.3.1 %}
+            <input type="checkbox" class="hidden-check" name="cut" id="cut-{{ code }}" value="{{ code }}"
+                   {% if code in active_filters.cut %}checked{% endif %}>
+            <label class="filter-toggle" for="cut-{{ code }}">{{ label }}</label>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Buttons -->
+    <div class="d-flex justify-content-between mt-3">
+      {% comment %} <button type="button" id="applyFilters" class="btn btn-filter equal-button" onclick="toggleFilterOverlay()">Apply</button> {% endcomment %}
+      <a href="/" class="btn btn-sort equal-button ajax-link">Reset</a>
+      <button type="button" id="closeFilterOverlay" class="btn btn-sm btn-danger">Close</button>
+    </div>
+  </form>
 </div>
