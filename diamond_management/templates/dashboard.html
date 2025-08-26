@@ -83,17 +83,17 @@
         height: 60px;
     }
 
-    /* SHared Button Styles */
+    /* Shared Button Styles */
     .equal-button, .btn-sort, .btn-filter {
-        min-width: 70px !important;   /* reduced from 90px */
-        height: 28px !important;      /* reduced from 36px */
-        font-size: 0.8rem !important; /* smaller font size */
-        padding: 3px 8px;             /* reduced padding */
+        min-width: 70px !important;
+        height: 28px !important;
+        font-size: 0.8rem !important;
+        padding: 3px 8px;
         white-space: nowrap;
         background: rgb(11, 25, 55);
         color: rgb(255, 255, 255) !important;
         border: none;
-        border-radius: 14px;          /* smaller radius to match new size */
+        border-radius: 14px;
         font-weight: 500;
         box-shadow: 0 2px 6px rgba(11, 25, 55, 0.25);
         transition: background 0.3s, color 0.3s;
@@ -103,16 +103,13 @@
         text-align: center;
     }
     
-    /* Hover styles */
     .equal-button:hover,
-    .btn-filter:hover
-     {
+    .btn-filter:hover {
         background: rgb(255, 255, 255);
         color: rgb(11, 25, 55) !important;
         border: 1px solid rgb(11, 25, 55);
     }
 
-    /* Sort btn override style */
     .btn-sort {
         background-color: rgb(11, 25, 55) !important;
         color: rgb(255, 255, 255) !important;
@@ -128,7 +125,16 @@
         border: 1px solid rgb(11, 25, 55) !important;
     }
 
-    /* Dropdown styles */
+    .sort-dropdown:hover .dropdown-menu {
+        display: block;
+        margin-top: 0;
+    }
+
+    .sort-dropdown .dropdown-menu {
+        display: none;
+        position: absolute;
+    }
+
     .dropdown-menu {
         background-color: #e6f4fa !important;
         color: #0a3d62;
@@ -141,11 +147,6 @@
         background-color: transparent !important;
     }
 
-    {% comment %} .dropdown-item:hover {
-        background-color: #b6e0f7 !important;
-        color: rgb(11, 25, 55) !important;
-    } {% endcomment %}
-
     .dropdown-item:hover,
     .dropdown-item:focus,
     .dropdown-item:active {
@@ -153,54 +154,17 @@
         color: rgb(11, 25, 55) !important;
     }
 
-    .filter-button-group {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        margin-top: 6px;
-      }
-
-      .filter-toggle {
-        padding: 10px 14px;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        background-color: #fff;
-        color: #000;
-        font-size: 14px;
-        min-width: 60px;
-        text-align: center;
-        cursor: pointer;
-        transition: all 0.2s ease-in-out;
-        border: 1px solid grey; /* Added for shape icon labels */
-      }
-
-      .filter-toggle:hover {
-        background-color: #f5f5f5;
-        border-color: #888;
-      }
-
-      input[type="checkbox"].hidden-check {
-        display: none;
-      }
-
-      input[type="checkbox"].hidden-check:checked + .filter-toggle {
-        border-color: #000;
-        background-color: #eee;
-      }
-
-{% comment %} end {% endcomment %}
     .page-link {
-        min-width: 60px;            /* smaller width */
-        height: 28px;               /* smaller height */
-        border-radius: 14px !important; /* adjusted radius */
-        font-size: 0.8rem;          /* smaller text */
+        min-width: 60px;
+        height: 28px;
+        border-radius: 14px !important;
+        font-size: 0.8rem;
         font-weight: 500;
         background: rgb(11, 25, 55);
         color: white !important;
         border: none;
         margin: 0 2px;
         box-shadow: 0 2px 6px rgba(11, 25, 55, 0.25);
-        text-align: center !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
@@ -219,13 +183,12 @@
     }
 
     .page-item {
-        list-style: none;   /* removes the bullet */
+        list-style: none;
     }    
 
-    /* Pagination Input + Text */
     .page-input {
-        height: 28px;               /* match button height */
-        width: 50px;                /* compact */
+        height: 28px;
+        width: 50px;
         font-size: 0.8rem;
         text-align: center;
         border-radius: 14px;
@@ -235,22 +198,42 @@
 
     .page-total {
         font-size: 0.8rem;
-        line-height: 28px;          /* vertically aligned */
-        color: #6c757d;             /* muted text color */
+        line-height: 28px;
+        color: #6c757d;
     }
 
     .pagination {
         display: flex;
         justify-content: center;
         align-items: center;
-        gap: 10px; /* spacing between elements */
+        gap: 10px;
     }
     
     .pagination .form-control-sm {
         height: 36px;
         padding: 0;
     }
-    
+
+    #topBar { 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        gap: 12px; 
+    }
+
+    #topBar #top-pagination { 
+        display: flex; 
+        align-items: center; 
+    }
+    #topBar #top-pagination .pagination { 
+        margin: 0; 
+    }
+
+    #topBar .controls { 
+        display: flex; 
+        align-items: center; 
+        gap: 8px; 
+    }
 
     @media (max-width: 576px) {
         .diamond-table th, .diamond-table td {
@@ -279,271 +262,193 @@
     </div>
 </div>
 
-<!-- === AJAX Wrapper (everything inside reloads) === -->
-<div id="diamondTableWrapper">
-    <!-- Top Pagination -->
-    <div id="top-pagination">
-        {% include "includes/pagination.html" %}
-    </div>
-
-    <!-- Controls (Sort/Filter/Download) -->
-    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
-        <!-- Right Side: Download / Sort / Filter -->
-        <div class="d-flex gap-2">
-            <form id="download-form" method="post" action="{% url 'diamond_download_excel' %}" style="display:inline;">
-                {% csrf_token %}
-                <input type="hidden" name="diamond_ids" id="diamond-ids-input">
-                <button type="button" class="btn equal-button" id="download-btn">Download</button>
-            </form>
-            <div class="dropdown">
-                <button class="btn btn-sort equal-button dropdown-toggle" type="button" id="sortDropdownButton" data-bs-toggle="dropdown" aria-expanded="false">
-                    Sort
-                </button>
-                <ul class="dropdown-menu text-small" aria-labelledby="sortDropdownButton">
-                    <li class="dropdown-header">Price</li>
-                    <li><a class="dropdown-item ajax-link" href="{{ request.get_full_path|add_sort:'price_asc' }}">Low-to-high</a></li>
-                    <li><a class="dropdown-item ajax-link" href="{{ request.get_full_path|add_sort:'price_desc' }}">High-to-Low</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li class="dropdown-header">Carat</li>
-                    <li><a class="dropdown-item ajax-link" href="{{ request.get_full_path|add_sort:'carat_asc' }}">Low-to-high</a></li>
-                    <li><a class="dropdown-item ajax-link" href="{{ request.get_full_path|add_sort:'carat_desc' }}">High-to-Low</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li class="dropdown-header">Color</li>
-                    <li><a class="dropdown-item ajax-link" href="{{ request.get_full_path|add_sort:'color_asc' }}">Low-to-high</a></li>
-                    <li><a class="dropdown-item ajax-link" href="{{ request.get_full_path|add_sort:'color_desc' }}">High-to-Low</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li class="dropdown-header">Clarity</li>
-                    <li><a class="dropdown-item ajax-link" href="{{ request.get_full_path|add_sort:'clarity_asc' }}">Low-to-high</a></li>
-                    <li><a class="dropdown-item ajax-link" href="{{ request.get_full_path|add_sort:'clarity_desc' }}">High-to-Low</a></li>
-                </ul>
-            </div>
-            <button id="filterToggleButton" class="btn btn-filter equal-button" type="button" onclick="toggleFilterOverlay()">Filter</button>
+<div class="container-fluid mt-3">
+    <!-- ===== TOP ROW: pagination left, controls right ===== -->
+    <div id="topBar" class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+      <div id="top-pagination">
+        {% include "includes/pagination.html" with position="top" %}
+      </div>
+      <div class="controls d-flex gap-2 align-items-center">
+        <form id="download-form" method="post" action="{% url 'diamond_download_excel' %}" style="display:inline;">
+          {% csrf_token %}
+          <input type="hidden" name="diamond_ids" id="diamond-ids-input">
+          <button type="button" class="btn equal-button" id="download-btn">Download</button>
+        </form>
+        <div class="dropdown sort-dropdown">
+          <button class="btn btn-sort equal-button dropdown-toggle" type="button" id="sortDropdownButton">Sort</button>
+          <ul class="dropdown-menu text-small" aria-labelledby="sortDropdownButton">
+            <li class="dropdown-header">Price</li>
+            <li><a class="dropdown-item ajax-link" href="{{ request.get_full_path|add_sort:'price_asc' }}">Low-to-high</a></li>
+            <li><a class="dropdown-item ajax-link" href="{{ request.get_full_path|add_sort:'price_desc' }}">High-to-Low</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li class="dropdown-header">Carat</li>
+            <li><a class="dropdown-item ajax-link" href="{{ request.get_full_path|add_sort:'carat_asc' }}">Low-to-high</a></li>
+            <li><a class="dropdown-item ajax-link" href="{{ request.get_full_path|add_sort:'carat_desc' }}">High-to-Low</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li class="dropdown-header">Color</li>
+            <li><a class="dropdown-item ajax-link" href="{{ request.get_full_path|add_sort:'color_asc' }}">Low-to-high</a></li>
+            <li><a class="dropdown-item ajax-link" href="{{ request.get_full_path|add_sort:'color_desc' }}">High-to-Low</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li class="dropdown-header">Clarity</li>
+            <li><a class="dropdown-item ajax-link" href="{{ request.get_full_path|add_sort:'clarity_asc' }}">Low-to-high</a></li>
+            <li><a class="dropdown-item ajax-link" href="{{ request.get_full_path|add_sort:'clarity_desc' }}">High-to-Low</a></li>
+          </ul>
         </div>
+        <button id="filterToggleButton" class="btn btn-filter equal-button" type="button">Filter</button>
+      </div>
     </div>
-
-    <!-- Filter Overlay -->
-    <div id="filterOverlayWrapper" class="filter-collapse">
-        {% include "includes/filter_overlay.html" %}
-    </div> 
-
-    <!-- Diamond Table -->
-    {% include "includes/diamond_table.html" %}
+  
+    <!-- ===== FILTER OVERLAY ===== -->
+    <div id="filterOverlayWrapper" class="filter-collapse mb-3">
+      {% include "includes/filter_overlay.html" %}
+    </div>
+  
+    <!-- ===== TABLE WRAPPER ===== -->
+    <div id="diamondTableWrapper">
+      {% include "includes/dashboard_partial.html" %}
+    </div>
 </div>
 
-
-
 <script>
-    // === AJAX Loader for Table ===
-    function loadTable(url) {
-        fetch(url, {
-            headers: { "X-Requested-With": "XMLHttpRequest" }
-        })
-        .then(resp => resp.json())
-        .then(data => {
-            document.getElementById('diamondTableWrapper').innerHTML = data.table_html;
-            rebindTableEvents(); // rebind after ajax replace
-            adjustTableHeight();
-        });
-    }
+function loadTable(url) {
+  const wrapperBefore = document.getElementById('filterOverlayWrapper');
+  const wasFilterOpen = wrapperBefore && wrapperBefore.classList.contains('active');
 
-    // === Rebind all dynamic events after ajax ===
-    function rebindTableEvents() {
-        const selectAllCheckbox = document.getElementById('select-all');
+  fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" } })
+    .then(resp => resp.json())
+    .then(data => {
+      document.getElementById('diamondTableWrapper').innerHTML = data.table_html;
 
-        // --- Checkbox Logic ---
-        if (selectAllCheckbox) {
-            const rowCheckboxes = document.querySelectorAll('.row-checkbox');
-            const rowCheckboxArray = Array.from(rowCheckboxes);
-
-            selectAllCheckbox.addEventListener('change', function () {
-                rowCheckboxArray.forEach(cb => cb.checked = this.checked);
-            });
-
-            rowCheckboxArray.forEach(cb => {
-                cb.addEventListener('change', function () {
-                    const allChecked = rowCheckboxArray.every(cb => cb.checked);
-                    const anyChecked = rowCheckboxArray.some(cb => cb.checked);
-
-                    selectAllCheckbox.checked = allChecked;
-                    selectAllCheckbox.indeterminate = !allChecked && anyChecked;
-                });
-            });
+      if (wasFilterOpen) {
+        const wrapperAfter = document.getElementById('filterOverlayWrapper');
+        const content = document.getElementById('filterOverlay');
+        if (wrapperAfter && content) {
+          wrapperAfter.classList.add('active');
+          wrapperAfter.style.maxHeight = content.scrollHeight + 'px';
         }
+      }
+      rebindTableEvents();
+    })
+    .catch(err => console.error('loadTable error', err));
+}
 
-        // --- Download Button Logic ---
-        const downloadBtn = document.getElementById('download-btn');
-        if (downloadBtn) {
-            downloadBtn.addEventListener('click', function () {
-                const checkboxes = document.querySelectorAll('.row-checkbox');
-                let selected = [];
-                checkboxes.forEach(cb => { if (cb.checked) selected.push(cb.value); });
-                if (selected.length === 0) {
-                    checkboxes.forEach(cb => selected.push(cb.value));
-                }
-                document.getElementById('diamond-ids-input').value = selected.join(',');
-                document.getElementById('download-form').submit();
-            });
-        }
-
-        // --- Pagination Input Logic ---
-        document.querySelectorAll('.page-input').forEach(function (pageInput) {
-            pageInput.addEventListener('keypress', function (e) {
-                if (e.key === 'Enter') goToPage(this);
-            });
-            pageInput.addEventListener('blur', function () {
-                goToPage(this);
-            });
-        });
-
-        function goToPage(inputEl) {
-            if (!inputEl) return;
-            let pageNum = parseInt(inputEl.value);
-            const maxPages = parseInt(inputEl.getAttribute('max'));
-
-            if (isNaN(pageNum) || pageNum < 1) pageNum = 1;
-            else if (pageNum > maxPages) pageNum = maxPages;
-
-            let currentUrl = new URL(window.location.href);
-            currentUrl.searchParams.set('page', pageNum);
-            loadTable(currentUrl.toString());
-            history.pushState({}, "", currentUrl.toString());
-        }
-
-        // --- Ajax Link Intercepts (pagination/sort/filter) ---
-        document.querySelectorAll('a.ajax-link').forEach(link => {
-            link.addEventListener('click', function (e) {
-                e.preventDefault();
-                loadTable(this.href);
-                history.pushState({}, "", this.href);
-            });
-        });
-
-        // --- Apply Filters ---
-        const applyBtn = document.getElementById('applyFilters');
-        if (applyBtn) {
-            applyBtn.addEventListener('click', function (e) {
-                e.preventDefault();
-                const form = document.getElementById('filterForm');
-                const params = new URLSearchParams(new FormData(form)).toString();
-                const url = window.location.pathname + '?' + params;
-                loadTable(url);
-                history.pushState({}, "", url);
-                toggleFilterOverlay();
-            });
-        }
-
-        // ✅ Rebind filter overlay logic here
-        bindFilterOverlayEvents();
-    }
-
-    // === Filter Overlay Events ===
-    function bindFilterOverlayEvents() {
-        const rangeGroups = new Set(['color', 'clarity']);
-        const groups = document.querySelectorAll('.filter-button-group[data-name]');
-
-        groups.forEach(group => {
-            const name = group.getAttribute('data-name');
-            if (!rangeGroups.has(name)) return;
-
-            const inputs = Array.from(group.querySelectorAll('input.hidden-check'));
-            const labels = Array.from(group.querySelectorAll('label.filter-toggle'));
-
-            let anchorIndex = null;
-            let lastRange = null;
-
-            function setCheckedRange(start, end, checked) {
-                const [lo, hi] = start <= end ? [start, end] : [end, start];
-                for (let i = lo; i <= hi; i++) inputs[i].checked = checked;
-            }
-
-            labels.forEach((label, idx) => {
-                label.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const alreadyChecked = inputs[idx].checked;
-
-                    if (anchorIndex === null && lastRange) {
-                        inputs.forEach(i => i.checked = false);
-                        lastRange = null;
-                        inputs[idx].checked = true;
-                        anchorIndex = idx;
-                        return;
-                    }
-
-                    if (anchorIndex === null) {
-                        inputs[idx].checked = !alreadyChecked;
-                        anchorIndex = idx;
-                    } else if (anchorIndex === idx) {
-                        inputs[idx].checked = !alreadyChecked;
-                        anchorIndex = null;
-                        lastRange = null;
-                    } else {
-                        setCheckedRange(anchorIndex, idx, true);
-                        lastRange = { lo: Math.min(anchorIndex, idx), hi: Math.max(anchorIndex, idx) };
-                        anchorIndex = null;
-                    }
-                });
-            });
-
-            document.addEventListener('click', function(ev) {
-                if (!group.contains(ev.target)) {
-                    anchorIndex = null;
-                }
-            });
-        });
-
-        // Collapse / expand overlay height
-        const filterCollapse = document.getElementById('filterOverlayWrapper');
-        const filterContent = document.getElementById('filterOverlay');
-
-        function setMaxHeight() {
-            if (filterCollapse.classList.contains('active')) {
-                filterCollapse.style.maxHeight = filterContent.scrollHeight + 'px';
-            } else {
-                filterCollapse.style.maxHeight = '0';
-            }
-        }
-
-        setMaxHeight();
-
-        const toggleButton = document.getElementById('filterToggleButton');
-        if (toggleButton) toggleButton.addEventListener('click', setMaxHeight);
-
-        window.addEventListener('resize', setMaxHeight);
-    }
-
-    // === Table Height ===
-    function adjustTableHeight() {
-        const tableContainer = document.getElementById('tableContainer');
-        if (!tableContainer) return;
-        const top = tableContainer.getBoundingClientRect().top;
-        const available = window.innerHeight - top - 20;
-        const minHeight = 220;
-        tableContainer.style.maxHeight = (available > minHeight ? available : minHeight) + 'px';
-    }
-
-    // === Overlay Toggle ===
-    function toggleFilterOverlay() {
-        const wrapper = document.getElementById('filterOverlayWrapper');
-        wrapper.classList.toggle('active');
-    }
-
-    // --- Initial binding ---
-    document.addEventListener('DOMContentLoaded', function () {
-        rebindTableEvents();
-        window.addEventListener("popstate", function () {
-            loadTable(location.href);
-        });
-        window.addEventListener('load', adjustTableHeight);
-        window.addEventListener('resize', adjustTableHeight);
-
-        if (window.MutationObserver) {
-            const wrapper = document.getElementById('filterOverlayWrapper');
-            if (wrapper) {
-                const mo = new MutationObserver(adjustTableHeight);
-                mo.observe(wrapper, { attributes: true, attributeFilter: ['class', 'style'] });
-            }
-        }
+function rebindTableEvents() {
+  // --- Download selected ---
+  const downloadBtn = document.getElementById('download-btn');
+  if (downloadBtn) {
+    downloadBtn.addEventListener('click', () => {
+      const checkboxes = document.querySelectorAll('.row-checkbox');
+      let selected = [];
+      checkboxes.forEach(cb => { if (cb.checked) selected.push(cb.value); });
+      if (selected.length === 0) checkboxes.forEach(cb => selected.push(cb.value));
+      document.getElementById('diamond-ids-input').value = selected.join(',');
+      document.getElementById('download-form').submit();
     });
-</script>
+  }
 
+  // --- Ajax link interception ---
+  document.querySelectorAll('a.ajax-link').forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      loadTable(link.href);
+      history.pushState({}, "", link.href);
+    });
+  });
+
+  /* ---------- Auto Apply Filters ---------- */
+  const filterForm = document.getElementById('filterForm');
+  if (filterForm) {
+    function scheduleApply() {
+      clearTimeout(window._filterTimer);
+      window._filterTimer = setTimeout(() => {
+        const params = new URLSearchParams(new FormData(filterForm)).toString();
+        const url = window.location.pathname + (params ? '?' + params : '');
+        loadTable(url);
+        history.pushState({}, "", url);
+      }, 200);
+    }
+
+    // Ensure label clicks trigger change
+    document.querySelectorAll('.filter-button-group label').forEach(label => {
+      label.addEventListener('click', () => {
+        const inputId = label.getAttribute('for');
+        if (!inputId) return;
+        const input = document.getElementById(inputId);
+        if (input) {
+          setTimeout(() => {
+            input.dispatchEvent(new Event('change', { bubbles: true }));
+          }, 0);
+        }
+      });
+    });
+
+    // Checkboxes & selects
+    filterForm.querySelectorAll('input[type="checkbox"], select').forEach(el => {
+      el.addEventListener('change', scheduleApply);
+    });
+
+    // Number fields
+    filterForm.querySelectorAll('input[type="number"]').forEach(el => {
+      el.addEventListener('blur', scheduleApply);
+      el.addEventListener('keypress', e => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          scheduleApply();
+        }
+      });
+    });
+
+    // --- Sync filter form with current URL query params ---
+    const params = new URLSearchParams(window.location.search);
+    filterForm.querySelectorAll('input, select').forEach(el => {
+      if (el.type === 'checkbox') {
+        el.checked = params.getAll(el.name).includes(el.value);
+      } else if (el.type === 'number' || el.tagName === 'SELECT') {
+        el.value = params.get(el.name) || '';
+      }
+    });
+  }
+
+  /* ---------- Close button ---------- */
+  const closeBtn = document.getElementById('closeFilterOverlay');
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+      const wrapper = document.getElementById('filterOverlayWrapper');
+      if (wrapper) {
+        wrapper.classList.remove('active');
+        wrapper.style.maxHeight = '0';
+      }
+    });
+  }
+
+  /* ---------- Reset button ---------- */
+  const resetBtn = document.getElementById('resetFilters');
+  if (resetBtn && filterForm) {
+    resetBtn.addEventListener('click', () => {
+      filterForm.reset();
+      filterForm.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+      const url = window.location.pathname;
+      loadTable(url);
+      history.pushState({}, "", url);
+    });
+  }
+
+  /* ---------- Filter toggle ---------- */
+  const toggleButton = document.getElementById('filterToggleButton');
+  if (toggleButton) {
+    toggleButton.addEventListener('click', () => {
+      const wrapper = document.getElementById('filterOverlayWrapper');
+      const content = document.getElementById('filterOverlay');
+      if (!wrapper) return;
+      const isActive = wrapper.classList.toggle('active');
+      wrapper.style.maxHeight = isActive ? content.scrollHeight + 'px' : '0';
+    });
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  rebindTableEvents();
+  window.addEventListener("popstate", () => loadTable(location.href));
+});
+</script>    
 {% endblock %}

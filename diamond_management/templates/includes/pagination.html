@@ -1,7 +1,7 @@
 {% load static %}
 {% load custom_filters %}
 
-<ul class="pagination justify-content-center align-items-center" style="gap: 10px;">
+<ul class="pagination align-items-center {% if position == 'top' %}justify-content-start{% else %}justify-content-center{% endif %}" style="gap: 10px;">
 
     {# First + Prev #}
     {% if page_obj.has_previous %}
@@ -39,4 +39,4 @@
       <li class="page-item disabled"><span class="page-link">Next ›</span></li>
       <li class="page-item disabled"><span class="page-link">Last »</span></li>
     {% endif %}
-  </ul>
+</ul>

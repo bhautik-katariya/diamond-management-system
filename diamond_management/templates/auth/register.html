@@ -1,84 +1,105 @@
 {% extends "base.html" %}
-{% load static %}
-
-{% block title %}Register{% endblock %}
+{% block title %}Register - Diamond Management{% endblock %}
 
 {% block content %}
 <style>
-    body {
-        background-color: #f8fafc;
+    /* Compact form style */
+    .card-body {
+        padding: 0.75rem !important;
     }
-    .register-container {
-        max-width: 600px;   /* nanu box - login size jetlu */
-        margin: 40px auto;
-        padding: 30px;
-        background: #fff;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    .card-header {
+        padding: 0.5rem !important;
     }
-    .register-title {
-        font-weight: 600;
-        margin-bottom: 20px;
-        text-align: center;
+    .card-footer {
+        padding: 0.5rem !important;
+    }
+    .form-label {
+        font-size: 0.9rem;
+        margin-bottom: 2px;
+    }
+    .form-control {
+        padding: 0.35rem 0.5rem;
+        font-size: 0.9rem;
+    }
+    .mb-3 {
+        margin-bottom: 0.6rem !important;
     }
 </style>
 
-<div class="register-container">
-    {% if is_vendor_register %} 
-        <h2 class="register-title">Vendor Register</h2> 
-    {% else %} 
-        <h2 class="register-title">Register</h2> 
-    {% endif %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header">
+                {% if is_vendor_register %}
+                    <h5 class="card-title mb-0 text-center">Vendor Register</h5>
+                {% else %}
+                    <h5 class="card-title mb-0 text-center">Register</h5>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
 
-    <form method="post">
-        {% csrf_token %}
-        <div class="row mb-3">
-            <div class="col-md-12">
-                <label class="form-label">Username</label>
-                <input type="text" name="username" class="form-control" placeholder="Enter username" required>
-            </div>
-        </div>
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <label class="form-label">First Name</label>
-                <input type="text" name="first_name" class="form-control" placeholder="First Name">
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Last Name</label>
-                <input type="text" name="last_name" class="form-control" placeholder="Last Name">
-            </div>
-        </div>
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <label class="form-label">Phone</label>
-                <input type="text" name="phone" class="form-control" placeholder="Phone">
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Email</label>
-                <input type="email" name="email" class="form-control" placeholder="Email">
-            </div>
-        </div>
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <label class="form-label">Password</label>
-                <input type="password" name="password1" class="form-control" placeholder="Password" required>
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Confirm Password</label>
-                <input type="password" name="password2" class="form-control" placeholder="Confirm Password" required>
-            </div>
-        </div>
-        <div class="d-grid">
-            <button type="submit" class="btn btn-primary">Register</button>
-        </div>
-    </form>
+                    <!-- Username -->
+                    <div class="mb-3">
+                        <label for="{{ form.username.id_for_label }}" class="form-label">{{ form.username.label }}</label>
+                        {{ form.username }}
+                    </div>
 
-    <div class="text-center mt-3">
-        {% if is_vendor_register %}
-            <p class="mb-0">Register as a customer? <a href="{% url 'register' %}" class="text-decoration-none">Customer Registration</a></p>
-        {% else %}
-            <p class="mb-0">Register as a vendor? <a href="{% url 'vendor_register' %}" class="text-decoration-none">Vendor Registration</a></p>
-        {% endif %}
+                    <!-- First + Last Name -->
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label for="{{ form.fname.id_for_label }}" class="form-label">{{ form.fname.label }}</label>
+                            {{ form.fname }}
+                        </div>
+                        <div class="col-6">
+                            <label for="{{ form.lname.id_for_label }}" class="form-label">{{ form.lname.label }}</label>
+                            {{ form.lname }}
+                        </div>
+                    </div>
+
+                    <!-- Phone + Email -->
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label for="{{ form.phone.id_for_label }}" class="form-label">{{ form.phone.label }}</label>
+                            {{ form.phone }}
+                        </div>
+                        <div class="col-6">
+                            <label for="{{ form.email.id_for_label }}" class="form-label">{{ form.email.label }}</label>
+                            {{ form.email }}
+                        </div>
+                    </div>
+
+                    <!-- Password + Confirm -->
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label for="{{ form.password1.id_for_label }}" class="form-label">{{ form.password1.label }}</label>
+                            {{ form.password1 }}
+                        </div>
+                        <div class="col-6">
+                            <label for="{{ form.password2.id_for_label }}" class="form-label">{{ form.password2.label }}</label>
+                            {{ form.password2 }}
+                        </div>
+                    </div>
+
+                    <!-- Submit -->
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-sm">Register</button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer text-center">
+                {% if is_vendor_register %}
+                    <small>Register as a customer? 
+                        <a href="{% url 'register' %}">Customer Registration</a>
+                    </small>
+                {% else %}
+                    <small>Register as a vendor? 
+                        <a href="{% url 'vendor_register' %}">Vendor Registration</a>
+                    </small>
+                {% endif %}
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

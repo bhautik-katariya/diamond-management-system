@@ -1,59 +1,10 @@
 {% load static %}
 {% load custom_filters %}
 
-
-<!-- === Top Pagination === -->
-<div id="top-pagination">
-    {% include "includes/pagination.html" %}
-</div>
-
-<!-- === Controls (Sort / Filter / Download) === -->
-<div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
-    <div class="d-flex gap-2">
-        <!-- Download -->
-        <form id="download-form" method="post" action="{% url 'diamond_download_excel' %}" style="display:inline;">
-            {% csrf_token %}
-            <input type="hidden" name="diamond_ids" id="diamond-ids-input">
-            <button type="button" class="btn equal-button" id="download-btn">Download</button>
-        </form>
-
-        <!-- Sort -->
-        <div class="dropdown">
-            <button class="btn btn-sort equal-button dropdown-toggle" type="button" id="sortDropdownButton" data-bs-toggle="dropdown" aria-expanded="false">
-                Sort
-            </button>
-            <ul class="dropdown-menu text-small" aria-labelledby="sortDropdownButton">
-                <li class="dropdown-header">Price</li>
-                <li><a class="dropdown-item ajax-link" href="{{ request.get_full_path|add_sort:'price_asc' }}">Low-to-high</a></li>
-                <li><a class="dropdown-item ajax-link" href="{{ request.get_full_path|add_sort:'price_desc' }}">High-to-Low</a></li>
-                <li><hr class="dropdown-divider"></li>
-
-                <li class="dropdown-header">Carat</li>
-                <li><a class="dropdown-item ajax-link" href="{{ request.get_full_path|add_sort:'carat_asc' }}">Low-to-high</a></li>
-                <li><a class="dropdown-item ajax-link" href="{{ request.get_full_path|add_sort:'carat_desc' }}">High-to-Low</a></li>
-                <li><hr class="dropdown-divider"></li>
-
-                <li class="dropdown-header">Color</li>
-                <li><a class="dropdown-item ajax-link" href="{{ request.get_full_path|add_sort:'color_asc' }}">Low-to-high</a></li>
-                <li><a class="dropdown-item ajax-link" href="{{ request.get_full_path|add_sort:'color_desc' }}">High-to-Low</a></li>
-                <li><hr class="dropdown-divider"></li>
-
-                <li class="dropdown-header">Clarity</li>
-                <li><a class="dropdown-item ajax-link" href="{{ request.get_full_path|add_sort:'clarity_asc' }}">Low-to-high</a></li>
-                <li><a class="dropdown-item ajax-link" href="{{ request.get_full_path|add_sort:'clarity_desc' }}">High-to-Low</a></li>
-            </ul>
-        </div>
-
-        <!-- Filter -->
-        <button id="filterToggleButton" class="btn btn-filter equal-button" type="button" onclick="toggleFilterOverlay()">Filter</button>
-    </div>
-</div>
-
-<!-- === Filter Overlay === -->
-<div id="filterOverlayWrapper" class="filter-collapse">
-    {% include "includes/filter_overlay.html" %}
-</div>
-
 <!-- === Diamond Table === -->
 {% include "includes/diamond_table.html" %}
 
+<!-- === Bottom Pagination (centered) === -->
+<div class="d-flex justify-content-center my-3">
+  {% include "includes/pagination.html" with position="bottom" %}
+</div>

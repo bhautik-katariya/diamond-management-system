@@ -24,7 +24,7 @@
     }    
     .shape-row {
         border: 1.5px solid #eee;
-        margin-bottom: 10px;
+        margin-bottom: 10px;}
     /* ensure buttons wrap and rows leave space before the table */
     .filter-button-group { 
         display: flex; 
@@ -226,110 +226,3 @@
         </div>
       </form>    
 </div>
-
-{% comment %} <script>
-    function toggleFilterOverlay() {
-        const wrapper = document.getElementById('filterOverlayWrapper');
-        wrapper.classList.toggle('active');
-    }
-
-    // Range select for color and clarity buttons
-    document.addEventListener('DOMContentLoaded', function() {
-        // Names we want range behavior for
-        const rangeGroups = new Set(['color', 'clarity']);
-
-        const groups = document.querySelectorAll('.filter-button-group[data-name]');
-
-        groups.forEach(group => {
-            const name = group.getAttribute('data-name');
-            if (!rangeGroups.has(name)) return; // only for color/clarity
-
-            // Get ordered checkboxes in this group
-            const inputs = Array.from(group.querySelectorAll('input.hidden-check'));
-            const labels = Array.from(group.querySelectorAll('label.filter-toggle'));
-
-            let anchorIndex = null; // first clicked index
-            let lastRange = null;   // {lo, hi} of last applied range
-
-            function setCheckedRange(start, end, checked) {
-                const [lo, hi] = start <= end ? [start, end] : [end, start];
-                for (let i = lo; i <= hi; i++) {
-                    inputs[i].checked = checked;
-                }
-            }
-
-            // Click handler for labels (since labels are what users click)
-            labels.forEach((label, idx) => {
-                label.addEventListener('click', function(e) {
-                    // prevent default label toggle, we'll manage it
-                    e.preventDefault();
-
-                    const alreadyChecked = inputs[idx].checked;
-
-                    // If a completed range exists and no active anchor, any further click clears the previous selection
-                    // and treats this click as start of a new selection range (select only the clicked one)
-                    if (anchorIndex === null && lastRange) {
-                        // Clear all selections in this group
-                        inputs.forEach(i => { i.checked = false; });
-                        lastRange = null;
-                        inputs[idx].checked = true; // select current as new anchor selection
-                        anchorIndex = idx;
-                        return;
-                    }
-
-                    if (anchorIndex === null) {
-                        // No anchor yet → start a new selection with just this one toggled
-                        inputs[idx].checked = !alreadyChecked;
-                        anchorIndex = idx;
-                    } else if (anchorIndex === idx) {
-                        // Clicking the same item again clears anchor and toggles single
-                        inputs[idx].checked = !alreadyChecked;
-                        anchorIndex = null;
-                        lastRange = null;
-                    } else {
-                        // We have an anchor and a second click → select the inclusive range
-                        const lo = Math.min(anchorIndex, idx);
-                        const hi = Math.max(anchorIndex, idx);
-                        setCheckedRange(anchorIndex, idx, true);
-                        // Remember range so next (third) click clears it
-                        lastRange = { lo, hi };
-                        // Clear anchor after completing a range
-                        anchorIndex = null;
-                    }
-                });
-            });
-
-            // Also allow clearing the anchor if user clicks outside the group
-            document.addEventListener('click', function(ev) {
-                if (!group.contains(ev.target)) {
-                    // Keep lastRange so that returning clicks can clear previous selection
-                    anchorIndex = null;
-                }
-            });
-        });
-
-        // Script to dynamically adjust max-height
-        const filterCollapse = document.getElementById('filterOverlayWrapper');
-        const filterContent = document.getElementById('filterOverlay');
-
-        function setMaxHeight() {
-            if (filterCollapse.classList.contains('active')) {
-                filterCollapse.style.maxHeight = filterContent.scrollHeight + 'px';
-            } else {
-                filterCollapse.style.maxHeight = '0';
-            }
-        }
-
-        // Set initial max-height if active on load
-        setMaxHeight();
-
-        // Update max-height when the filter overlay is toggled
-        const toggleButton = document.getElementById('filterToggleButton'); // Assuming you have a button with this ID to toggle the overlay
-        if (toggleButton) {
-            toggleButton.addEventListener('click', setMaxHeight);
-        }
-
-        // Update max-height on window resize
-        window.addEventListener('resize', setMaxHeight);
-    }); // closing the DOMContentLoaded listener
-</script> {% endcomment %}
