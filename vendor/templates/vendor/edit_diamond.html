@@ -295,14 +295,15 @@
                 if (diamonds.length === 1) {
                     // Single diamond - fill the form as before
                     fillDiamondForm(diamonds[0]);
-                } else {
+                }
+                {% comment %}  else {
                     // Multiple diamonds - show confirmation and process
                     const confirmed = confirm(`Found ${diamonds.length} diamonds in the JSON file. Do you want to update all of them?`);
                     if (confirmed) {
                         processMultipleDiamonds(diamonds);
                     }
                 }
-    
+     {% endcomment %}
             } catch (err) {
                 alert('Invalid JSON format');
                 console.error(err);
@@ -361,7 +362,7 @@
         }
     }
     
-    function processMultipleDiamonds(diamonds) {
+    {% comment %} function processMultipleDiamonds(diamonds) {
         // Show loading message
         const loadingMsg = document.createElement('div');
         loadingMsg.innerHTML = `
@@ -409,7 +410,7 @@
             console.error('Error:', error);
             alert('An error occurred while processing the diamonds. Please try again.');
         });
-    }
+    } {% endcomment %}
     
     // Handle manual shape selection and visual feedback
     document.addEventListener('DOMContentLoaded', function() {

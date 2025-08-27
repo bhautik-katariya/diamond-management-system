@@ -151,7 +151,6 @@ class Diamond(models.Model):
 class Order(models.Model):
     customer = models.ForeignKey('customer.Customer', on_delete=models.CASCADE, related_name='orders')
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE, related_name='orders')
-    status = models.CharField(max_length=20, default='Pending')
     seen = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -163,6 +162,7 @@ class OrderItem(models.Model):
     diamond = models.ForeignKey(Diamond, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
     price_per_carat = models.DecimalField(max_digits=12, decimal_places=2)
+    status = models.CharField(max_length=20, default='Pending')
     line_total = models.DecimalField(max_digits=15, decimal_places=2)
 
     def __str__(self):

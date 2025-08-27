@@ -145,13 +145,13 @@
                     <a href="{% url 'diamond_detail' oi.item.diamond.id %}?from_order=true" class="btn btn-equal btn-sm">View</a>
                 </td>
                 <td>
-                    {% if oi.order.status == "Pending" %}
+                    {% if oi.item.status == "Pending" %}
                       <form method="post" action="{% url 'vendor:process_order' oi.order.id %}" style="display:inline;">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-equal btn-sm">Mark as Processed</button>
                       </form>
                     {% else %}
-                      <span class="badge bg-secondary">{{ oi.order.status }}</span>
+                      <span class="badge bg-success">{{ oi.item.status }}</span>
                     {% endif %}
                   </td>
             </tr>
