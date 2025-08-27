@@ -339,6 +339,7 @@
         .then(resp => resp.json())
         .then(data => {
           document.getElementById('diamondTableWrapper').innerHTML = data.table_html;
+          initSelectAllFeature();
   
           if (wasFilterOpen) {
             const wrapperAfter = document.getElementById('filterOverlayWrapper');
@@ -351,6 +352,39 @@
         })
         .catch(err => console.error('loadTable error', err));
     }
+
+    function initSelectAllFeature() {
+      const selectAll = document.getElementById('select-all');
+      if (!selectAll) return;
+    
+      // --- Header checkbox toggles all rows ---
+      selectAll.onchange = () => {
+        document.querySelectorAll('.row-checkbox').forEach(cb => {
+          cb.checked = selectAll.checked;
+        });
+      };
+    
+      // --- Each row checkbox updates header checkbox state ---
+      const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+      rowCheckboxes.forEach(cb => {
+        cb.onchange = () => {
+          const boxes = [...document.querySelectorAll('.row-checkbox')];
+          const allChecked = boxes.every(c => c.checked);
+          const noneChecked = boxes.every(c => !c.checked);
+    
+          if (allChecked) {
+            selectAll.checked = true;
+            selectAll.indeterminate = false;
+          } else if (noneChecked) {
+            selectAll.checked = false;
+            selectAll.indeterminate = false;
+          } else {
+            selectAll.indeterminate = true;
+          }
+        };
+      });
+    }
+     
   
     // ------------------- Delegated AJAX Links -------------------
     document.addEventListener('click', e => {
@@ -482,6 +516,8 @@
   
     // ------------------- Handle browser back/forward -------------------
     window.addEventListener("popstate", () => loadTable(location.href));
+
+    initSelectAllFeature();
   
   });
 </script>    

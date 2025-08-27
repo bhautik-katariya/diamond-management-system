@@ -1,32 +1,30 @@
 /* === NAVBAR BACKGROUND === */
 #header {
-    background-color: #0B1E3A !important; /* Navy blue */
+    background-color: rgb(10, 24, 53) !important; /* Navy blue */
 }
 
 /* === SITE NAME ("Diamond System") === */
-#header #site-name a:link,
-#header #site-name a:visited {
+#header #site-name a {
     color: #ffffff !important; /* White text */
+    text-decoration: none !important;
 }
 
 /* === USER TOOLS (WELCOME, ADMIN, links) === */
 #header #user-tools,
-#header #user-tools a:link,
-#header #user-tools a:visited {
+#header #user-tools a {
     color: #ffffff !important; /* White text */
 }
 
 /* === Links in header hover === */
 #header #site-name a:hover,
 #header #user-tools a:hover {
-    color: #ffffff !important;
-    text-decoration: underline;
+    text-decoration: underline !important;
 }
 
 /* === TABLE HEADER STYLING === */
 #content-main table thead th {
     background-color: #E3F2FD !important; /* Light blue */
-    color: #0B1E3A !important; /* Navy blue text */
+    color: rgb(10, 24, 53) !important; /* Navy blue text */
 }
 
 /* === TABLE BODY TEXT === */
@@ -38,7 +36,7 @@
 .button,
 input[type=submit],
 .submit-row input {
-    background-color: #0B1E3A !important; /* Navy blue */
+    background-color: rgb(10, 24, 53) !important; /* Navy blue */
     color: #ffffff !important;
     border: none !important;
 }
@@ -49,19 +47,18 @@ input[type=submit]:hover,
     background-color: #09305F !important; /* Slightly darker navy */
 }
 
-html body #container #header #site-name a:link,
-html body #container #header #site-name a:visited {
-    color: #ffffff !important;
+/* === Django Admin App Headers === */
+.module caption {
+    background-color: #e6f4fa !important; /* Light blue background */
+    color: #0b1937 !important; /* Dark navy text */
+    font-weight: bold !important;
+    text-transform: uppercase !important;
 }
 
-/* Override for ALL link states */
-#header #site-name a:link,
-#header #site-name a:visited,
-#header #site-name a:hover,
-#header #site-name a:focus,
-#header #site-name a:active {
-    color: #ffffff !important;
-    background: none !important; /* remove any highlight */
-    text-decoration: none !important;
-
+a.button.cancel-link {
+    display: inline-block;   /* ensures padding applies properly */
+    padding: 8px 15px;       /* adjust vertical padding */
+    line-height: 1.4;        /* gives breathing room */
+    border-radius: 4px;      /* optional, to look like a real button */
+    box-sizing: border-box;  /* prevents cutoff due to box sizing */
 }
