@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, reverse
 from django.contrib import messages
 from django.shortcuts import get_object_or_404
+from django.views.decorators.http import require_POST
 from django.core.paginator import Paginator
 from django.http import JsonResponse
 import requests
@@ -483,108 +484,6 @@ def import_diamonds_from_api(request):
             messages.error(request, f'Error importing from API: {str(e)}')
             return redirect('vendor:add_diamond')
 
-# def update_multiple_diamonds(request):
-#     if request.session.get('user_type') != 'vendor' or 'user_id' not in request.session:
-#         return redirect('login')
-    
-#     if request.method == 'POST':
-#         try:
-#             # Handle both form data and JSON data
-#             if request.content_type == 'application/json':
-#                 data = json.loads(request.body)
-#                 multiple_diamonds = data.get('multiple_diamonds')
-#             else:
-#                 multiple_diamonds = request.POST.get('multiple_diamonds')
-#                 if multiple_diamonds:
-#                     multiple_diamonds = json.loads(multiple_diamonds)
-            
-#             if multiple_diamonds:
-#                 vendor = Vendor.objects.get(pk=request.session['user_id'])
-#                 success_count = 0
-#                 error_count = 0
-                
-#                 for diamond_data in multiple_diamonds:
-#                     try:
-#                         # Check if diamond exists by stock_id
-#                         stock_id = diamond_data.get('stock_id')
-#                         if stock_id:
-#                             diamond = Diamond.objects.filter(stock_id=stock_id, vendor=vendor).first()
-#                             if diamond:
-#                                 # Update existing diamond
-#                                 form_data = {}
-#                                 for key, value in diamond_data.items():
-#                                     if key in ['type', 'lab', 'color', 'clarity', 'cut', 'polish', 'symmetry', 'fluorescence', 'shape']:
-#                                         # Handle choice fields
-#                                         normalized_value = str(value).strip().lower()
-#                                         if key in rawMappings:
-#                                             mapped_value = rawMappings[key].get(normalized_value)
-#                                             if mapped_value:
-#                                                 form_data[key] = mapped_value
-#                                             elif key == 'shape':
-#                                                 form_data[key] = 'OT'  # Default to "other" for unrecognized shapes
-#                                             else:
-#                                                 form_data[key] = value
-#                                         else:
-#                                             form_data[key] = value
-#                                     else:
-#                                         form_data[key] = value
-                                
-#                                 # Create form with existing diamond instance
-#                                 form = DiamondForm(form_data, instance=diamond)
-#                                 if form.is_valid():
-#                                     form.save()
-#                                     success_count += 1
-#                                 else:
-#                                     error_count += 1
-#                             else:
-#                                 error_count += 1
-#                         else:
-#                             error_count += 1
-#                     except Exception as e:
-#                         error_count += 1
-                
-#                 # Return JSON response for AJAX requests
-#                 if request.content_type == 'application/json':
-#                     if success_count > 0:
-#                         return JsonResponse({
-#                             'success': True,
-#                             'success_count': success_count,
-#                             'error_count': error_count,
-#                             'message': f"Successfully updated {success_count} diamonds."
-#                         })
-#                     else:
-#                         return JsonResponse({
-#                             'success': False,
-#                             'error': f"Failed to update any diamonds. {error_count} errors occurred."
-#                         })
-#                 else:
-#                     # Handle form submission (fallback)
-#                     if success_count > 0:
-#                         messages.success(request, f"Successfully updated {success_count} diamonds.")
-#                     if error_count > 0:
-#                         messages.warning(request, f"Failed to update {error_count} diamonds. Please check the data format.")
-#                     return redirect('vendor:load_diamonds')
-#             else:
-#                 if request.content_type == 'application/json':
-#                     return JsonResponse({'success': False, 'error': 'No diamond data provided.'})
-#                 else:
-#                     messages.error(request, "No diamond data provided.")
-#                     return redirect('vendor:load_diamonds')
-                
-#         except json.JSONDecodeError as e:
-#             if request.content_type == 'application/json':
-#                 return JsonResponse({'success': False, 'error': f'Invalid JSON format: {str(e)}'})
-#             else:
-#                 messages.error(request, f"Invalid JSON format: {str(e)}")
-#                 return redirect('vendor:load_diamonds')
-#         except Exception as e:
-#             if request.content_type == 'application/json':
-#                 return JsonResponse({'success': False, 'error': f'Error processing diamonds: {str(e)}'})
-#             else:
-#                 messages.error(request, f"Error processing diamonds: {str(e)}")
-#                 return redirect('vendor:load_diamonds')
-    
-#     return redirect('vendor:load_diamonds')
 
 def view_orders(request):
     if request.session.get('user_type') != 'vendor' or 'user_id' not in request.session:
@@ -592,9 +491,15 @@ def view_orders(request):
 
     vendor_id = request.session['user_id']
     orders_qs = (Order.objects.filter(vendor_id=vendor_id)
-             .order_by('-created_at')
-             .prefetch_related('items__diamond', 'customer'))
-    OrderItem.objects.filter(order__in=orders_qs, status="Pending", order__seen=False).update(order__seen=True)
+                 .order_by('-created_at')
+                 .prefetch_related('items__diamond', 'customer'))
+
+    # Mark orders as seen if they have pending items
+    Order.objects.filter(
+        id__in=orders_qs.values_list("id", flat=True),
+        seen=False,
+        items__status="Pending"
+    ).update(seen=True)
 
     # Flatten into order_items
     order_items = []
@@ -616,19 +521,33 @@ def pending_orders_count(request):
     if request.session.get('user_type') != 'vendor' or 'user_id' not in request.session:
         return redirect('login')
 
-    vendor_id = request.session.get("user_id") 
-    count = OrderItem.objects.filter(order__vendor_id=vendor_id, status="Pending", order__seen=False).count()
+    vendor_id = request.session.get("user_id")
+
+    # Count pending ORDERS (not items)
+    count = Order.objects.filter(
+        vendor_id=vendor_id,
+        seen=False,
+        items__status="Pending"
+    ).distinct().count()
+
     return JsonResponse({"count": count})
 
-
-def process_order(request, order_id):
+@require_POST
+def process_order_item(request, item_id):
     if request.session.get('user_type') != 'vendor' or 'user_id' not in request.session:
         return redirect('login')
     
     vendor_id = request.session.get("user_id")
     vendor = get_object_or_404(Vendor, id=vendor_id) 
-    order = get_object_or_404(Order, id=order_id, vendor=vendor)
-    if request.method == "POST":
-        order.items.filter(status="Pending").update(status="Completed")
-        messages.success(request, f"All items in Order #{order.id} marked as processed.")
+
+    # Make sure this item belongs to one of this vendor's orders
+    item = get_object_or_404(OrderItem, id=item_id, order__vendor=vendor)
+
+    if item.status == "Pending":
+        item.status = "Completed"
+        item.save()
+        messages.success(request, f"Item {item.diamond.stock_id} in Order #{item.order.id} marked as processed.")
+    else:
+        messages.info(request, f"Item {item.diamond.stock_id} is already {item.status}.")
     return redirect('vendor:view_orders')
+

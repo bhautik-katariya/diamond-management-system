@@ -293,17 +293,9 @@
                 const diamonds = Array.isArray(data) ? data : [data];
                 
                 if (diamonds.length === 1) {
-                    // Single diamond - fill the form as before
+                    // Single diamond - fill the form
                     fillDiamondForm(diamonds[0]);
                 }
-                {% comment %}  else {
-                    // Multiple diamonds - show confirmation and process
-                    const confirmed = confirm(`Found ${diamonds.length} diamonds in the JSON file. Do you want to update all of them?`);
-                    if (confirmed) {
-                        processMultipleDiamonds(diamonds);
-                    }
-                }
-     {% endcomment %}
             } catch (err) {
                 alert('Invalid JSON format');
                 console.error(err);
@@ -361,56 +353,6 @@
             }
         }
     }
-    
-    {% comment %} function processMultipleDiamonds(diamonds) {
-        // Show loading message
-        const loadingMsg = document.createElement('div');
-        loadingMsg.innerHTML = `
-            <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; display: flex; align-items: center; justify-content: center;">
-                <div style="background: white; padding: 20px; border-radius: 10px; text-align: center;">
-                    <div class="spinner-border text-primary mb-3" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                    <h5>Processing Multiple Diamonds...</h5>
-                    <p>Please wait while we update ${diamonds.length} diamonds in your inventory.</p>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(loadingMsg);
-        
-        const requestData = {
-            multiple_diamonds: diamonds
-        };
-        
-        // Process diamonds using fetch API
-        fetch('{% url "vendor:update_multiple_diamonds" %}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-            },
-            body: JSON.stringify(requestData)
-        })
-        .then(response => response.json())
-        .then(data => {
-            // Remove loading message
-            document.body.removeChild(loadingMsg);
-            
-            if (data.success) {
-                alert(`Successfully updated ${data.success_count} diamonds!`);
-                // Redirect to load diamonds page
-                window.location.href = '{% url "vendor:load_diamonds" %}';
-            } else {
-                alert(`Error: ${data.error}`);
-            }
-        })
-        .catch(error => {
-            // Remove loading message
-            document.body.removeChild(loadingMsg);
-            console.error('Error:', error);
-            alert('An error occurred while processing the diamonds. Please try again.');
-        });
-    } {% endcomment %}
     
     // Handle manual shape selection and visual feedback
     document.addEventListener('DOMContentLoaded', function() {
