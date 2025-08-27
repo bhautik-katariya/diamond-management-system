@@ -339,7 +339,10 @@
         .then(resp => resp.json())
         .then(data => {
           document.getElementById('diamondTableWrapper').innerHTML = data.table_html;
+          document.getElementById('top-pagination').innerHTML = data.top_pagination;
+          document.getElementById('bottom-pagination').innerHTML = data.bottom_pagination;
           initSelectAllFeature();
+          syncPageInputs();
   
           if (wasFilterOpen) {
             const wrapperAfter = document.getElementById('filterOverlayWrapper');
@@ -382,6 +385,21 @@
             selectAll.indeterminate = true;
           }
         };
+      });
+    }
+
+    function syncPageInputs() {
+      const inputs = document.querySelectorAll('.ajax-page-input');
+      if (inputs.length < 2) return;
+    
+      inputs.forEach(input => {
+        input.addEventListener('input', () => {
+          inputs.forEach(other => {
+            if (other !== input) {
+              other.value = input.value;
+            }
+          });
+        });
       });
     }
      
@@ -516,8 +534,8 @@
   
     // ------------------- Handle browser back/forward -------------------
     window.addEventListener("popstate", () => loadTable(location.href));
-
     initSelectAllFeature();
+    syncPageInputs();
   
   });
 </script>    

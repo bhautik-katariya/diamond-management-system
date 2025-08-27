@@ -255,7 +255,14 @@ def dashboard(request):
     # === AJAX Partial Render ===
     if request.headers.get("x-requested-with") == "XMLHttpRequest":
         wrapper_html = render_to_string("includes/dashboard_partial.html", context, request=request)
-        return JsonResponse({"table_html": wrapper_html})
+        bottom_pagination = render_to_string("includes/pagination.html", {**context, "position": "bottom"}, request=request)
+        top_pagination = render_to_string("includes/pagination.html", {**context, "position": "top"}, request=request)
+
+        return JsonResponse({
+            "table_html": wrapper_html,
+            "bottom_pagination": bottom_pagination,
+            "top_pagination": top_pagination,
+        })
 
     # === Full Page Render ===
     return render(request, "dashboard.html", context)
@@ -307,11 +314,8 @@ def download_diamonds_excel(request):
             row = [index]
             for field in fields:
                 value = getattr(d, field.name)
-                # For ForeignKey, get readable string
-                if field.is_relation and field.many_to_one:
-                    value = str(value) if value else ''
                 # For display fields, get the display name
-                elif field.name == 'shape':
+                if field.name == 'shape':
                     value = d.get_shape_display()
                 elif field.name == 'cut':
                     value = d.get_cut_display()
@@ -319,6 +323,8 @@ def download_diamonds_excel(request):
                     value = d.get_polish_display()
                 elif field.name == 'symmetry':
                     value = d.get_symmetry_display()
+                elif field.name == 'report_number':
+                    value = str(value) if value is not None else ''
                 # Remove timezone from datetime/time fields
                 if isinstance(value, (datetime.datetime, datetime.time)) and getattr(value, 'tzinfo', None) is not None:
                     value = value.replace(tzinfo=None)
@@ -331,7 +337,7 @@ def download_diamonds_excel(request):
         response['Content-Disposition'] = 'attachment; filename=diamonds.xlsx'
         wb.save(response)
         return response
-    return HttpResponse(status=405)
+    return HttpResponse(status=405) 
   
 class AdminLogoutView(LogoutView):
     next_page = 'admin:login'
