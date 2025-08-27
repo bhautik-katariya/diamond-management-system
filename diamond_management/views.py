@@ -21,7 +21,9 @@ from django.template.loader import render_to_string
 
 def register(request):
     if request.method == 'POST':
-        form = RegistrationForm(request.POST)
+        post_data = request.POST.copy()
+        post_data['user_type'] = 'customer'  
+        form = RegistrationForm(post_data)
         if form.is_valid():
             customer = Customer.objects.create(
                 fname=form.cleaned_data['fname'],
@@ -31,21 +33,17 @@ def register(request):
                 phone=form.cleaned_data['phone'],
                 password=make_password(form.cleaned_data['password1']),
             )
-
-            # Set session
             request.session['user_type'] = "customer"
             request.session['user_id'] = customer.id
-
-            messages.success(request, f"Customer registration successful!")
+            messages.success(request, "Customer registration successful!")
             return redirect('dashboard')
     else:
-        form = RegistrationForm()
-
+        form = RegistrationForm(initial={'user_type': 'customer'})
     return render(request, 'auth/register.html', {'form': form})
 
 def vendor_register(request):
     if request.method == 'POST':
-        form = RegistrationForm(request.POST)
+        form = RegistrationForm(request.POST, initial={'user_type': 'vendor'})
         if form.is_valid():
             vendor = Vendor.objects.create(
                 fname=form.cleaned_data['fname'],

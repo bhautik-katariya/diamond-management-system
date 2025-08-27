@@ -35,16 +35,16 @@
         
         .badge-notify {
             position: absolute;
-            top: -6px;         /* lift it above text */
-            right: 8px;        /* push it exactly above the "s" */
+            top: -6px;
+            right: 8px;
             background: red;
             color: white;
             border-radius: 50%;
-            padding: 2px 5px;
-            font-size: 0.65rem;
+            font-size: 0.7rem;
             font-weight: bold;
-            line-height: 1;
-            min-width: 16px;
+            line-height: 18px;
+            min-width: 18px;
+            height: 18px;
             text-align: center;
         }
         
@@ -83,7 +83,8 @@
                         <li class="nav-item position-relative">
                             <a class="nav-link position-relative" href="{% url 'vendor:view_orders' %}">
                                 Orders
-                                <span id="orderBadge" class="badge-notify" style="{% if pending_orders_count == 0 %}display:none;{% endif %}">
+                                <span id="orderBadge" class="badge-notify"
+                                    style="{% if pending_orders_count == 0 %}display:none;{% endif %}">
                                     {{ pending_orders_count }}
                                 </span>
                             </a>

@@ -9,4 +9,5 @@ def base_context(request):
             status="Pending",
             order__seen=False
         ).count()
-    return {"pending_count": pending_count}
+    return {"pending_orders_count": pending_count}
+

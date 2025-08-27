@@ -148,7 +148,9 @@
                     {% if oi.item.status == "Pending" %}
                       <form method="post" action="{% url 'vendor:process_order_item' oi.item.id %}" style="display:inline;">
                         {% csrf_token %}
-                        <button type="submit" class="btn btn-equal btn-sm">Mark as Processed</button>
+                        <button type="submit" class="btn btn-equal btn-sm">
+                            Mark as Processed
+                        </button>
                       </form>
                     {% else %}
                       <span class="badge bg-success">{{ oi.item.status }}</span>
@@ -242,18 +244,6 @@ function goToPage() {
     // Redirect to the new page
     window.location.href = currentUrl.toString();
 }
-
-    document.addEventListener("DOMContentLoaded", function () {
-        // Find all "Process Order" buttons (adjust selector to match your template)
-        const buttons = document.querySelectorAll(".process-order-btn");
-    
-        buttons.forEach(btn => {
-            btn.addEventListener("click", function () {
-                // Wait a little after redirect or AJAX finishes
-                setTimeout(updateOrderBadge, 1500);
-            });
-        });
-    });
 </script>
 {% endblock %}
 
