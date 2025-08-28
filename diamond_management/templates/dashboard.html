@@ -529,31 +529,38 @@
     }
 
     // ------------------- Sort Dropdown (Click Toggle) -------------------
-  const sortBtn = document.getElementById("sortDropdownButton");
-  if (sortBtn) {
-    const sortDropdown = sortBtn.closest(".sort-dropdown");
+    const sortBtn = document.getElementById("sortDropdownButton");
+    if (sortBtn) {
+      const sortDropdown = sortBtn.closest(".sort-dropdown");
 
-    // Button click open/close
-    sortBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      sortDropdown.classList.toggle("show");
-    });
+      // Button click open/close
+      sortBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        sortDropdown.classList.toggle("show");
 
-    // Option click auto close
-    document.querySelectorAll(".sort-dropdown .dropdown-item").forEach(item => {
-      item.addEventListener("click", () => {
-        sortDropdown.classList.remove("show");
+        // Remove focus if just toggled (so it goes back to normal style)
+        if (!sortDropdown.classList.contains("show")) {
+          sortBtn.blur();
+        }
       });
-    });
 
-    // Closes on clicking outside
-    document.addEventListener("click", (e) => {
-      if (!sortDropdown.contains(e.target)) {
-        sortDropdown.classList.remove("show");
-      }
-    });
-  }
+      // Option click auto close
+      document.querySelectorAll(".sort-dropdown .dropdown-item").forEach(item => {
+        item.addEventListener("click", () => {
+          sortDropdown.classList.remove("show");
+          sortBtn.blur();   // also reset button style after choosing
+        });
+      });
+
+      // Closes on clicking outside
+      document.addEventListener("click", (e) => {
+        if (!sortDropdown.contains(e.target)) {
+          sortDropdown.classList.remove("show");
+          sortBtn.blur();   // reset style when closed without choosing
+        }
+      });
+    }
   
     // ------------------- Close Filter -------------------
     const closeBtn = document.getElementById('closeFilterOverlay');
