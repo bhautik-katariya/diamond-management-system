@@ -1,0 +1,56 @@
+<div class="table-responsive">
+    <table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th><input type="checkbox" id="select-all"></th>
+            <th>Sr No</th>
+            <th>Order Date</th>
+            <th>Customer</th>
+            <th>Diamond ID</th>
+            <th>Shape</th>
+            <th>Carat</th>
+            <th>Color</th>
+            <th>Clarity</th>
+            <th>Quantity</th>
+            <th>Price/Carat</th>
+            <th>Total</th>
+            <th>View</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for oi in page_obj %}
+        <tr>
+            <td><input type="checkbox" class="row-checkbox" name="selected_order_items" value="{{ oi.item.id }}"></td>
+            <td>{{ forloop.counter0|add:page_obj.start_index }}</td>
+            <td>{{ oi.order.created_at }}</td>
+            <td>{{ oi.order.customer.fname }} {{ oi.order.customer.lname }}</td>
+            <td>{{ oi.item.diamond.stock_id }}</td>
+            <td>{{ oi.item.diamond.get_shape_display }}</td>
+            <td>{{ oi.item.diamond.carat }}</td>
+            <td>{{ oi.item.diamond.get_color_display }}</td>
+            <td>{{ oi.item.diamond.get_clarity_display }}</td>
+            <td>{{ oi.item.quantity }}</td>
+            <td>${{ oi.item.price_per_carat }}</td>
+            <td>${{ oi.item.line_total|floatformat:2 }}</td>
+            <td>
+                <a href="{% url 'diamond_detail' oi.item.diamond.id %}?from_order=true" class="btn btn-equal btn-sm">View</a>
+            </td>
+            <td>
+                {% if oi.item.status == "Pending" %}
+                  <button type="button" class="btn btn-equal btn-sm mark-processed" 
+                          data-id="{{ oi.item.id }}">
+                      Mark as Processed
+                  </button>
+                {% else %}
+                  <span class="badge bg-success">{{ oi.item.status }}</span>
+                {% endif %}
+              </td>                  
+        </tr>
+        {% empty %}
+        <tr><td colspan="13" class="text-center">No orders found.</td></tr>
+        {% endfor %}
+    </tbody>        
+</table>
+</div>
+</div>

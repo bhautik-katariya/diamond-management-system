@@ -1,5 +1,6 @@
 from django.shortcuts import redirect, render, reverse, get_object_or_404
 from django.http import JsonResponse
+from django.template.loader import render_to_string
 from django.contrib import messages
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
@@ -46,33 +47,43 @@ def add_to_cart(request, diamond_id):
 def view_cart(request):
     cart_items = []
     if request.session.get('user_type') == 'customer' and 'user_id' in request.session:
-        # Logged-in user's cart
         customer = get_object_or_404(Customer, pk=request.session['user_id'])
         cart, created = Cart.objects.get_or_create(customer=customer)
         cart_items = cart.items.all()
     else:
-        # Guest cart
         guest_cart = request.session.get('guest_cart', {})
         for diamond_id, quantity in guest_cart.items():
             try:
                 diamond = get_object_or_404(Diamond, pk=diamond_id)
-                # Create a temporary object to represent the cart item
-                cart_items.append({'diamond': diamond, 'quantity': quantity, 'line_total': float(diamond.price_per_carat) * float(diamond.carat) * quantity, 'id': diamond_id})
+                cart_items.append({
+                    'diamond': diamond,
+                    'quantity': quantity,
+                    'line_total': float(diamond.price_per_carat) * float(diamond.carat) * quantity,
+                    'id': diamond_id
+                })
             except Diamond.DoesNotExist:
-                # Remove diamond from guest cart if it no longer exists
                 del request.session['guest_cart'][diamond_id]
         cart = None
         request.session.modified = True
 
-    # Apply pagination to cart_items
-    paginator = Paginator(list(cart_items), 10)  # 10 items per page
+    paginator = Paginator(list(cart_items), 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
-    return render(request, 'customer/cart.html', {
-        'cart': cart,
-        'page_obj': page_obj,
-        'paged_items': page_obj.object_list,
+    # AJAX request → return partials
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
+        table_html = render_to_string("customer/cart_table.html", {"page_obj": page_obj, "paged_items": page_obj.object_list, "cart": cart, }, request=request)
+        pagination_html = render_to_string("includes/pagination.html", {"page_obj": page_obj}, request=request)
+
+        return JsonResponse({
+            "table_html": table_html,
+            "pagination_html": pagination_html,
+        })
+
+    return render(request, "customer/cart.html", {
+        "cart": cart,
+        "page_obj": page_obj,
+        "paged_items": page_obj.object_list,
     })
 
 def remove_from_cart(request, item_id):

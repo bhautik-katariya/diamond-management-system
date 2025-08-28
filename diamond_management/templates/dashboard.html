@@ -371,7 +371,9 @@
           // Scroll to top of table after refresh
           const tableWrapper = document.getElementById('diamondTableWrapper');
           if (tableWrapper) {
-            tableWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            const headerOffset = 120; // adjust based on your top bar + header height
+            const elementPosition = tableWrapper.getBoundingClientRect().top + window.pageYOffset;
+            window.scrollTo({ top: elementPosition - headerOffset, behavior: 'smooth' });
           }
         })
         .catch(err => console.error('loadTable error', err));

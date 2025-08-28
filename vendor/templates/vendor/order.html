@@ -106,87 +106,15 @@
         }
 
     </style>
-    <div class="table-responsive">
-        <table class="table table-bordered table-striped">
-        <thead>
-            <tr>
-                <th><input type="checkbox" id="select-all"></th>
-                <th>Sr No</th>
-                <th>Order Date</th>
-                <th>Customer</th>
-                <th>Diamond ID</th>
-                <th>Shape</th>
-                <th>Carat</th>
-                <th>Color</th>
-                <th>Clarity</th>
-                <th>Quantity</th>
-                <th>Price/Carat</th>
-                <th>Total</th>
-                <th>View</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for oi in page_obj %}
-            <tr>
-                <td><input type="checkbox" class="row-checkbox" name="selected_order_items" value="{{ oi.item.id }}"></td>
-                <td>{{ forloop.counter0|add:page_obj.start_index }}</td>
-                <td>{{ oi.order.created_at }}</td>
-                <td>{{ oi.order.customer.fname }} {{ oi.order.customer.lname }}</td>
-                <td>{{ oi.item.diamond.stock_id }}</td>
-                <td>{{ oi.item.diamond.get_shape_display }}</td>
-                <td>{{ oi.item.diamond.carat }}</td>
-                <td>{{ oi.item.diamond.get_color_display }}</td>
-                <td>{{ oi.item.diamond.get_clarity_display }}</td>
-                <td>{{ oi.item.quantity }}</td>
-                <td>${{ oi.item.price_per_carat }}</td>
-                <td>${{ oi.item.line_total|floatformat:2 }}</td>
-                <td>
-                    <a href="{% url 'diamond_detail' oi.item.diamond.id %}?from_order=true" class="btn btn-equal btn-sm">View</a>
-                </td>
-                <td>
-                    {% if oi.item.status == "Pending" %}
-                      <button type="button" class="btn btn-equal btn-sm mark-processed" 
-                              data-id="{{ oi.item.id }}">
-                          Mark as Processed
-                      </button>
-                    {% else %}
-                      <span class="badge bg-success">{{ oi.item.status }}</span>
-                    {% endif %}
-                  </td>                  
-            </tr>
-            {% empty %}
-            <tr><td colspan="13" class="text-center">No orders found.</td></tr>
-            {% endfor %}
-        </tbody>        
-    </table>
-</div>
+
+<div id="ordersTableWrapper">
+    {% include "vendor/order_table.html" %}
 </div>
 
 {% if page_obj %}
-<nav aria-label="Pagination" class="mt-3 d-flex justify-content-center">
-  <ul class="pagination" style="gap:10px;">
-    {% if page_obj.has_previous %}
-      <li class="page-item"><a class="page-link" href="?page=1">&laquo; First</a></li>
-      <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">‹ Prev</a></li>
-    {% else %}
-      <li class="page-item disabled"><span class="page-link">‹ Prev</span></li>
-    {% endif %}
-
-    <li class="page-item d-flex align-items-center" style="gap: 6px;">
-        <input type="number" id="pageInput" class="page-input"
-               value="{{ page_obj.number }}" min="1" max="{{ page_obj.paginator.num_pages }}">
-        <span class="page-total">of {{ page_obj.paginator.num_pages }}</span>
-    </li>
-
-    {% if page_obj.has_next %}
-      <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next ›</a></li>
-      <li class="page-item"><a class="page-link"  href="?page={{ page_obj.paginator.num_pages }}">Last »</a></li>
-    {% else %}
-      <li class="page-item disabled"><span class="page-link">Next ›</span></li>
-    {% endif %}
-  </ul>
-</nav>
+<div id="ordersPaginationWrapper">
+    {% include "includes/pagination.html" with position="bottom" %}
+</div>
 {% endif %}
 
 <script>
@@ -269,6 +197,46 @@ document.addEventListener("DOMContentLoaded", () => {
         .catch(err => console.error("Error:", err));
       });
     });
+
+    function loadOrders(url) {
+        fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" }})
+          .then(resp => resp.json())
+          .then(data => {
+            document.querySelector("#ordersTableWrapper").innerHTML = data.table_html;
+            document.querySelector("#ordersPaginationWrapper").innerHTML = data.pagination_html;
+          })
+          .catch(err => console.error("Error:", err));
+      }
+    
+      // Handle clicks
+      document.addEventListener("click", e => {
+        const link = e.target.closest("#ordersPaginationWrapper a.page-link");
+        if (!link) return;
+        e.preventDefault();
+        loadOrders(link.href);
+        history.pushState({}, "", link.href);
+      });
+    
+      // Handle page input
+      document.addEventListener("change", e => {
+        if (!e.target.closest("#ordersPaginationWrapper .page-input")) return;
+        let page = parseInt(e.target.value);
+        const max = parseInt(e.target.max);
+        if (isNaN(page) || page < 1) page = 1;
+        if (page > max) page = max;
+        const url = new URL(window.location);
+        url.searchParams.set("page", page);
+        loadOrders(url.toString());
+        history.pushState({}, "", url);
+      });
+
+      const wrapper = document.getElementById("ordersTableWrapper");
+        if (wrapper) {
+        const headerOffset = 120; // adjust as needed
+        const elementPosition = wrapper.getBoundingClientRect().top + window.pageYOffset;
+        window.scrollTo({ top: elementPosition - headerOffset, behavior: "smooth" });
+        }
+
   });
 </script>
 {% endblock %}

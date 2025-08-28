@@ -1,0 +1,91 @@
+{% if diamonds %}
+<div class="table-container table-responsive">
+    <table class="table table-striped table-bordered table-hover w-100">
+        <thead class="table-dark">
+            <tr>
+                <th><input type="checkbox" id="select-all"></th>
+                <th>Sr No</th>
+                <th>Stock Id</th>
+                <th>Report #</th>
+                <th>Type</th>
+                <th>Lab</th>
+                <th>Shape</th>
+                <th>Carat</th>
+                <th>Color</th>
+                <th>Clarity</th>
+                <th>Cut</th>
+                <th>Polish</th>
+                <th>Symmetry</th>
+                <th>Fluorescence</th>
+                <th>Price/Carat</th>
+                <th>Video</th>
+                <th>Photo</th>
+                <th>Report</th>
+                <th>Edit</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for diamond in diamonds %}
+            <tr>
+                <td><input type="checkbox" class="row-checkbox" name="selected_diamonds" value="{{ diamond.id }}"></td>
+                <td>{{ forloop.counter0|add:page_obj.start_index }}</td>
+                <td>{{ diamond.stock_id }}</td>
+                <td>{{ diamond.report_number }}</td>
+                <td>{{ diamond.type }}</td>
+                <td>{{ diamond.lab }}</td>
+                <td>{{ diamond.get_shape_display }}</td>
+                <td>{{ diamond.carat }}</td>
+                <td>{{ diamond.get_color_display }}</td>
+                <td>{{ diamond.get_clarity_display }}</td>
+                <td>{{ diamond.get_cut_display }}</td>
+                <td>{{ diamond.get_polish_display }}</td>
+                <td>{{ diamond.get_symmetry_display }}</td>
+                <td>{{ diamond.fluorescence }}</td>
+                <td>{{ diamond.price_per_carat }}</td>
+                <td>
+                    {% if diamond.video_360 %}
+                        <a href="{{ diamond.video_360 }}" target="_blank">Video</a>
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>
+                    {% if diamond.photo %}
+                        <a href="{{ diamond.photo }}" target="_blank">Image</a>
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>
+                    {% if diamond.pdf %}
+                        <a href="{{ diamond.pdf }}" target="_blank">PDF</a>
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'vendor:edit_diamond' diamond.id %}" class="btn edit-btn">Edit</a>
+                </td> 
+                <td>
+                    <button class="btn btn-delete" 
+                            onclick="showConfirm(this)" 
+                            data-url="{% url 'vendor:delete_diamond' diamond.id %}?page={{ page_obj.number }}">
+                        Delete
+                    </button>
+                    <span class="d-none ms-2" data-confirm-box>
+                        <span class="text-danger fw-bold">Confirm?</span>
+                        <a href="#" class="btn btn-sm btn-outline-danger" onclick="confirmDelete(this)">Yes</a>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="cancelDelete(this)">Cancel</button>
+                    </span>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<p class="text-muted">You have not added any diamonds yet.</p>
+{% endif %}
+
+

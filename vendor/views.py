@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_POST
 from django.core.paginator import Paginator
 from django.http import JsonResponse
+from django.template.loader import render_to_string
 import requests
 import json
 import ijson
@@ -119,14 +120,20 @@ def delete_diamond(request, id):
 
 def load_diamonds(request):
     if request.session.get('user_type') != 'vendor' or 'user_id' not in request.session:
-        return redirect('login')   
+        return redirect('login')
     diamond_qs = Diamond.objects.filter(vendor_id=request.session['user_id']).order_by('-created_at')
     paginator = Paginator(diamond_qs, 50)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    return render(request, 'vendor/load_diamonds.html', {
-        'diamonds': page_obj.object_list,
-        'page_obj': page_obj,
+
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
+        table_html = render_to_string("vendor/load_diamonds_table.html", {"diamonds": page_obj.object_list, "page_obj": page_obj, }, request=request)
+        pagination_html = render_to_string("includes/pagination.html", {"page_obj": page_obj, }, request=request)
+        return JsonResponse({"table_html": table_html, "pagination_html": pagination_html})
+
+    return render(request, "vendor/load_diamonds.html", {
+        "diamonds": page_obj.object_list,
+        "page_obj": page_obj,
     })
 
 def _process_multiple_diamonds_list(multiple_diamonds, vendor, batch_size=1000):
@@ -494,28 +501,27 @@ def view_orders(request):
                  .order_by('-created_at')
                  .prefetch_related('items__diamond', 'customer'))
 
-    # Mark orders as seen if they have pending items
     Order.objects.filter(
         id__in=orders_qs.values_list("id", flat=True),
         seen=False,
         items__status="Pending"
     ).update(seen=True)
 
-    # Flatten into order_items
     order_items = []
     for order in orders_qs:
         for item in order.items.all():
-            order_items.append({
-                "order": order,
-                "item": item,
-            })
+            order_items.append({"order": order, "item": item})
 
-    # Paginate order_items instead of orders
-    paginator = Paginator(order_items, 10)  # 10 rows per page
+    paginator = Paginator(order_items, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
-    return render(request, 'vendor/order.html', {'page_obj': page_obj})
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
+        table_html = render_to_string("vendor/order_table.html", {"page_obj": page_obj, }, request=request)
+        pagination_html = render_to_string("includes/pagination.html", {"page_obj": page_obj, }, request=request)
+        return JsonResponse({"table_html": table_html, "pagination_html": pagination_html})
+
+    return render(request, "vendor/order.html", {"page_obj": page_obj})
 
 def pending_orders_count(request):
     if request.session.get('user_type') != 'vendor' or 'user_id' not in request.session:

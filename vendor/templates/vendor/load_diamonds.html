@@ -168,120 +168,14 @@
     
 </style>
 
-{% if diamonds %}
-<div class="table-container table-responsive">
-    <table class="table table-striped table-bordered table-hover w-100">
-        <thead class="table-dark">
-            <tr>
-                <th><input type="checkbox" id="select-all"></th>
-                <th>Sr No</th>
-                <th>Stock Id</th>
-                <th>Report #</th>
-                <th>Type</th>
-                <th>Lab</th>
-                <th>Shape</th>
-                <th>Carat</th>
-                <th>Color</th>
-                <th>Clarity</th>
-                <th>Cut</th>
-                <th>Polish</th>
-                <th>Symmetry</th>
-                <th>Fluorescence</th>
-                <th>Price/Carat</th>
-                <th>Video</th>
-                <th>Photo</th>
-                <th>Report</th>
-                <th>Edit</th>
-                <th>Delete</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for diamond in diamonds %}
-            <tr>
-                <td><input type="checkbox" class="row-checkbox" name="selected_diamonds" value="{{ diamond.id }}"></td>
-                <td>{{ forloop.counter0|add:page_obj.start_index }}</td>
-                <td>{{ diamond.stock_id }}</td>
-                <td>{{ diamond.report_number }}</td>
-                <td>{{ diamond.type }}</td>
-                <td>{{ diamond.lab }}</td>
-                <td>{{ diamond.get_shape_display }}</td>
-                <td>{{ diamond.carat }}</td>
-                <td>{{ diamond.get_color_display }}</td>
-                <td>{{ diamond.get_clarity_display }}</td>
-                <td>{{ diamond.get_cut_display }}</td>
-                <td>{{ diamond.get_polish_display }}</td>
-                <td>{{ diamond.get_symmetry_display }}</td>
-                <td>{{ diamond.fluorescence }}</td>
-                <td>{{ diamond.price_per_carat }}</td>
-                <td>
-                    {% if diamond.video_360 %}
-                        <a href="{{ diamond.video_360 }}" target="_blank">Video</a>
-                    {% else %}
-                        -
-                    {% endif %}
-                </td>
-                <td>
-                    {% if diamond.photo %}
-                        <a href="{{ diamond.photo }}" target="_blank">Image</a>
-                    {% else %}
-                        -
-                    {% endif %}
-                </td>
-                <td>
-                    {% if diamond.pdf %}
-                        <a href="{{ diamond.pdf }}" target="_blank">PDF</a>
-                    {% else %}
-                        -
-                    {% endif %}
-                </td>
-                <td>
-                    <a href="{% url 'vendor:edit_diamond' diamond.id %}" class="btn edit-btn">Edit</a>
-                </td> 
-                <td>
-                    <button class="btn btn-delete" 
-                            onclick="showConfirm(this)" 
-                            data-url="{% url 'vendor:delete_diamond' diamond.id %}?page={{ page_obj.number }}">
-                        Delete
-                    </button>
-                    <span class="d-none ms-2" data-confirm-box>
-                        <span class="text-danger fw-bold">Confirm?</span>
-                        <a href="#" class="btn btn-sm btn-outline-danger" onclick="confirmDelete(this)">Yes</a>
-                        <button class="btn btn-sm btn-outline-secondary" onclick="cancelDelete(this)">Cancel</button>
-                    </span>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div id="diamondsTableWrapper">
+    {% include "vendor/load_diamonds_table.html" %}
 </div>
-{% else %}
-<p class="text-muted">You have not added any diamonds yet.</p>
-{% endif %}
 
 {% if page_obj %}
-<nav aria-label="Pagination" class="mt-3 d-flex justify-content-center">
-  <ul class="pagination" style="gap:10px;">
-    {% if page_obj.has_previous %}
-      <li class="page-item"><a class="page-link" href="?page=1">&laquo; First</a></li>
-      <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">‹ Prev</a></li>
-    {% else %}
-      <li class="page-item disabled"><span class="page-link">‹ Prev</span></li>
-    {% endif %}
-
-    <li class="page-item d-flex align-items-center" style="gap: 6px;">
-        <input type="number" id="pageInput" class="page-input"
-               value="{{ page_obj.number }}" min="1" max="{{ page_obj.paginator.num_pages }}">
-        <span class="page-total">of {{ page_obj.paginator.num_pages }}</span>
-    </li>
-
-    {% if page_obj.has_next %}
-      <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next ›</a></li>
-      <li class="page-item"><a class="page-link"  href="?page={{ page_obj.paginator.num_pages }}">Last »</a></li>
-    {% else %}
-      <li class="page-item disabled"><span class="page-link">Next ›</span></li>
-    {% endif %}
-  </ul>
-</nav>
+<div id="diamondsPaginationWrapper">
+    {% include "includes/pagination.html" with position="bottom" %}
+</div>
 {% endif %}
 
 <script>
@@ -367,5 +261,46 @@
         // Redirect to the new page
         window.location.href = currentUrl.toString();
     }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        function loadDiamonds(url) {
+          fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" }})
+            .then(resp => resp.json())
+            .then(data => {
+              document.querySelector("#diamondsTableWrapper").innerHTML = data.table_html;
+              document.querySelector("#diamondsPaginationWrapper").innerHTML = data.pagination_html;
+            })
+            .catch(err => console.error("Error:", err));
+        }
+      
+        // Handle clicks
+        document.addEventListener("click", e => {
+          const link = e.target.closest("#diamondsPaginationWrapper a.page-link");
+          if (!link) return;
+          e.preventDefault();
+          loadDiamonds(link.href);
+          history.pushState({}, "", link.href);
+        });
+      
+        // Handle page input
+        document.addEventListener("change", e => {
+          if (!e.target.closest("#diamondsPaginationWrapper .page-input")) return;
+          let page = parseInt(e.target.value);
+          const max = parseInt(e.target.max);
+          if (isNaN(page) || page < 1) page = 1;
+          if (page > max) page = max;
+          const url = new URL(window.location);
+          url.searchParams.set("page", page);
+          loadDiamonds(url.toString());
+          history.pushState({}, "", url);
+        });
+
+        const wrapper = document.getElementById("diamondsTableWrapper");
+        if (wrapper) {
+        const headerOffset = 120; // adjust for your top bar height
+        const elementPosition = wrapper.getBoundingClientRect().top + window.pageYOffset;
+        window.scrollTo({ top: elementPosition - headerOffset, behavior: "smooth" });
+        }
+      });
 </script>   
 {% endblock %}
