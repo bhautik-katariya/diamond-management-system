@@ -535,19 +535,30 @@ def pending_orders_count(request):
 @require_POST
 def process_order_item(request, item_id):
     if request.session.get('user_type') != 'vendor' or 'user_id' not in request.session:
-        return redirect('login')
+        return JsonResponse({"success": False, "error": "Unauthorized"}, status=403)
     
     vendor_id = request.session.get("user_id")
-    vendor = get_object_or_404(Vendor, id=vendor_id) 
-
-    # Make sure this item belongs to one of this vendor's orders
+    vendor = get_object_or_404(Vendor, id=vendor_id)
     item = get_object_or_404(OrderItem, id=item_id, order__vendor=vendor)
 
     if item.status == "Pending":
         item.status = "Completed"
         item.save()
+        if request.headers.get("x-requested-with") == "XMLHttpRequest":
+            return JsonResponse({
+                "success": True,
+                "item_id": item.id,
+                "status": item.status
+            })
         messages.success(request, f"Item {item.diamond.stock_id} in Order #{item.order.id} marked as processed.")
     else:
+        if request.headers.get("x-requested-with") == "XMLHttpRequest":
+            return JsonResponse({
+                "success": False,
+                "item_id": item.id,
+                "status": item.status
+            })
         messages.info(request, f"Item {item.diamond.stock_id} is already {item.status}.")
+    
     return redirect('vendor:view_orders')
 

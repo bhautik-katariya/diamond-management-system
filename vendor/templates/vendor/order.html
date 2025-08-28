@@ -146,16 +146,14 @@
                 </td>
                 <td>
                     {% if oi.item.status == "Pending" %}
-                      <form method="post" action="{% url 'vendor:process_order_item' oi.item.id %}" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-equal btn-sm">
-                            Mark as Processed
-                        </button>
-                      </form>
+                      <button type="button" class="btn btn-equal btn-sm mark-processed" 
+                              data-id="{{ oi.item.id }}">
+                          Mark as Processed
+                      </button>
                     {% else %}
                       <span class="badge bg-success">{{ oi.item.status }}</span>
                     {% endif %}
-                </td>
+                  </td>                  
             </tr>
             {% empty %}
             <tr><td colspan="13" class="text-center">No orders found.</td></tr>
@@ -190,6 +188,7 @@
   </ul>
 </nav>
 {% endif %}
+
 <script>
 (function() {
     const selectAll = document.getElementById('select-all');
@@ -244,6 +243,33 @@ function goToPage() {
     // Redirect to the new page
     window.location.href = currentUrl.toString();
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+    const csrfToken = "{{ csrf_token }}";
+  
+    document.querySelectorAll(".mark-processed").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const itemId = btn.dataset.id;
+        fetch(`/vendor/process-order-item/${itemId}/`, {
+          method: "POST",
+          headers: {
+            "X-CSRFToken": csrfToken,
+            "X-Requested-With": "XMLHttpRequest"
+          }
+        })
+        .then(resp => resp.json())
+        .then(data => {
+          if (data.success) {
+            // Replace button with badge
+            btn.outerHTML = `<span class="badge bg-success">${data.status}</span>`;
+          } else {
+            alert("Already " + data.status);
+          }
+        })
+        .catch(err => console.error("Error:", err));
+      });
+    });
+  });
 </script>
 {% endblock %}
 

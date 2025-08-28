@@ -47,6 +47,17 @@
             height: 18px;
             text-align: center;
         }
+
+        .badge-dot {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 10px;
+            height: 10px;
+            background: red;
+            border-radius: 50%;
+            display: inline-block;
+        }
         
         /* Fix overflow on very small screens */
         body {
@@ -67,9 +78,11 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-navy sticky-top">
         <div class="container-fluid px-3">
             <a class="navbar-brand" href="{% if request.session.user_type == 'vendor' %}{% url 'vendor:load_diamonds' %}{% else %}/{% endif %}">Diamond System</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+            <button class="navbar-toggler position-relative" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
+                <span id="toggleBadge" class="badge-dot"
+                    style="{% if pending_orders_count == 0 %}display:none;{% endif %}"></span>
             </button>
             <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                 <ul class="navbar-nav">
@@ -141,30 +154,19 @@
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-navy text-white text-center p-3 mt-5">
-        &copy; 2025 Diamond Management System. All rights reserved.
-    </footer>
+<!-- Footer -->
+<footer class="bg-navy text-white text-center p-3 mt-5">
+    &copy; 2025 Diamond Management System. All rights reserved.
+</footer>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const alerts = document.querySelectorAll('.alert');
-            alerts.forEach(function (alert) {
-                setTimeout(function () {
-                    alert.style.transition = 'opacity 0.5s ease-out';
-                    alert.style.opacity = '0';
-                    setTimeout(function () {
-                        alert.remove();
-                    }, 500);
-                }, 3000);
-            });
-        }); 
-
+<script>
         document.addEventListener("DOMContentLoaded", function () {
             const vendorId = "{{ request.session.user_id }}";
             const badge = document.getElementById("orderBadge");
+            const toggleBadge = document.getElementById("toggleBadge");
         
-            // WebSocket connection
+            if (!vendorId || !badge || !toggleBadge) return;
+        
             const socket = new WebSocket(
                 "ws://" + window.location.host + "/ws/vendor/orders/" + vendorId + "/"
             );
@@ -174,21 +176,36 @@
                 if (data.count > 0) {
                     badge.style.display = "inline-block";
                     badge.textContent = data.count;
+                    toggleBadge.style.display = "inline-block";   // show dot on navbar toggler
                 } else {
                     badge.style.display = "none";
+                    toggleBadge.style.display = "none";           // hide dot on navbar toggler
                 }
             };
         
-            // Hide instantly when clicking Orders
             const ordersLink = document.querySelector("a[href='{% url 'vendor:view_orders' %}']");
-            if (ordersLink && badge) {
+            if (ordersLink) {
                 ordersLink.addEventListener("click", function() {
                     badge.style.display = "none";
+                    toggleBadge.style.display = "none";
                 });
             }
         });
-    </script>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        document.addEventListener("click", function (event) {
+            const navbar = document.getElementById("navbarNav");
+            const toggler = document.querySelector(".navbar-toggler");
+        
+            // Check if navbar is open
+            if (navbar.classList.contains("show")) {
+                // If click is outside navbar and toggler → collapse it
+                if (!navbar.contains(event.target) && !toggler.contains(event.target)) {
+                    new bootstrap.Collapse(navbar, { toggle: true });
+                }
+            }
+        });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

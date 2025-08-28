@@ -123,6 +123,20 @@ html[data-theme="auto"] {
     </div>
   </div>
 </nav>
+
+<script>
+  document.addEventListener("click", function (event) {
+      const navbar = document.getElementById("adminNav");
+      const toggler = document.querySelector(".navbar-toggler");
+  
+      if (navbar.classList.contains("show")) {
+          if (!navbar.contains(event.target) && !toggler.contains(event.target)) {
+              new bootstrap.Collapse(navbar, { toggle: true });
+          }
+      }
+  });
+</script>
+
 {% endblock %}
 
 {% block welcome-msg %}{% endblock %}
