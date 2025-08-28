@@ -325,23 +325,15 @@
                 </td>
                 <td>${{ item.diamond.price_per_carat }}</td>
                 <td>
+                    <input type="hidden" id="csrf-token" value="{{ csrf_token }}">
                     <div class="cart-qty-controls">
-                        <form method="post" action="{% url 'customer:decrease_quantity' item.id %}" style="display:inline;">
-                            {% csrf_token %}
-                            <button type="submit" class="cart-qty-btn">-</button>
-                        </form>
+                        <button type="button" class="cart-qty-btn qty-decrease" data-id="{{ item.id }}">-</button>
                         <input class="cart-qty-input" type="text" value="{{ item.quantity }}" readonly>
-                        <form method="post" action="{% url 'customer:increase_quantity' item.id %}" style="display:inline;">
-                            {% csrf_token %}
-                            <button type="submit" class="cart-qty-btn">+</button>
-                        </form>
+                        <button type="button" class="cart-qty-btn qty-increase" data-id="{{ item.id }}">+</button>
                     </div>
                     <div class="cart-qty-controls">
-                        <form method="post" action="{% url 'customer:remove_from_cart' item.id %}" style="display:inline;">
-                            {% csrf_token %}
-                            <button type="submit" class="cart-remove">Remove</button>
-                        </form>
-                    </div>
+                        <button type="button" class="cart-remove" data-id="{{ item.id }}">Remove</button>
+                    </div>                    
                 </td>
                 <td>${{ item.line_total|floatformat:2 }}</td>
             </tr>
@@ -412,7 +404,7 @@
                     <div class="cart-qty-controls">
                         <form method="post" action="{% url 'customer:remove_from_cart' item.id %}" style="display:inline;">
                             {% csrf_token %}
-                            <button type="submit" class="cart-remove">Remove</button>
+                            <button type="button" class="cart-remove" data-id="{{ item.id }}">Remove</button>
                         </form>
                     </div>
                 </td>
@@ -522,5 +514,59 @@ function goToPage() {
     // Redirect to the new page
     window.location.href = currentUrl.toString();
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+    const csrfTokenInput = document.getElementById("csrf-token");
+    if (!csrfTokenInput) return;
+    const csrfToken = csrfTokenInput.value;
+  
+    function updateQuantity(url, itemId) {
+      fetch(url, {
+        method: "POST",
+        headers: {
+          "X-CSRFToken": csrfToken,
+          "X-Requested-With": "XMLHttpRequest",
+        },
+      })
+      .then(resp => resp.json())
+      .then(data => {
+        if (!data.success) return;
+  
+        const row = document.querySelector(`button[data-id="${itemId}"]`).closest("tr");
+  
+        // If item removed
+        if (data.removed) {
+          row.remove();
+          return;
+        }
+  
+        // Update quantity and line total
+        row.querySelector(".cart-qty-input").value = data.quantity;
+        row.querySelector("td:last-child").textContent = "$" + data.line_total.toFixed(2);
+      })
+      .catch(err => console.error("Cart update failed", err));
+    }
+  
+    // Increase
+    document.querySelectorAll(".qty-increase").forEach(btn => {
+      btn.addEventListener("click", () => {
+        updateQuantity(`/customer/cart/increase/${btn.dataset.id}/`, btn.dataset.id);
+      });
+    });
+  
+    // Decrease
+    document.querySelectorAll(".qty-decrease").forEach(btn => {
+      btn.addEventListener("click", () => {
+        updateQuantity(`/customer/cart/decrease/${btn.dataset.id}/`, btn.dataset.id);
+      });
+    });
+  
+    // Remove
+    document.querySelectorAll(".cart-remove").forEach(btn => {
+        btn.addEventListener("click", () => {
+        updateQuantity(`/customer/cart/remove/${btn.dataset.id}/`, btn.dataset.id);
+        });
+    });
+  });
 </script>
 {% endblock %}

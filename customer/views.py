@@ -1,4 +1,5 @@
 from django.shortcuts import redirect, render, reverse, get_object_or_404
+from django.http import JsonResponse
 from django.contrib import messages
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
@@ -79,6 +80,12 @@ def remove_from_cart(request, item_id):
         # Customer cart
         item = get_object_or_404(CartItem, pk=item_id, cart__customer_id=request.session['user_id'])
         item.delete()
+        if request.headers.get("x-requested-with") == "XMLHttpRequest":
+            return JsonResponse({
+                "success": True,
+                "item_id": item_id,
+                "removed": True,
+            })
         messages.success(request, "Item removed from your cart.")
     else:
         # Guest cart
@@ -86,11 +93,16 @@ def remove_from_cart(request, item_id):
         if str(item_id) in guest_cart:
             del guest_cart[str(item_id)]
             request.session['guest_cart'] = guest_cart
+            if request.headers.get("x-requested-with") == "XMLHttpRequest":
+                return JsonResponse({
+                    "success": True,
+                    "item_id": item_id,
+                    "removed": True,
+                })
             messages.success(request, "Item removed from your cart.")
         else:
             messages.error(request, "Item not found in your cart.")
     return redirect('customer:view_cart')
-
 
 def increase_quantity(request, item_id):
     if request.session.get('user_type') == 'customer' and 'user_id' in request.session:
@@ -98,18 +110,35 @@ def increase_quantity(request, item_id):
         item = get_object_or_404(CartItem, pk=item_id, cart__customer_id=request.session['user_id'])
         item.quantity += 1
         item.save()
+        if request.headers.get("x-requested-with") == "XMLHttpRequest":
+            return JsonResponse({
+                "success": True,
+                "item_id": item.id,
+                "quantity": item.quantity,
+                "line_total": float(item.line_total),
+            })
         messages.success(request, f"Increased quantity for {item.diamond.stock_id}.")
+        return redirect('customer:view_cart')
+
     else:
         # Guest cart
         guest_cart = request.session.get('guest_cart', {})
         if str(item_id) in guest_cart:
             guest_cart[str(item_id)] += 1
             request.session['guest_cart'] = guest_cart
+            if request.headers.get("x-requested-with") == "XMLHttpRequest":
+                diamond = get_object_or_404(Diamond, pk=item_id)
+                line_total = float(diamond.price_per_carat) * float(diamond.carat) * guest_cart[str(item_id)]
+                return JsonResponse({
+                    "success": True,
+                    "item_id": item_id,
+                    "quantity": guest_cart[str(item_id)],
+                    "line_total": line_total,
+                })
             messages.success(request, "Increased quantity in your cart.")
         else:
             messages.error(request, "Item not found in your cart.")
-    return redirect('customer:view_cart')
-
+        return redirect('customer:view_cart')
 
 def decrease_quantity(request, item_id):
     if request.session.get('user_type') == 'customer' and 'user_id' in request.session:
@@ -118,24 +147,55 @@ def decrease_quantity(request, item_id):
         if item.quantity > 1:
             item.quantity -= 1
             item.save()
+            if request.headers.get("x-requested-with") == "XMLHttpRequest":
+                return JsonResponse({
+                    "success": True,
+                    "item_id": item.id,
+                    "quantity": item.quantity,
+                    "line_total": float(item.line_total),
+                })
             messages.success(request, f"Decreased quantity for {item.diamond.stock_id}.")
         else:
             item.delete()
+            if request.headers.get("x-requested-with") == "XMLHttpRequest":
+                return JsonResponse({
+                    "success": True,
+                    "item_id": item_id,
+                    "removed": True,
+                })
             messages.success(request, f"Removed {item.diamond.stock_id} from your cart.")
+        return redirect('customer:view_cart')
+
     else:
         # Guest cart
         guest_cart = request.session.get('guest_cart', {})
         if str(item_id) in guest_cart:
             if guest_cart[str(item_id)] > 1:
                 guest_cart[str(item_id)] -= 1
+                if request.headers.get("x-requested-with") == "XMLHttpRequest":
+                    diamond = get_object_or_404(Diamond, pk=item_id)
+                    line_total = float(diamond.price_per_carat) * float(diamond.carat) * guest_cart[str(item_id)]
+                    return JsonResponse({
+                        "success": True,
+                        "item_id": item_id,
+                        "quantity": guest_cart[str(item_id)],
+                        "line_total": line_total,
+                    })
                 messages.success(request, "Decreased quantity in your cart.")
             else:
                 del guest_cart[str(item_id)]
+                if request.headers.get("x-requested-with") == "XMLHttpRequest":
+                    return JsonResponse({
+                        "success": True,
+                        "item_id": item_id,
+                        "removed": True,
+                    })
                 messages.success(request, "Removed item from your cart.")
             request.session['guest_cart'] = guest_cart
         else:
             messages.error(request, "Item not found in your cart.")
-    return redirect('customer:view_cart')
+        return redirect('customer:view_cart')
+
 
 def checkout(request):
     if 'user_id' not in request.session or request.session.get('user_type') != 'customer':

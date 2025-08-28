@@ -132,10 +132,21 @@
         border: 1px solid rgb(11, 25, 55) !important;
     }
 
-    .sort-dropdown:hover .dropdown-menu {
-        display: block;
-        margin-top: 0;
-    }
+    .sort-dropdown { 
+      position: relative;
+  }
+
+
+  .sort-dropdown .dropdown-menu {
+      display: none;
+      position: absolute;
+      z-index: 1000;   /* phone overlap fix */
+  }
+
+ 
+  .sort-dropdown.show .dropdown-menu {
+      display: block;
+  }
 
     .sort-dropdown .dropdown-menu {
         display: none;
@@ -338,7 +349,7 @@
     function loadTable(url) {
       const wrapperBefore = document.getElementById('filterOverlayWrapper');
       const wasFilterOpen = wrapperBefore && wrapperBefore.classList.contains('active');
-  
+    
       fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" } })
         .then(resp => resp.json())
         .then(data => {
@@ -347,7 +358,7 @@
           document.getElementById('bottom-pagination').innerHTML = data.bottom_pagination;
           initSelectAllFeature();
           syncPageInputs();
-  
+    
           if (wasFilterOpen) {
             const wrapperAfter = document.getElementById('filterOverlayWrapper');
             const content = document.getElementById('filterOverlay');
@@ -355,6 +366,12 @@
               wrapperAfter.classList.add('active');
               wrapperAfter.style.maxHeight = content.scrollHeight + 'px';
             }
+          }
+    
+          // Scroll to top of table after refresh
+          const tableWrapper = document.getElementById('diamondTableWrapper');
+          if (tableWrapper) {
+            tableWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }
         })
         .catch(err => console.error('loadTable error', err));
@@ -418,17 +435,21 @@
     });
   
     // ------------------- Delegated AJAX Page Input -------------------
-    document.addEventListener('change', e => {
+    document.addEventListener('input', e => {
       if (!e.target.classList.contains('ajax-page-input')) return;
+
       let page = parseInt(e.target.value);
+      if (isNaN(page)) return;
+
       if (page < 1) page = 1;
       if (page > parseInt(e.target.max)) page = e.target.max;
-  
+
       const url = new URL(window.location.href);
       url.searchParams.set('page', page);
       loadTable(url.toString());
       history.pushState({}, "", url);
     });
+
   
     // ------------------- Download Selected -------------------
     const downloadBtn = document.getElementById('download-btn');
@@ -449,8 +470,16 @@
       function scheduleApply() {
         clearTimeout(window._filterTimer);
         window._filterTimer = setTimeout(() => {
-          const params = new URLSearchParams(new FormData(filterForm)).toString();
-          const url = window.location.pathname + (params ? '?' + params : '');
+          let params = new URLSearchParams(new FormData(filterForm));
+
+          // Preserve current sort param if exists
+          const currentUrl = new URL(window.location.href);
+          const currentSort = currentUrl.searchParams.get("sort");
+          if (currentSort) {
+            params.set("sort", currentSort);
+          }
+
+          const url = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
           loadTable(url);
           history.pushState({}, "", url);
         }, 200);
@@ -459,11 +488,11 @@
       // checkbox & select change
       filterForm.querySelectorAll('input[type="checkbox"], select').forEach(el => el.addEventListener('change', scheduleApply));
   
-      // number input change or Enter
+      // number input auto-apply while typing
       filterForm.querySelectorAll('input[type="number"]').forEach(el => {
-        el.addEventListener('blur', scheduleApply);
-        el.addEventListener('keypress', e => {
-          if (e.key === 'Enter') { e.preventDefault(); scheduleApply(); }
+        el.addEventListener('input', () => {
+          clearTimeout(window._numberInputTimer);
+          window._numberInputTimer = setTimeout(scheduleApply, 400); // apply after 400ms pause
         });
       });
   
@@ -498,6 +527,33 @@
         wrapper.style.maxHeight = isActive ? content.scrollHeight + 'px' : '0';
       });
     }
+
+    // ------------------- Sort Dropdown (Click Toggle) -------------------
+  const sortBtn = document.getElementById("sortDropdownButton");
+  if (sortBtn) {
+    const sortDropdown = sortBtn.closest(".sort-dropdown");
+
+    // Button click open/close
+    sortBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      sortDropdown.classList.toggle("show");
+    });
+
+    // Option click auto close
+    document.querySelectorAll(".sort-dropdown .dropdown-item").forEach(item => {
+      item.addEventListener("click", () => {
+        sortDropdown.classList.remove("show");
+      });
+    });
+
+    // Closes on clicking outside
+    document.addEventListener("click", (e) => {
+      if (!sortDropdown.contains(e.target)) {
+        sortDropdown.classList.remove("show");
+      }
+    });
+  }
   
     // ------------------- Close Filter -------------------
     const closeBtn = document.getElementById('closeFilterOverlay');

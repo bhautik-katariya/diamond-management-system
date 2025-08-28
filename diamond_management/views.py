@@ -156,11 +156,6 @@ def edit_profile(request):
 
     return render(request, 'edit_profile.html', {'form': form, 'user_type':user_type})
 
-
-from django.shortcuts import render
-from django.db.models import Sum
-from django.core.paginator import Paginator
-
 def dashboard(request):
     diamonds = Diamond.objects.all()
 
@@ -190,9 +185,9 @@ def dashboard(request):
     if max_carat:
         diamonds = diamonds.filter(carat__lte=max_carat)
     if min_price:
-        diamonds = diamonds.filter(total_amount__gte=min_price)
+        diamonds = diamonds.filter(price_per_carat__gte=min_price)
     if max_price:
-        diamonds = diamonds.filter(total_amount__lte=max_price)
+        diamonds = diamonds.filter(price_per_carat__lte=max_price)
 
     # --- Sorting ---
     sort = request.GET.get('sort')
