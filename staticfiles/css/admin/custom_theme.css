@@ -1,0 +1,67 @@
+/* === NAVBAR BACKGROUND === */
+#header {
+    background-color: rgb(10, 24, 53) !important; 
+}
+
+/* === SITE NAME ("Diamond System") === */
+#header #site-name a {
+    color: #ffffff !important; 
+    text-decoration: none !important;
+}
+
+/* === USER TOOLS (WELCOME, ADMIN, links) === */
+#header #user-tools,
+#header #user-tools a {
+    color: #ffffff !important; 
+}
+
+/* === Links in header hover === */
+#header #site-name a:hover,
+#header #user-tools a:hover {
+    text-decoration: underline !important;
+}
+
+/* === TABLE HEADER STYLING === */
+#content-main table thead th {
+    background-color: #E3F2FD !important; 
+    color: rgb(10, 24, 53) !important; 
+}
+
+/* === TABLE BODY TEXT === */
+#content-main table tbody td {
+    color: #000000 !important; 
+}
+
+/* === BUTTONS === */
+.button,
+input[type=submit],
+.submit-row input {
+    background-color: rgb(10, 24, 53) !important; 
+    color: #ffffff !important;
+    border: none !important;
+}
+
+.button:hover,
+input[type=submit]:hover,
+.submit-row input:hover {
+    background-color: #09305F !important; 
+}
+
+/* === Django Admin App Headers === */
+.module caption {
+    background-color: #e6f4fa !important; 
+    color: #0b1937 !important; 
+    font-weight: bold !important;
+    text-transform: uppercase !important;
+}
+
+a.button.cancel-link {
+    display: inline-block !important;
+    padding: 8px 16px !important;
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+    height: auto !important;
+    min-height: 36px !important;
+    vertical-align: middle !important;
+    box-sizing: border-box !important;
+}

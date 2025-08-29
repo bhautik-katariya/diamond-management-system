@@ -280,153 +280,62 @@
     </div>
 {% endif %}
 
+<script src="{% static 'js/common.js' %}"></script>
 <script>
-(function() {
-    const selectAll = document.getElementById('select-all');
-    if (!selectAll) return;
-    const rowChecks = document.querySelectorAll('.row-checkbox');
-    selectAll.addEventListener('change', function() {
-        rowChecks.forEach(cb => cb.checked = selectAll.checked);
-        selectAll.indeterminate = false;
-    });
-    rowChecks.forEach(cb => {
-        cb.addEventListener('change', function() {
-            const total = rowChecks.length;
-            const checked = Array.from(rowChecks).filter(x => x.checked).length;
-            selectAll.checked = checked === total;
-            selectAll.indeterminate = checked > 0 && checked < total;
-        });
-    });
-})();
-
-// Page input functionality
-const pageInput = document.getElementById('pageInput');
-if (pageInput) {
-    pageInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            goToPage();
-        }
-    });
-    
-    pageInput.addEventListener('blur', function() {
-        goToPage();
-    });
-}
-
-function goToPage() {
-    const pageInput = document.getElementById('pageInput');
-    if (!pageInput) return;
-    
-    let pageNum = parseInt(pageInput.value);
-    const maxPages = parseInt(pageInput.getAttribute('max'));
-    
-    // Validate page number
-    if (isNaN(pageNum) || pageNum < 1) {
-        pageNum = 1;
-    } else if (pageNum > maxPages) {
-        pageNum = maxPages;
-    }
-    
-    // Build URL with current parameters
-    const currentUrl = new URL(window.location);
-    currentUrl.searchParams.set('page', pageNum);
-    
-    // Redirect to the new page
-    window.location.href = currentUrl.toString();
-}
-
 document.addEventListener("DOMContentLoaded", () => {
-    const csrfTokenInput = document.getElementById("csrf-token");
-    if (!csrfTokenInput) return;
-    const csrfToken = csrfTokenInput.value;
-  
-    function updateQuantity(url, itemId) {
-      fetch(url, {
-        method: "POST",
-        headers: {
-          "X-CSRFToken": csrfToken,
-          "X-Requested-With": "XMLHttpRequest",
-        },
-      })
+  const csrfTokenInput = document.getElementById("csrf-token");
+  if (!csrfTokenInput) return;
+  const csrfToken = csrfTokenInput.value;
+
+  function updateQuantity(url, itemId) {
+    fetch(url, {
+      method: "POST",
+      headers: { "X-CSRFToken": csrfToken, "X-Requested-With": "XMLHttpRequest" },
+    })
+    .then(resp => resp.json())
+    .then(data => {
+      if (!data.success) return;
+      const row = document.querySelector(`button[data-id="${itemId}"]`).closest("tr");
+      if (data.removed) { row.remove(); return; }
+      row.querySelector(".cart-qty-input").value = data.quantity;
+      row.querySelector("td:last-child").textContent = "$" + data.line_total.toFixed(2);
+    })
+    .catch(err => console.error("Cart update failed", err));
+  }
+
+  // Increase / Decrease / Remove
+  document.querySelectorAll(".qty-increase").forEach(btn => {
+    btn.addEventListener("click", () => updateQuantity(`/customer/cart/increase/${btn.dataset.id}/`, btn.dataset.id));
+  });
+  document.querySelectorAll(".qty-decrease").forEach(btn => {
+    btn.addEventListener("click", () => updateQuantity(`/customer/cart/decrease/${btn.dataset.id}/`, btn.dataset.id));
+  });
+  document.querySelectorAll(".cart-remove").forEach(btn => {
+    btn.addEventListener("click", () => updateQuantity(`/customer/cart/remove/${btn.dataset.id}/`, btn.dataset.id));
+  });
+
+  function loadCart(url) {
+    fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" }})
       .then(resp => resp.json())
       .then(data => {
-        if (!data.success) return;
-  
-        const row = document.querySelector(`button[data-id="${itemId}"]`).closest("tr");
-  
-        // If item removed
-        if (data.removed) {
-          row.remove();
-          return;
-        }
-  
-        // Update quantity and line total
-        row.querySelector(".cart-qty-input").value = data.quantity;
-        row.querySelector("td:last-child").textContent = "$" + data.line_total.toFixed(2);
+        document.getElementById("cartTableWrapper").innerHTML = data.table_html;
+        document.getElementById("cart-pagination").innerHTML = data.pagination_html;
       })
-      .catch(err => console.error("Cart update failed", err));
-    }
-  
-    // Increase
-    document.querySelectorAll(".qty-increase").forEach(btn => {
-      btn.addEventListener("click", () => {
-        updateQuantity(`/customer/cart/increase/${btn.dataset.id}/`, btn.dataset.id);
-      });
-    });
-  
-    // Decrease
-    document.querySelectorAll(".qty-decrease").forEach(btn => {
-      btn.addEventListener("click", () => {
-        updateQuantity(`/customer/cart/decrease/${btn.dataset.id}/`, btn.dataset.id);
-      });
-    });
-  
-    // Remove
-    document.querySelectorAll(".cart-remove").forEach(btn => {
-        btn.addEventListener("click", () => {
-        updateQuantity(`/customer/cart/remove/${btn.dataset.id}/`, btn.dataset.id);
-        });
-    });
+      .catch(err => console.error("Cart load failed", err));
+  }
 
-    function loadCart(url) {
-        fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" }})
-          .then(resp => resp.json())
-          .then(data => {
-            document.getElementById("cartTableWrapper").innerHTML = data.table_html;
-            document.getElementById("cart-pagination").innerHTML = data.pagination_html;
-          })
-          .catch(err => console.error("Cart load failed", err));
-      }
-    
-      // Delegated clicks for AJAX links
-      document.addEventListener("click", e => {
-        const link = e.target.closest("a.ajax-link");
-        if (!link) return;
-        e.preventDefault();
-        loadCart(link.href);
-        history.pushState({}, "", link.href);
-      });
-    
-      // Delegated input for page number
-      document.addEventListener("input", e => {
-        if (!e.target.classList.contains("ajax-page-input")) return;
-        let page = parseInt(e.target.value);
-        if (isNaN(page)) return;
-        const max = parseInt(e.target.max);
-        if (page < 1) page = 1;
-        if (page > max) page = max;
-        const url = new URL(window.location.href);
-        url.searchParams.set("page", page);
-        loadCart(url.toString());
-        history.pushState({}, "", url);
-      });
-
-      const wrapper = document.getElementById("cartTableWrapper");
-        if (wrapper) {
-        const headerOffset = 120; // adjust based on navbar/header height
-        const elementPosition = wrapper.getBoundingClientRect().top + window.pageYOffset;
-        window.scrollTo({ top: elementPosition - headerOffset, behavior: "smooth" });
-        }
+  document.addEventListener("click", e => {
+    const link = e.target.closest("a.ajax-link");
+    if (!link) return;
+    e.preventDefault();
+    loadCart(link.href);
+    history.pushState({}, "", link.href);
   });
+
+  initPageInput("#cart-pagination", loadCart);
+  initSelectAllFeature("cartTableWrapper");
+  scrollToWrapper("cartTableWrapper");
+});
 </script>
+
 {% endblock %}

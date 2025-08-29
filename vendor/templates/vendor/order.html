@@ -117,127 +117,52 @@
 </div>
 {% endif %}
 
+<script src="{% static 'js/common.js' %}"></script>
 <script>
-(function() {
-    const selectAll = document.getElementById('select-all');
-    if (!selectAll) return;
-    const rowChecks = document.querySelectorAll('.row-checkbox');
-    selectAll.addEventListener('change', function() {
-        rowChecks.forEach(cb => cb.checked = selectAll.checked);
-        selectAll.indeterminate = false;
-    });
-    rowChecks.forEach(cb => {
-        cb.addEventListener('change', function() {
-            const total = rowChecks.length;
-            const checked = Array.from(rowChecks).filter(x => x.checked).length;
-            selectAll.checked = checked === total;
-            selectAll.indeterminate = checked > 0 && checked < total;
-        });
-    });
-})();
-
-// Page input functionality
-const pageInput = document.getElementById('pageInput');
-if (pageInput) {
-    pageInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            goToPage();
-        }
-    });
-    
-    pageInput.addEventListener('blur', function() {
-        goToPage();
-    });
-}
-
-function goToPage() {
-    const pageInput = document.getElementById('pageInput');
-    if (!pageInput) return;
-    
-    let pageNum = parseInt(pageInput.value);
-    const maxPages = parseInt(pageInput.getAttribute('max'));
-    
-    // Validate page number
-    if (isNaN(pageNum) || pageNum < 1) {
-        pageNum = 1;
-    } else if (pageNum > maxPages) {
-        pageNum = maxPages;
-    }
-    
-    // Build URL with current parameters
-    const currentUrl = new URL(window.location);
-    currentUrl.searchParams.set('page', pageNum);
-    
-    // Redirect to the new page
-    window.location.href = currentUrl.toString();
-}
-
 document.addEventListener("DOMContentLoaded", () => {
-    const csrfToken = "{{ csrf_token }}";
-  
-    document.querySelectorAll(".mark-processed").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const itemId = btn.dataset.id;
-        fetch(`/vendor/process-order-item/${itemId}/`, {
-          method: "POST",
-          headers: {
-            "X-CSRFToken": csrfToken,
-            "X-Requested-With": "XMLHttpRequest"
-          }
-        })
-        .then(resp => resp.json())
-        .then(data => {
-          if (data.success) {
-            // Replace button with badge
-            btn.outerHTML = `<span class="badge bg-success">${data.status}</span>`;
-          } else {
-            alert("Already " + data.status);
-          }
-        })
-        .catch(err => console.error("Error:", err));
-      });
-    });
+  const csrfToken = "{{ csrf_token }}";
 
-    function loadOrders(url) {
-        fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" }})
-          .then(resp => resp.json())
-          .then(data => {
-            document.querySelector("#ordersTableWrapper").innerHTML = data.table_html;
-            document.querySelector("#ordersPaginationWrapper").innerHTML = data.pagination_html;
-          })
-          .catch(err => console.error("Error:", err));
-      }
-    
-      // Handle clicks
-      document.addEventListener("click", e => {
-        const link = e.target.closest("#ordersPaginationWrapper a.page-link");
-        if (!link) return;
-        e.preventDefault();
-        loadOrders(link.href);
-        history.pushState({}, "", link.href);
-      });
-    
-      // Handle page input
-      document.addEventListener("change", e => {
-        if (!e.target.closest("#ordersPaginationWrapper .page-input")) return;
-        let page = parseInt(e.target.value);
-        const max = parseInt(e.target.max);
-        if (isNaN(page) || page < 1) page = 1;
-        if (page > max) page = max;
-        const url = new URL(window.location);
-        url.searchParams.set("page", page);
-        loadOrders(url.toString());
-        history.pushState({}, "", url);
-      });
-
-      const wrapper = document.getElementById("ordersTableWrapper");
-        if (wrapper) {
-        const headerOffset = 120; // adjust as needed
-        const elementPosition = wrapper.getBoundingClientRect().top + window.pageYOffset;
-        window.scrollTo({ top: elementPosition - headerOffset, behavior: "smooth" });
+  document.querySelectorAll(".mark-processed").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const itemId = btn.dataset.id;
+      fetch(`/vendor/process-order-item/${itemId}/`, {
+        method: "POST",
+        headers: { "X-CSRFToken": csrfToken, "X-Requested-With": "XMLHttpRequest" }
+      })
+      .then(resp => resp.json())
+      .then(data => {
+        if (data.success) {
+          btn.outerHTML = `<span class="badge bg-success">${data.status}</span>`;
+        } else {
+          alert("Already " + data.status);
         }
-
+      })
+      .catch(err => console.error("Error:", err));
+    });
   });
+
+  function loadOrders(url) {
+    fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" }})
+      .then(resp => resp.json())
+      .then(data => {
+        document.querySelector("#ordersTableWrapper").innerHTML = data.table_html;
+        document.querySelector("#ordersPaginationWrapper").innerHTML = data.pagination_html;
+      })
+      .catch(err => console.error("Error:", err));
+  }
+
+  document.addEventListener("click", e => {
+    const link = e.target.closest("#ordersPaginationWrapper a.page-link");
+    if (!link) return;
+    e.preventDefault();
+    loadOrders(link.href);
+    history.pushState({}, "", link.href);
+  });
+
+  initPageInput("#ordersPaginationWrapper", loadOrders);
+  initSelectAllFeature("ordersTableWrapper");
+  scrollToWrapper("ordersTableWrapper");
+});
 </script>
 {% endblock %}
 

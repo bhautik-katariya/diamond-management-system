@@ -105,7 +105,7 @@ class Diamond(models.Model):
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE, related_name='diamonds')
     type = models.CharField(max_length=50, blank=False, null=False, choices=TYPES)
     stock_id = models.CharField(max_length=100, unique=True, blank=False, null=False)
-    report_number = models.BigIntegerField(unique=True, blank=False, null=False)
+    report_number = models.CharField(max_length=100, unique=True, blank=False, null=False)
     lab = models.CharField(max_length=50, blank=False, null=False, choices=LAB)
     shape = models.CharField(max_length=50, blank=False, null=False, choices=SHAPE)
     carat = models.DecimalField(max_digits=10, decimal_places=2, blank=False, null=False)

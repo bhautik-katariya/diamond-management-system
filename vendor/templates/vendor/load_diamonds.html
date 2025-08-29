@@ -178,129 +178,51 @@
 </div>
 {% endif %}
 
+<script src="{% static 'js/common.js' %}"></script>
 <script>
-    // Select all logic
-    (function() {
-        const selectAll = document.getElementById('select-all');
-        if (!selectAll) return;
-        const rowChecks = document.querySelectorAll('.row-checkbox');
-        selectAll.addEventListener('change', function() {
-            rowChecks.forEach(cb => cb.checked = selectAll.checked);
-            selectAll.indeterminate = false;
-        });
-        rowChecks.forEach(cb => {
-            cb.addEventListener('change', function() {
-                const total = rowChecks.length;
-                const checked = Array.from(rowChecks).filter(x => x.checked).length;
-                selectAll.checked = checked === total;
-                selectAll.indeterminate = checked > 0 && checked < total;
-            });
-        });
-    })();
+function showConfirm(button) {
+  document.querySelectorAll('[data-confirm-box]').forEach(box => {
+    box.classList.add('d-none');
+    if (box.previousElementSibling) box.previousElementSibling.style.display = 'inline-block';
+  });
+  const confirmBox = button.nextElementSibling;
+  confirmBox.classList.remove('d-none');
+  button.style.display = 'none';
+}
+function cancelDelete(button) {
+  const confirmBox = button.parentElement;
+  const deleteBtn = confirmBox.previousElementSibling;
+  confirmBox.classList.add('d-none');
+  deleteBtn.style.display = 'inline-block';
+}
+function confirmDelete(button) {
+  const confirmBox = button.parentElement;
+  const deleteUrl = confirmBox.previousElementSibling.getAttribute('data-url');
+  window.location.href = deleteUrl;
+}
 
-    function showConfirm(button) {
-        // Hide any other open confirm boxes
-        document.querySelectorAll('[data-confirm-box]').forEach(box => {
-            box.classList.add('d-none');
-            if (box.previousElementSibling) {
-                box.previousElementSibling.style.display = 'inline-block';
-            }
-        });
-    
-        // Show the confirm box for the clicked button
-        const confirmBox = button.nextElementSibling;
-        confirmBox.classList.remove('d-none');
-        button.style.display = 'none';
-    }
+document.addEventListener("DOMContentLoaded", () => {
+  function loadDiamonds(url) {
+    fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" }})
+      .then(resp => resp.json())
+      .then(data => {
+        document.querySelector("#diamondsTableWrapper").innerHTML = data.table_html;
+        document.querySelector("#diamondsPaginationWrapper").innerHTML = data.pagination_html;
+      })
+      .catch(err => console.error("Error:", err));
+  }
 
-    function cancelDelete(button) {
-        const confirmBox = button.parentElement;
-        const deleteBtn = confirmBox.previousElementSibling;
-        confirmBox.classList.add('d-none');
-        deleteBtn.style.display = 'inline-block';
-    }
+  document.addEventListener("click", e => {
+    const link = e.target.closest("#diamondsPaginationWrapper a.page-link");
+    if (!link) return;
+    e.preventDefault();
+    loadDiamonds(link.href);
+    history.pushState({}, "", link.href);
+  });
 
-    function confirmDelete(button) {
-        const confirmBox = button.parentElement;
-        const deleteUrl = confirmBox.previousElementSibling.getAttribute('data-url');
-        window.location.href = deleteUrl;
-    }
-
-    // Page input functionality
-    const pageInput = document.getElementById('pageInput');
-    if (pageInput) {
-        pageInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                goToPage();
-            }
-        });
-        
-        pageInput.addEventListener('blur', function() {
-            goToPage();
-        });
-    }
-
-    function goToPage() {
-        const pageInput = document.getElementById('pageInput');
-        if (!pageInput) return;
-        
-        let pageNum = parseInt(pageInput.value);
-        const maxPages = parseInt(pageInput.getAttribute('max'));
-        
-        // Validate page number
-        if (isNaN(pageNum) || pageNum < 1) {
-            pageNum = 1;
-        } else if (pageNum > maxPages) { 
-            pageNum = maxPages;
-        }
-        
-        // Build URL with current parameters
-        const currentUrl = new URL(window.location);
-        currentUrl.searchParams.set('page', pageNum);
-        
-        // Redirect to the new page
-        window.location.href = currentUrl.toString();
-    }
-
-    document.addEventListener("DOMContentLoaded", () => {
-        function loadDiamonds(url) {
-          fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" }})
-            .then(resp => resp.json())
-            .then(data => {
-              document.querySelector("#diamondsTableWrapper").innerHTML = data.table_html;
-              document.querySelector("#diamondsPaginationWrapper").innerHTML = data.pagination_html;
-            })
-            .catch(err => console.error("Error:", err));
-        }
-      
-        // Handle clicks
-        document.addEventListener("click", e => {
-          const link = e.target.closest("#diamondsPaginationWrapper a.page-link");
-          if (!link) return;
-          e.preventDefault();
-          loadDiamonds(link.href);
-          history.pushState({}, "", link.href);
-        });
-      
-        // Handle page input
-        document.addEventListener("change", e => {
-          if (!e.target.closest("#diamondsPaginationWrapper .page-input")) return;
-          let page = parseInt(e.target.value);
-          const max = parseInt(e.target.max);
-          if (isNaN(page) || page < 1) page = 1;
-          if (page > max) page = max;
-          const url = new URL(window.location);
-          url.searchParams.set("page", page);
-          loadDiamonds(url.toString());
-          history.pushState({}, "", url);
-        });
-
-        const wrapper = document.getElementById("diamondsTableWrapper");
-        if (wrapper) {
-        const headerOffset = 120; // adjust for your top bar height
-        const elementPosition = wrapper.getBoundingClientRect().top + window.pageYOffset;
-        window.scrollTo({ top: elementPosition - headerOffset, behavior: "smooth" });
-        }
-      });
-</script>   
+  initPageInput("#diamondsPaginationWrapper", loadDiamonds);
+  initSelectAllFeature("diamondsTableWrapper");
+  scrollToWrapper("diamondsTableWrapper");
+});
+</script>
 {% endblock %}
