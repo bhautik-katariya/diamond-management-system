@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}Your Diamonds{% endblock %}
 
 {% block content %}
@@ -208,6 +209,9 @@ document.addEventListener("DOMContentLoaded", () => {
       .then(data => {
         document.querySelector("#diamondsTableWrapper").innerHTML = data.table_html;
         document.querySelector("#diamondsPaginationWrapper").innerHTML = data.pagination_html;
+        initPageInput("#diamondsPaginationWrapper", loadDiamonds);
+        initSelectAllFeature("diamondsTableWrapper");
+        scrollToWrapper("diamondsTableWrapper");
       })
       .catch(err => console.error("Error:", err));
   }

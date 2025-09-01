@@ -16,7 +16,6 @@
                 <th>Cut</th>
                 <th>Polish</th>
                 <th>Symmetry</th>
-                <th>Fluorescence</th>
                 <th>Price/Carat</th>
                 <th>Video</th>
                 <th>Photo</th>
@@ -36,12 +35,40 @@
                 <td>{{ diamond.lab }}</td>
                 <td>{{ diamond.get_shape_display }}</td>
                 <td>{{ diamond.carat }}</td>
-                <td>{{ diamond.get_color_display }}</td>
-                <td>{{ diamond.get_clarity_display }}</td>
-                <td>{{ diamond.get_cut_display }}</td>
-                <td>{{ diamond.get_polish_display }}</td>
-                <td>{{ diamond.get_symmetry_display }}</td>
-                <td>{{ diamond.fluorescence }}</td>
+                <td>
+                    {% if diamond.color %}
+                        {{ diamond.get_color_display }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>
+                    {% if diamond.clarity %}
+                        {{ diamond.clarity }}                    
+                    {% else %}
+                        -
+                    {% endif %}
+                <td>
+                    {% if diamond.cut %}                    
+                        {{ diamond.cut }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>
+                    {% if diamond.polish %}                    
+                        {{ diamond.polish }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>
+                    {% if diamond.symmetry %}                    
+                        {{ diamond.symmetry }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
                 <td>{{ diamond.price_per_carat }}</td>
                 <td>
                     {% if diamond.video_360 %}

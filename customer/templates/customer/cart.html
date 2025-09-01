@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}Your Shopping Cart{% endblock %}
 
 {% block content %}
@@ -260,7 +261,15 @@
 </style> 
 
 <div id="cartTableWrapper">
-    {% include "customer/cart_table.html" %}
+    {% if page_obj or cart.item.exist or cart.item.all %}    
+        {% include "customer/cart_table.html" %}
+    {% else %}
+        <!-- EMPTY CART MESSAGE -->
+        <div class="text-center mt-5">
+            <p class="mb-3">Your cart is empty.</p>
+            <a href="{% url 'dashboard' %}" class="btn equal-button">Browse Diamonds</a>
+        </div>
+    {% endif %}
 </div>
 
 {% if paged_items %}
@@ -320,6 +329,9 @@ document.addEventListener("DOMContentLoaded", () => {
       .then(data => {
         document.getElementById("cartTableWrapper").innerHTML = data.table_html;
         document.getElementById("cart-pagination").innerHTML = data.pagination_html;
+        initPageInput("#cart-pagination", loadCart);
+        initSelectAllFeature("cartTableWrapper");
+        scrollToWrapper("cartTableWrapper");
       })
       .catch(err => console.error("Cart load failed", err));
   }

@@ -1,5 +1,8 @@
 {% extends 'base.html' %}
+{% load static %}
+
 {% block title %}Order Details{% endblock %}
+
 {% block content %}
 <div class="container mt-5">
     <h2 class="mb-4">Order Details</h2>
@@ -147,6 +150,9 @@ document.addEventListener("DOMContentLoaded", () => {
       .then(data => {
         document.querySelector("#ordersTableWrapper").innerHTML = data.table_html;
         document.querySelector("#ordersPaginationWrapper").innerHTML = data.pagination_html;
+        initPageInput("#ordersPaginationWrapper", loadOrders);
+        initSelectAllFeature("ordersTableWrapper");
+        scrollToWrapper("ordersTableWrapper");
       })
       .catch(err => console.error("Error:", err));
   }

@@ -8,6 +8,16 @@ from vendor.models import Vendor
 from customer.models import Customer
 
 class RegistrationForm(forms.Form):
+    USER_TYPE_CHOICES = [
+        ('customer', 'Customer'),
+        ('vendor', 'Vendor'),
+    ]
+
+    user_type = forms.ChoiceField(
+        choices=USER_TYPE_CHOICES,
+        widget=forms.HiddenInput()
+    )
+
     fname = forms.CharField(max_length=255, label="First Name")
     lname = forms.CharField(max_length=255, label="Last Name")
     username = forms.CharField(max_length=150, label="Username")
@@ -18,7 +28,6 @@ class RegistrationForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        
         for field_name, field in self.fields.items():
             widget = field.widget
             if isinstance(widget, forms.RadioSelect):
@@ -39,20 +48,16 @@ class RegistrationForm(forms.Form):
         if user_type not in ['vendor', 'customer']:
             raise forms.ValidationError("Invalid user type selected.")
 
-        # Dynamically determine the model
         Model = Vendor if user_type == 'vendor' else Customer
 
-        # Username check
         username = cleaned_data.get('username')
         if username and Model.objects.filter(username=username).exists():
             raise forms.ValidationError(f"This username is already taken by a {user_type}.")
 
-        # Email check
         email = cleaned_data.get('email')
         if email and Model.objects.filter(email=email).exists():
             raise forms.ValidationError(f"This email is already registered by a {user_type}.")
 
-        # Phone check
         phone = cleaned_data.get('phone')
         if phone and Model.objects.filter(phone=phone).exists():
             raise forms.ValidationError(f"This phone number is already registered by a {user_type}.")

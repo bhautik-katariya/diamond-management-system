@@ -64,6 +64,10 @@
             overflow-x: hidden;
         }
 
+        .alert.fade {
+            transition: opacity 0.5s linear;
+        }
+
         /* Optional: Better spacing for mobile nav items */
         @media (max-width: 991.98px) {
             .navbar-nav .nav-item {
@@ -86,6 +90,7 @@
             </button>
             <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                 <ul class="navbar-nav">
+                    {% block custom_nav %}
                     {% if request.session.user_id and request.session.user_type == 'vendor' %}
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'vendor:load_diamonds' %}">My Diamonds</a>
@@ -138,6 +143,7 @@
                             <a class="nav-link" href="/admin/">Admin</a>
                         </li>
                     {% endif %}
+                    {% endblock %}
                 </ul>
             </div>
         </div>
@@ -147,10 +153,11 @@
     <main class="container-fluid mt-4 px-3 flex-grow-1">
         {% if messages %}
             {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                <div class="alert alert-{{ message.tags }} fade show" role="alert">
+                    {{ message }}
+                </div>
             {% endfor %}
         {% endif %}
-
         {% block content %}{% endblock %}
     </main>
 
@@ -161,6 +168,14 @@
 
 <script>
         document.addEventListener("DOMContentLoaded", function () {
+
+            document.querySelectorAll(".alert").forEach(function (alert) {
+                setTimeout(function () {
+                    alert.classList.remove("show");      // triggers Bootstrap fade on .fade.show
+                    setTimeout(function () { alert.remove(); }, 500); // remove after transition
+                }, 3000); // 3 seconds
+            });
+
             const vendorId = "{{ request.session.user_id }}";
             const badge = document.getElementById("orderBadge");
             const toggleBadge = document.getElementById("toggleBadge");

@@ -91,7 +91,7 @@
 </div>
 
 <div class="mb-5">
-    <form method="post" enctype="multipart/form-data" id="diamond-form">
+    <form method="post" enctype="multipart/form-data" id="diamond-form" novalidate>
         {% csrf_token %}
 
         <!-- JSON Upload -->
@@ -108,21 +108,31 @@
             <div id="basic-section" class="collapse show card-body row">
                 {% for field in form %}
                     {% if field.name == 'type' or field.name == 'stock_id' or field.name == 'report_number' or field.name == 'lab' or field.name == 'carat' or field.name == 'color' or field.name == 'clarity' or field.name == 'rap_rate' or field.name == 'discount_percentage' %}
-                        <div class="mb-3 col-md-4">
-                            <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-                            {{ field }}
-                            {% if field.errors %}
-                                <div class="text-danger">{{ field.errors }}</div>
-                            {% endif %}
-                        </div>
+                    <div class="mb-3 col-md-4">
+                        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}
+                            {% for error in field.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ error }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
                     {% elif field.name == 'shape' %}
-                         <div class="mb-3 col-md-12">
-                            <label class="form-label">{{ field.label }}</label>
-                            <div class="shape-container">
-                                {% for choice in field.field.choices %}
-                                    <input type="radio" class="hidden-radio" name="{{ field.name }}" id="{{ field.id_for_label }}_{{ forloop.counter0 }}" value="{{ choice.0 }}">
-                                     <label class="shape-icon-label" for="{{ field.id_for_label }}_{{ forloop.counter0 }}" tabindex=0>
-                                        <span class="shape-svg">
+                    <div class="mb-3 col-md-12">
+                        <label class="form-label">{{ field.label }}</label>
+                        <div class="shape-container">
+                          {% for choice in field.field.choices %}
+                            <input type="radio"
+                                   class="hidden-radio"
+                                   name="{{ field.name }}"
+                                   id="{{ field.id_for_label }}_{{ forloop.counter0 }}"
+                                   value="{{ choice.0 }}"
+                                   {% if form.shape.value == choice.0 and not field.errors %}checked{% endif %}>
+                            <label class="shape-icon-label {% if form.shape.value == choice.0 and not field.errors %}selected-shape{% endif %}"
+                                   for="{{ field.id_for_label }}_{{ forloop.counter0 }}">
+                              <span class="shape-svg">
                                             {% if choice.0 == 'AS' %}
                                                 <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651456/asscher_xwkvvy.svg" width="40" height="40" alt="Asscher Shape">
                                             {% elif choice.0 == 'BG' %}
@@ -155,15 +165,19 @@
                                                 <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651462/trilliant_hwawud.svg" width="32" height="40" alt="Trillion Shape">
                                             {% else %}
                                                 <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651458/other_n3otbi.svg" width="40" height="40" alt="Other Shape">
-                                            {% endif %}                                        </span>
+                                            {% endif %}                                    
+                                        </span>
                                         <div class="shape-label">{{ choice.1|title }}</div>
-                                    </label>
-                                {% endfor %}
-                            </div>
-                             {% if field.errors %}
-                                <div class="text-danger">{{ field.errors }}</div>
-                            {% endif %}
-                        </div>
+                                      </label>
+                                    {% endfor %}
+                                  </div>
+                                  {% if field.errors %}
+                                    {% for error in field.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ error }}
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}                                </div>
                     {% endif %}
                 {% endfor %}
             </div>
@@ -177,13 +191,17 @@
             <div id="finish-section" class="collapse card-body row">
                 {% for field in form %}
                     {% if field.name == 'cut' or field.name == 'polish' or field.name == 'symmetry' or field.name == 'fluorescence' %}
-                        <div class="mb-3 col-md-4">
-                            <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-                            {{ field }}
-                            {% if field.errors %}
-                                <div class="text-danger">{{ field.errors }}</div>
-                            {% endif %}
-                        </div>
+                    <div class="mb-3 col-md-4">
+                        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}
+                            {% for error in field.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ error }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
                     {% endif %}
                 {% endfor %}
             </div>
@@ -197,13 +215,17 @@
             <div id="measurement-section" class="collapse card-body row">
                 {% for field in form %}
                     {% if field.name == 'length' or field.name == 'width' or field.name == 'height' or field.name == 'table_percentage' or field.name == 'depth_percentage' or field.name == 'crown_angle' or field.name == 'crown_height_percentage' or field.name == 'pavilion_angle' or field.name == 'pavilion_depth' or field.name == 'ratio' or field.name == 'bgm' %}
-                        <div class="mb-3 col-md-4">
-                            <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-                            {{ field }}
-                            {% if field.errors %}
-                                <div class="text-danger">{{ field.errors }}</div>
-                            {% endif %}
-                        </div>
+                    <div class="mb-3 col-md-4">
+                        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}
+                            {% for error in field.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ error }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
                     {% endif %}
                 {% endfor %}
             </div>
@@ -217,13 +239,17 @@
             <div id="media-section" class="collapse card-body row">
                 {% for field in form %}
                     {% if field.name == 'video_360' or field.name == 'photo' or field.name == 'pdf' %}
-                        <div class="mb-3 col-md-6">
-                            <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-                            {{ field }}
-                            {% if field.errors %}
-                                <div class="text-danger">{{ field.errors }}</div>
-                            {% endif %}
-                        </div>
+                    <div class="mb-3 col-md-4">
+                        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}
+                            {% for error in field.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ error }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
                     {% endif %}
                 {% endfor %}
             </div>
@@ -616,6 +642,19 @@
                 }
             });
         });
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        // find the first invalid input, select, or textarea
+        const firstInvalid = document.querySelector(".is-invalid");
+    
+        if (firstInvalid) {
+            // scroll into view smoothly
+            firstInvalid.scrollIntoView({ behavior: "smooth", block: "center" });
+    
+            // also focus it for better UX
+            firstInvalid.focus({ preventScroll: true });
+        }
     });
     
     </script>

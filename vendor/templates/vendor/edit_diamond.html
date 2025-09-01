@@ -85,7 +85,11 @@
                             <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
                             {{ field }}
                             {% if field.errors %}
-                                <div class="text-danger">{{ field.errors }}</div>
+                                {% for error in field.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ error }}
+                                    </div>
+                                {% endfor %}
                             {% endif %}
                         </div>
                     {% elif field.name == 'shape' %}
@@ -141,7 +145,11 @@
                                 {% endfor %}
                             </div>
                             {% if field.errors %}
-                                <div class="text-danger">{{ field.errors }}</div>
+                                {% for error in field.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ error }}
+                                    </div>
+                                {% endfor %}
                             {% endif %}
                         </div>
                     {% endif %}
@@ -161,7 +169,11 @@
                             <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
                             {{ field }}
                             {% if field.errors %}
-                                <div class="text-danger">{{ field.errors }}</div>
+                                {% for error in field.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ error }}
+                                    </div>
+                                {% endfor %}
                             {% endif %}
                         </div>
                     {% endif %}
@@ -181,7 +193,11 @@
                             <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
                             {{ field }}
                             {% if field.errors %}
-                                <div class="text-danger">{{ field.errors }}</div>
+                                {% for error in field.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ error }}
+                                    </div>
+                                {% endfor %}
                             {% endif %}
                         </div>
                     {% endif %}
@@ -201,7 +217,11 @@
                             <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
                             {{ field }}
                             {% if field.errors %}
-                                <div class="text-danger">{{ field.errors }}</div>
+                                {% for error in field.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ error }}
+                                    </div>
+                                {% endfor %}
                             {% endif %}
                         </div>
                     {% endif %}
@@ -375,6 +395,19 @@
                 this.classList.add('selected-shape');
             });
         });
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        // find the first invalid input, select, or textarea
+        const firstInvalid = document.querySelector(".is-invalid");
+    
+        if (firstInvalid) {
+            // scroll into view smoothly
+            firstInvalid.scrollIntoView({ behavior: "smooth", block: "center" });
+    
+            // also focus it for better UX
+            firstInvalid.focus({ preventScroll: true });
+        }
     });
     </script>
     

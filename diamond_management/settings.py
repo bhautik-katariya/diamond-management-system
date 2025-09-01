@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+from django.contrib.messages import constants as messages
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -24,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-6wrrs3l)jp8)tcr-3#l+=fsjmc)_)zt9z_z=r%dh2xr8dzn(w='
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -165,5 +166,8 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800  # 50MB
 FILE_UPLOAD_MAX_MEMORY_SIZE = 52428800  # 50MB
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 10000   # Increase field limit for large JSON
 
-
+# Messages
+MESSAGE_TAGS = {
+    messages.ERROR: 'danger',
+}
 

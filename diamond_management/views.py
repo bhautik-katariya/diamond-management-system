@@ -20,7 +20,7 @@ from django.template.loader import render_to_string
 
 
 def register(request):
-    if request.method == 'POST':
+    if request.method == 'POST':  
         post_data = request.POST.copy()
         post_data['user_type'] = 'customer'  
         form = RegistrationForm(post_data)
@@ -43,7 +43,9 @@ def register(request):
 
 def vendor_register(request):
     if request.method == 'POST':
-        form = RegistrationForm(request.POST, initial={'user_type': 'vendor'})
+        post_data = request.POST.copy()
+        post_data['user_type'] = 'vendor'  
+        form = RegistrationForm(post_data)
         if form.is_valid():
             vendor = Vendor.objects.create(
                 fname=form.cleaned_data['fname'],
@@ -185,15 +187,15 @@ def dashboard(request):
     if max_carat:
         diamonds = diamonds.filter(carat__lte=max_carat)
     if min_price:
-        diamonds = diamonds.filter(price_per_carat__gte=min_price)
+        diamonds = diamonds.filter(total_amount__gte=min_price)
     if max_price:
-        diamonds = diamonds.filter(price_per_carat__lte=max_price)
+        diamonds = diamonds.filter(total_amount__lte=max_price)
 
     # --- Sorting ---
     sort = request.GET.get('sort')
     sort_map = {
-        'price_asc': 'price_per_carat',
-        'price_desc': '-price_per_carat',
+        'price_asc': 'total_amount',
+        'price_desc': '-total_amount',
         'carat_asc': 'carat',
         'carat_desc': '-carat',
         'color_asc': 'color',
