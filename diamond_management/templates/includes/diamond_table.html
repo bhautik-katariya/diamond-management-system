@@ -19,7 +19,10 @@
                 <th>Polish</th>
                 <th>Symmetry</th>
                 <th>Measurement (W x L x H)</th>
+                <th>Rap Rate</th>
+                <th>Discount %</th>
                 <th>Price/Carat</th>
+                <th>Total Amount</th>
                 <th>View</th>
                 <th>Cart</th>
             </tr>
@@ -68,13 +71,46 @@
                     {% endif %}
                 </td>
                 <td>{{ diamond.carat }}</td>
-                <td>{{ diamond.get_color_display }}</td>
-                <td>{{ diamond.clarity }}</td>
-                <td>{{ diamond.cut }}</td>
-                <td>{{ diamond.polish }}</td>
-                <td>{{ diamond.symmetry }}</td>
+                <td>{% if diamond.color %}                
+                        {{ diamond.get_color_display }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>{% if diamond.clarity %}                
+                        {{ diamond.get_clarity_display }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>{% if diamond.cut %}                
+                        {{ diamond.cut }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>{% if diamond.polish %}                
+                        {{ diamond.polish }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>{% if diamond.symmetry %}                
+                        {{ diamond.symmetry }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
                 <td>{{ diamond.measurements }}</td>
+                <td>${{ diamond.rap_rate }}</td>
+                <td>{% if diamond.discount_percentage %}                
+                        {{ diamond.discount_percentage }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
                 <td>${{ diamond.price_per_carat }}</td>
+                <td>${{ diamond.total_amount }}</td>
                 <td><a href="{% url 'diamond_detail' diamond.id %}" class="btn equal-button">View</a></td>
                 <td><a href="{% url 'customer:add_to_cart' diamond.id %}?next={{ request.get_full_path|urlencode }}" class="btn equal-button">Cart</a></td>
             </tr>

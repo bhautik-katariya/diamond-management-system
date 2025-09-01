@@ -215,7 +215,13 @@ def dashboard(request):
     total_amount = round(aggs['total_amount'] or 0, 2)
 
     # --- Pagination ---
-    paginator = Paginator(diamonds, 50)
+    per_page = request.GET.get('per_page')  # get from query params
+    try:
+        per_page = int(per_page) if per_page else 50  # default 50
+    except ValueError:
+        per_page = 50
+
+    paginator = Paginator(diamonds, per_page)
     page_number = request.GET.get('page') or 1
     page_obj = paginator.get_page(page_number)
 
@@ -245,6 +251,8 @@ def dashboard(request):
         'total_carat': total_carat,
         'total_amount': total_amount,
         'get_params': request.GET.urlencode(),
+        'per_page': per_page,
+        'per_page_options': [50, 100, 500, 1000],
     }
 
     # === AJAX Partial Render ===

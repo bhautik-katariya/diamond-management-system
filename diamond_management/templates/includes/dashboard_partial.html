@@ -8,3 +8,21 @@
 <div class="d-flex justify-content-center my-3" id="bottom-pagination">
   {% include "includes/pagination.html" with position="bottom" %}
 </div>
+
+<form id="perPageForm" method="get" class="d-inline mb-0">
+  <label for="perPageSelect" class="me-2">Rows :</label>
+  <select name="per_page" id="perPageSelect" class="form-select form-select-sm d-inline w-auto">
+    {% for option in per_page_options %}
+      <option value="{{ option }}" {% if per_page == option %}selected{% endif %}>
+        {{ option }}
+      </option>
+    {% endfor %}
+  </select>
+
+  <!-- preserve filters/sort -->
+  {% for key, value in request.GET.items %}
+    {% if key != "per_page" and key != "page" %}
+      <input type="hidden" name="{{ key }}" value="{{ value }}">
+    {% endif %}
+  {% endfor %}
+</form>

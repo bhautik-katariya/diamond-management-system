@@ -390,6 +390,19 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+    // ------------------- Rows per page (AJAX) -------------------
+    document.addEventListener("change", (e) => {
+      if (e.target && e.target.id === "perPageSelect") {
+        const perPageSelect = e.target;
+        const url = new URL(window.location.href);
+        url.searchParams.set("per_page", perPageSelect.value);
+        url.searchParams.set("page", 1); // reset to first page
+  
+        loadTable(url.toString());
+        history.pushState({}, "", url);
+      }
+    }); 
+
   // ------------------- Delegated AJAX Links -------------------
   document.addEventListener('click', e => {
     const link = e.target.closest('a.ajax-link');
@@ -532,12 +545,15 @@ document.addEventListener("DOMContentLoaded", () => {
   enableRangeSelection("#color-group", "color-check");
   enableRangeSelection("#clarity-group", "clarity-check");
 
+
   // ------------------- Browser back/forward -------------------
   window.addEventListener("popstate", () => loadTable(location.href));
 
   initSelectAllFeature();
   syncPageInputs();
 });
+
+
 </script>
    
 {% endblock %}
