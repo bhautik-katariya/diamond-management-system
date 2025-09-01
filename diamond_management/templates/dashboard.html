@@ -349,10 +349,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ------------------- Utility: Load Table via AJAX -------------------
   function loadTable(url) {
+    const finalUrl = ensurePerPage(url);
     const wrapperBefore = document.getElementById('filterOverlayWrapper');
     const wasFilterOpen = wrapperBefore && wrapperBefore.classList.contains('active');
   
-    fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" } })
+    fetch(finalUrl, { headers: { "X-Requested-With": "XMLHttpRequest" } })
       .then(resp => resp.json())
       .then(data => {
         document.getElementById('diamondTableWrapper').innerHTML = data.table_html;
@@ -390,26 +391,44 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  function getCurrentPerPage() {
+    // Prefer the visible select value if present; otherwise fall back to URL
+    const select = document.getElementById('perPageSelect');
+    if (select && select.value) return select.value;
+    const fromUrl = new URL(window.location.href).searchParams.get('per_page');
+    return fromUrl || null;
+  }
+  
+  function ensurePerPage(urlLike) {
+    const u = new URL(urlLike, window.location.origin);
+    const pp = getCurrentPerPage();
+    if (pp) u.searchParams.set('per_page', pp);
+    return u.toString();
+  }
+
     // ------------------- Rows per page (AJAX) -------------------
     document.addEventListener("change", (e) => {
       if (e.target && e.target.id === "perPageSelect") {
         const perPageSelect = e.target;
         const url = new URL(window.location.href);
         url.searchParams.set("per_page", perPageSelect.value);
-        url.searchParams.set("page", 1); // reset to first page
-  
-        loadTable(url.toString());
-        history.pushState({}, "", url);
+        url.searchParams.set("page", 1);
+        const finalUrl = ensurePerPage(url.toString());
+    
+        loadTable(finalUrl);
+        history.pushState({}, "", finalUrl);
       }
-    }); 
+    });
 
   // ------------------- Delegated AJAX Links -------------------
   document.addEventListener('click', e => {
     const link = e.target.closest('a.ajax-link');
     if (!link) return;
     e.preventDefault();
-    loadTable(link.href);
-    history.pushState({}, "", link.href);
+  
+    const finalUrl = ensurePerPage(link.href);
+    loadTable(finalUrl);
+    history.pushState({}, "", finalUrl);
   });
 
   // ------------------- Delegated AJAX Page Input -------------------
@@ -435,14 +454,17 @@ document.addEventListener("DOMContentLoaded", () => {
       clearTimeout(window._filterTimer);
       window._filterTimer = setTimeout(() => {
         let params = new URLSearchParams(new FormData(filterForm));
+    
         const currentUrl = new URL(window.location.href);
         const currentSort = currentUrl.searchParams.get("sort");
-        if (currentSort) {
-          params.set("sort", currentSort);
-        }
-        const url = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
-        loadTable(url);
-        history.pushState({}, "", url);
+        if (currentSort) params.set("sort", currentSort);
+    
+        // Build base path and then ensure per_page is kept
+        let url = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+        const finalUrl = ensurePerPage(url);
+    
+        loadTable(finalUrl);
+        history.pushState({}, "", finalUrl);
       }, 200);
     }
     filterForm.querySelectorAll('input[type="checkbox"], select')
@@ -547,12 +569,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   // ------------------- Browser back/forward -------------------
-  window.addEventListener("popstate", () => loadTable(location.href));
+  window.addEventListener("popstate", () => {
+    const finalUrl = ensurePerPage(location.href);
+    loadTable(finalUrl);
+  });
 
   initSelectAllFeature();
   syncPageInputs();
 });
-
 
 </script>
    

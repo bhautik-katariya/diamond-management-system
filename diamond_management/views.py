@@ -253,6 +253,7 @@ def dashboard(request):
         'get_params': request.GET.urlencode(),
         'per_page': per_page,
         'per_page_options': [50, 100, 500, 1000],
+        'request': request,
     }
 
     # === AJAX Partial Render ===
