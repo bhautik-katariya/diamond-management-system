@@ -97,34 +97,42 @@ def view_cart(request):
         "page_obj": page_obj,
         "paged_items": page_obj.object_list,
     })
-
 def remove_from_cart(request, item_id):
     if request.session.get('user_type') == 'customer' and 'user_id' in request.session:
         # Customer cart
         item = get_object_or_404(CartItem, pk=item_id, cart__customer_id=request.session['user_id'])
+        cart = item.cart   # cart reference laavo delete karva pehla
         item.delete()
+
         if request.headers.get("x-requested-with") == "XMLHttpRequest":
+            cart_empty = not cart.items.exists()   # check if empty
             return JsonResponse({
                 "success": True,
                 "item_id": item_id,
                 "removed": True,
+                "cart_empty": cart_empty,   # 👈 important
             })
         messages.success(request, "Item removed from your cart.")
+
     else:
         # Guest cart
         guest_cart = request.session.get('guest_cart', {})
         if str(item_id) in guest_cart:
             del guest_cart[str(item_id)]
             request.session['guest_cart'] = guest_cart
+
             if request.headers.get("x-requested-with") == "XMLHttpRequest":
+                cart_empty = len(guest_cart) == 0
                 return JsonResponse({
                     "success": True,
                     "item_id": item_id,
                     "removed": True,
+                    "cart_empty": cart_empty,   # 👈 important
                 })
             messages.success(request, "Item removed from your cart.")
         else:
             messages.error(request, "Item not found in your cart.")
+
     return redirect('customer:view_cart')
 
 def increase_quantity(request, item_id):

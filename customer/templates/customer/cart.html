@@ -273,7 +273,7 @@
 </div>
 
 {% if paged_items %}
-<div class="cart-footer">
+<div class="cart-footer" id="cart-footer">
         <a href="{% url 'dashboard' %}" class="btn equal-button">Continue Shopping</a>
     {% if request.session.user_type == "customer" %}
         <a href="{% url 'customer:checkout' %}" class="btn equal-button">Proceed to Checkout</a>
@@ -310,7 +310,9 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
             `;
             document.getElementById("cart-pagination").innerHTML = ""; // clear pagination if exists
-        }
+             const footer = document.getElementById("cart-footer");
+                if (footer) footer.remove();
+            }
         return; 
         }
       row.querySelector(".cart-qty-input").value = data.quantity;
