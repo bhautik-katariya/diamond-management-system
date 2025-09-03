@@ -122,50 +122,47 @@
 </div> 
 
 <script> 
-// -------------------- Add to cart -----------------------
-  document.addEventListener("click", function (e) {
-    const link = e.target.closest(".ajax-add-to-cart");
-    if (!link) return;
-  
-    e.preventDefault();
-    const diamondId = link.dataset.id;
-  
-    fetch(`/customer/add-to-cart/${diamondId}/`, {
-      method: "POST",
-      headers: {
-        "X-CSRFToken": "{{ csrf_token }}",
-        "X-Requested-With": "XMLHttpRequest",
-      },
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (data.messages) {
-          data.messages.forEach(m => showMessage(m.text, m.level));
-        }
+    // -------------------- Add to cart -----------------------
+    document.addEventListener("click", function (e) {
+        const link = e.target.closest(".ajax-add-to-cart");
+        if (!link) return;
       
-        if (data.cart_count !== undefined) {
-          const cartCount = document.getElementById("cart-count");
-          if (cartCount) cartCount.textContent = data.cart_count;
-        }
-      })      
-      .catch(err => {
-        showMessage("Something went wrong!", "error");
-        console.error(err);
+        e.preventDefault();
+        const diamondId = link.dataset.id;
+      
+        fetch(`/customer/add-to-cart/${diamondId}/`, {
+          method: "POST",
+          headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+            "X-Requested-With": "XMLHttpRequest",
+          },
+        })
+          .then(res => res.json())
+          .then(data => {
+            if (data.message) {
+              showMessage(data.message, data.level);
+            }
+            const cartCount = document.getElementById("cart-count");
+            if (cartCount) cartCount.textContent = data.cart_count;
+          })
+          .catch(err => {
+            showMessage("Something went wrong!", "error");
+            console.error(err);
+          });
       });
-  });
-  
-  function showMessage(msg, level) {
-    const container = document.getElementById("message-container");
-    if (!container) return;
-  
-    const div = document.createElement("div");
-    div.className = `alert alert-${level}`;
-    div.textContent = msg;
-  
-    container.appendChild(div);
-  
-    // auto remove after 3s
-    setTimeout(() => div.remove(), 3000);
-  }
+      
+      function showMessage(msg, level) {
+        const container = document.getElementById("message-container");
+      
+        // Create message element
+        const div = document.createElement("div");
+        div.className = `alert alert-${level}`;
+        div.textContent = msg;
+      
+        container.appendChild(div);
+      
+        // Auto-remove after 3 seconds
+        setTimeout(() => div.remove(), 3000);
+      }
 </script>
 {% endblock %}
