@@ -112,7 +112,13 @@
                 <td>${{ diamond.price_per_carat }}</td>
                 <td>${{ diamond.total_amount }}</td>
                 <td><a href="{% url 'diamond_detail' diamond.id %}" class="btn equal-button">View</a></td>
-                <td><a href="{% url 'customer:add_to_cart' diamond.id %}?next={{ request.get_full_path|urlencode }}" class="btn equal-button">Cart</a></td>
+                <td>
+                    <a href="{% url 'customer:add_to_cart' diamond.id %}?next={{ request.get_full_path|urlencode }}"
+                       class="btn equal-button ajax-add-to-cart"
+                       data-id="{{ diamond.id }}">
+                      Cart
+                    </a>
+                  </td>
             </tr>
             {% endfor %}
         </tbody>

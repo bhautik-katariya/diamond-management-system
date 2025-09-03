@@ -12,8 +12,8 @@ from django.core.paginator import Paginator
 def add_to_cart(request, diamond_id):
     diamond = get_object_or_404(Diamond, pk=diamond_id)
 
+    # Logged-in customer
     if request.session.get('user_type') == 'customer' and 'user_id' in request.session:
-        # User is logged in
         customer = get_object_or_404(Customer, pk=request.session['user_id'])
         cart, created = Cart.objects.get_or_create(customer=customer)
         try:
@@ -25,24 +25,32 @@ def add_to_cart(request, diamond_id):
         except IntegrityError:
             messages.error(request, "This diamond is already in your cart.")
     else:
-        # User is not logged in (guest cart)
+        # Guest cart (session-based)
         guest_cart = request.session.get('guest_cart', {})
         diamond_id_str = str(diamond_id)
         guest_cart[diamond_id_str] = guest_cart.get(diamond_id_str, 0) + 1
         request.session['guest_cart'] = guest_cart
         messages.success(request, f"Diamond {diamond.stock_id} added to your cart.")
 
-    # Redirect to the same page as before
-    next_url = request.GET.get('next')
-    if next_url:
-        return redirect(next_url)
-    else:
-        # Fallback to HTTP_REFERER or dashboard
-        referer = request.META.get('HTTP_REFERER')
-        if referer:
-            return redirect(referer)
+    # --- AJAX request ---
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
+        storage = get_messages(request)
+        msgs = [{"level": m.level_tag, "text": m.message} for m in storage]
+
+        # count cart items
+        if request.session.get('user_type') == 'customer' and 'user_id' in request.session:
+            cart_count = CartItem.objects.filter(cart__customer=customer).count()
         else:
-            return redirect('dashboard')
+            cart_count = sum(request.session.get('guest_cart', {}).values())
+
+        return JsonResponse({
+            "messages": msgs,
+            "cart_count": cart_count
+        })
+
+    # --- Normal redirect fallback ---
+    next_url = request.GET.get('next') or request.META.get('HTTP_REFERER')
+    return redirect(next_url or 'dashboard')
 
 def view_cart(request):
     cart_items = []

@@ -281,12 +281,6 @@
         <a href="{% url 'login' %}?next={{ request.get_full_path }}" class="btn equal-button">Proceed to Checkout</a>
     {% endif %}
 </div>
-{% else %}
-    <!-- EMPTY CART MESSAGE -->
-    <div class="text-center mt-5">
-        <p class="mb-3">Your cart is empty.</p>
-        <a href="{% url 'dashboard' %}" class="btn equal-button">Browse Diamonds</a>
-    </div>
 {% endif %}
 
 <script src="{% static 'js/common.js' %}"></script>
@@ -305,7 +299,20 @@ document.addEventListener("DOMContentLoaded", () => {
     .then(data => {
       if (!data.success) return;
       const row = document.querySelector(`button[data-id="${itemId}"]`).closest("tr");
-      if (data.removed) { row.remove(); return; }
+      if (data.removed) {
+        row.remove(); 
+        // If cart became empty, show the empty cart message
+        if (data.cart_empty) {
+            document.getElementById("cartTableWrapper").innerHTML = `
+            <div class="text-center mt-5">
+                <p class="mb-3">Your cart is empty.</p>
+                <a href="/dashboard/" class="btn equal-button">Browse Diamonds</a>
+            </div>
+            `;
+            document.getElementById("cart-pagination").innerHTML = ""; // clear pagination if exists
+        }
+        return; 
+        }
       row.querySelector(".cart-qty-input").value = data.quantity;
       row.querySelector("td:last-child").textContent = "$" + data.line_total.toFixed(2);
     })
@@ -321,7 +328,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   document.querySelectorAll(".cart-remove").forEach(btn => {
     btn.addEventListener("click", () => updateQuantity(`/customer/cart/remove/${btn.dataset.id}/`, btn.dataset.id));
-  });
+  }); 
 
   function loadCart(url) {
     fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" }})

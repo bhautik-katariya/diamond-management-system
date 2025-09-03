@@ -416,7 +416,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const finalUrl = ensurePerPage(url.toString());
     
         loadTable(finalUrl);
-        history.pushState({}, "", finalUrl);
+        {% comment %} history.pushState({}, "", finalUrl); {% endcomment %}
       }
     });
 
@@ -428,7 +428,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
     const finalUrl = ensurePerPage(link.href);
     loadTable(finalUrl);
-    history.pushState({}, "", finalUrl);
+    {% comment %} history.pushState({}, "", finalUrl); {% endcomment %}
   });
 
   // ------------------- Delegated AJAX Page Input -------------------
@@ -464,7 +464,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const finalUrl = ensurePerPage(url);
     
         loadTable(finalUrl);
-        history.pushState({}, "", finalUrl);
+        {% comment %} history.pushState({}, "", finalUrl); {% endcomment %}
       }, 200);
     }
     filterForm.querySelectorAll('input[type="checkbox"], select')
@@ -490,7 +490,7 @@ document.addEventListener("DOMContentLoaded", () => {
         filterForm.reset();
         filterForm.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
         loadTable(window.location.pathname);
-        history.pushState({}, "", window.location.pathname);
+        {% comment %} history.pushState({}, "", window.location.pathname); {% endcomment %}
       });
     }
   }
@@ -567,12 +567,57 @@ document.addEventListener("DOMContentLoaded", () => {
   enableRangeSelection("#color-group", "color-check");
   enableRangeSelection("#clarity-group", "clarity-check");
 
+  // -------------------- Add to cart -----------------------
+  document.addEventListener("click", function (e) {
+    const link = e.target.closest(".ajax-add-to-cart");
+    if (!link) return;
+  
+    e.preventDefault();
+    const diamondId = link.dataset.id;
+  
+    fetch(`/customer/add-to-cart/${diamondId}/`, {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": "{{ csrf_token }}",
+        "X-Requested-With": "XMLHttpRequest",
+      },
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.messages) {
+          data.messages.forEach(m => showMessage(m.text, m.level));
+        }
+      
+        if (data.cart_count !== undefined) {
+          const cartCount = document.getElementById("cart-count");
+          if (cartCount) cartCount.textContent = data.cart_count;
+        }
+      })      
+      .catch(err => {
+        showMessage("Something went wrong!", "error");
+        console.error(err);
+      });
+  });
+  
+  function showMessage(msg, level) {
+    const container = document.getElementById("message-container");
+    if (!container) return;
+  
+    const div = document.createElement("div");
+    div.className = `alert alert-${level}`;
+    div.textContent = msg;
+  
+    container.appendChild(div);
+  
+    // auto remove after 3s
+    setTimeout(() => div.remove(), 3000);
+  }
 
-  // ------------------- Browser back/forward -------------------
+  {% comment %} // ------------------- Browser back/forward -------------------
   window.addEventListener("popstate", () => {
     const finalUrl = ensurePerPage(location.href);
     loadTable(finalUrl);
-  });
+  }); {% endcomment %}
 
   initSelectAllFeature();
   syncPageInputs();

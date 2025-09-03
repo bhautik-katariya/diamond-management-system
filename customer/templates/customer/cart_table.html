@@ -5,7 +5,6 @@
             <thead>
                 <tr>
                     <th><input type="checkbox" id="select-all"></th>
-                    <th>Sr No</th>
                     <th>Product</th>
                     <th>Price</th>
                     <th>Quantity</th>
@@ -17,7 +16,6 @@
                     {% for item in paged_items %}
             <tr>
                 <td><input type="checkbox" class="row-checkbox" name="selected_items" value="{{ item.id }}"></td>
-                <td>{{ forloop.counter0|add:page_obj.start_index }}</td>
                 <td>
                     <div style="display: flex; align-items: center;">
                         <div class="shape-icon-label">
