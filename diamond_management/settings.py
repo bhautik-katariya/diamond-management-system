@@ -67,6 +67,7 @@ CSRF_TRUSTED_ORIGINS = [
     'https://*.onrender.com',              # For Render
     'https://*.ngrok.io',               # For Ngrok (Public Tunnel)
     'https://*.railway.com',            # For railway
+    'https://*.railway.app',
 ]
 
 
