@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 from django.contrib.messages import constants as messages
+import dj_database_url
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,10 +23,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-6wrrs3l)jp8)tcr-3#l+=fsjmc)_)zt9z_z=r%dh2xr8dzn(w='
+SECRET_KEY = os.environ.get("SECRET_KEY", "unsafe-secret-key")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get("DEBUG", "True") == "True"
 
 ALLOWED_HOSTS = ['*']
 
@@ -63,7 +65,8 @@ MIDDLEWARE = [
 CSRF_TRUSTED_ORIGINS = [
     'https://*.cloudworkstations.dev',  # Allow Firebase Workstations
     'https://*.onrender.com',              # For Render
-    'https://*.ngrok.io',                   # For Ngrok (Public Tunnel)
+    'https://*.ngrok.io',               # For Ngrok (Public Tunnel)
+    'https://*.railway.com',            # For railway
 ]
 
 
@@ -85,23 +88,6 @@ TEMPLATES = [
     },
 ]
 
-# ASGI_APPLICATION = "diamond_management.asgi.application"
-
-# DATABASE_URL = (
-#     "postgres://diamond_postgres_user:"
-#     "IU3gfwAEoxA86ZlTxoGuR9lkXyHDVTDL"
-#     "@dpg-d28tuj1r0fns73eqpdig-a.oregon-postgres.render.com:5432/diamond_postgres"
-# )
-
-# CHANNEL_LAYERS = {
-#     "default": {
-#         "BACKEND": "channels_postgres.core.PostgresChannelLayer",
-#         "CONFIG": {
-#             "db_dsn": DATABASE_URL,
-#         },
-#     },
-# }
-
 # Channels
 ASGI_APPLICATION = "diamond_management.asgi.application"
 
@@ -117,16 +103,10 @@ WSGI_APPLICATION = 'diamond_management.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'diamond_postgres',
-        'USER': 'diamond_postgres_user',
-        'PASSWORD': 'IU3gfwAEoxA86ZlTxoGuR9lkXyHDVTDL',
-        'HOST': 'dpg-d28tuj1r0fns73eqpdig-a.oregon-postgres.render.com',
-        'PORT': '5432',
-    }
+    "default": dj_database_url.config(
+        default=os.environ.get("DATABASE_URL") or os.environ.get("DATABASE_PUBLIC_URL")
+    )
 }
 
 # Password validation
