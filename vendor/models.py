@@ -151,7 +151,6 @@ class Diamond(models.Model):
 class Order(models.Model):
     customer = models.ForeignKey('customer.Customer', on_delete=models.CASCADE, related_name='orders')
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE, related_name='orders')
-    seen = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

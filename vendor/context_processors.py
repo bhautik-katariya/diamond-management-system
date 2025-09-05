@@ -6,8 +6,15 @@ def base_context(request):
     if request.session.get("user_type") == "vendor" and vendor_id:
         pending_count = OrderItem.objects.filter(
             order__vendor_id=vendor_id,
-            status="Pending",
-            order__seen=False
+            status="Pending"
         ).count()
-    return {"pending_orders_count": pending_count}
+
+    # Apply cap for UI consistency
+    display_count = "9+" if pending_count > 9 else pending_count
+
+    return {
+        "pending_orders_count": display_count,
+        "raw_pending_orders_count": pending_count,  # optional, if you need exact number in backend
+    }
+
 

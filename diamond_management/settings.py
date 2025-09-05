@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
-import os
 from django.contrib.messages import constants as messages
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -45,6 +44,7 @@ EXTERNAL_APPS = [
     'vendor',
     'widget_tweaks',
     'channels',
+    'channels_postgres',
 ]
 
 INSTALLED_APPS += EXTERNAL_APPS 
@@ -85,7 +85,25 @@ TEMPLATES = [
     },
 ]
 
-ASGI_APPLICATION = 'diamond_management.asgi.application'
+# ASGI_APPLICATION = "diamond_management.asgi.application"
+
+# DATABASE_URL = (
+#     "postgres://diamond_postgres_user:"
+#     "IU3gfwAEoxA86ZlTxoGuR9lkXyHDVTDL"
+#     "@dpg-d28tuj1r0fns73eqpdig-a.oregon-postgres.render.com:5432/diamond_postgres"
+# )
+
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels_postgres.core.PostgresChannelLayer",
+#         "CONFIG": {
+#             "db_dsn": DATABASE_URL,
+#         },
+#     },
+# }
+
+# Channels
+ASGI_APPLICATION = "diamond_management.asgi.application"
 
 CHANNEL_LAYERS = {
     "default": {

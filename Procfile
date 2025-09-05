@@ -1,1 +1,1 @@
-web: gunicorn diamond_management.wsgi
+web: daphne -b 0.0.0.0 -p $PORT diamond_management.asgi:application

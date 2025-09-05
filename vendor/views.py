@@ -501,12 +501,6 @@ def view_orders(request):
                  .order_by('-created_at')
                  .prefetch_related('items__diamond', 'customer'))
 
-    Order.objects.filter(
-        id__in=orders_qs.values_list("id", flat=True),
-        seen=False,
-        items__status="Pending"
-    ).update(seen=True)
-
     order_items = []
     for order in orders_qs:
         for item in order.items.all():
@@ -529,12 +523,11 @@ def pending_orders_count(request):
 
     vendor_id = request.session.get("user_id")
 
-    # Count pending ORDERS (not items)
-    count = Order.objects.filter(
-        vendor_id=vendor_id,
-        seen=False,
-        items__status="Pending"
-    ).distinct().count()
+    # Count pending items
+    count = OrderItem.objects.filter(
+        order__vendor_id=vendor_id,
+        status="Pending"
+    ).count()
 
     return JsonResponse({"count": count})
 

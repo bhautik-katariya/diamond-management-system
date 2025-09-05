@@ -264,7 +264,6 @@ def checkout(request):
     pending_count = OrderItem.objects.filter(
         order__vendor=order.vendor,
         status="Pending",
-        order__seen=False
     ).count()
 
     async_to_sync(channel_layer.group_send)(

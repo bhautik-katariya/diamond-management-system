@@ -194,21 +194,21 @@
                 const data = JSON.parse(e.data);
                 if (data.count > 0) {
                     badge.style.display = "inline-block";
-                    badge.textContent = data.count;
-                    toggleBadge.style.display = "inline-block";   // show dot on navbar toggler
+                    badge.textContent = (data.count > 9) ? "9+" : data.count;
+                    toggleBadge.style.display = "inline-block";   // show dot
                 } else {
                     badge.style.display = "none";
-                    toggleBadge.style.display = "none";           // hide dot on navbar toggler
+                    toggleBadge.style.display = "none";           // hide dot
                 }
             };
         
-            const ordersLink = document.querySelector("a[href='{% url 'vendor:view_orders' %}']");
+            {% comment %} const ordersLink = document.querySelector("a[href='{% url 'vendor:view_orders' %}']");
             if (ordersLink) {
                 ordersLink.addEventListener("click", function() {
                     badge.style.display = "none";
                     toggleBadge.style.display = "none";
                 });
-            }
+            } {% endcomment %}
         });
 
         document.addEventListener("click", function (event) {
