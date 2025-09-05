@@ -261,7 +261,7 @@
 </style> 
 
 <div id="cartTableWrapper">
-    {% if page_obj or cart.item.exist or cart.item.all %}    
+    {% if paged_items %}
         {% include "customer/cart_table.html" %}
     {% else %}
         <!-- EMPTY CART MESSAGE -->
@@ -274,12 +274,15 @@
 
 {% if paged_items %}
 <div class="cart-footer" id="cart-footer">
-        <a href="{% url 'dashboard' %}" class="btn equal-button">Continue Shopping</a>
+   
     {% if request.session.user_type == "customer" %}
+        <a href="{% url 'customer:order_history' %}" class="btn equal-button">Order History</a>
         <a href="{% url 'customer:checkout' %}" class="btn equal-button">Proceed to Checkout</a>
     {% else %}
+        <a href="{% url 'login' %}?next={% url 'customer:order_history' %}" class="btn equal-button">Order History</a>
         <a href="{% url 'login' %}?next={{ request.get_full_path }}" class="btn equal-button">Proceed to Checkout</a>
     {% endif %}
+    <a href="{% url 'dashboard' %}" class="btn equal-button">Continue Shopping</a>
 </div>
 {% endif %}
 
@@ -290,36 +293,49 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!csrfTokenInput) return;
   const csrfToken = csrfTokenInput.value;
 
-  function updateQuantity(url, itemId) {
-    fetch(url, {
-      method: "POST",
-      headers: { "X-CSRFToken": csrfToken, "X-Requested-With": "XMLHttpRequest" },
-    })
-    .then(resp => resp.json())
-    .then(data => {
-      if (!data.success) return;
-      const row = document.querySelector(`button[data-id="${itemId}"]`).closest("tr");
-      if (data.removed) {
-        row.remove(); 
-        // If cart became empty, show the empty cart message
-        if (data.cart_empty) {
-            document.getElementById("cartTableWrapper").innerHTML = `
+  function handleEmptyCart() {
+        document.getElementById("cartTableWrapper").innerHTML = `
             <div class="text-center mt-5">
                 <p class="mb-3">Your cart is empty.</p>
-                <a href="/dashboard/" class="btn equal-button">Browse Diamonds</a>
+                <a href="{% url 'dashboard' %}" class="btn equal-button">Browse Diamonds</a>
+                {% if request.session.user_type == "customer" %}
+                    <a href="{% url 'customer:order_history' %}" class="btn equal-button">Order History</a>
+                {% else %}
+                    <a href="{% url 'login' %}?next={% url 'customer:order_history' %}" class="btn equal-button">Order History</a>
+                {% endif %}
             </div>
-            `;
-            document.getElementById("cart-pagination").innerHTML = ""; // clear pagination if exists
-             const footer = document.getElementById("cart-footer");
-                if (footer) footer.remove();
+        `;
+        const pagination = document.getElementById("cart-pagination");
+        if (pagination) pagination.innerHTML = "";
+        const footer = document.getElementById("cart-footer");
+        if (footer) footer.remove();
+    }
+
+    function updateQuantity(url, itemId) {
+        fetch(url, {
+        method: "POST",
+        headers: { "X-CSRFToken": csrfToken, "X-Requested-With": "XMLHttpRequest" },
+        })
+        .then(resp => resp.json())
+        .then(data => {
+        if (!data.success) return;
+        const row = document.querySelector(`button[data-id="${itemId}"]`)?.closest("tr");
+
+        if (data.removed) {
+            if (row) row.remove();
+            if (data.cart_empty) {
+                handleEmptyCart();  
             }
-        return; 
+            return;
         }
-      row.querySelector(".cart-qty-input").value = data.quantity;
-      row.querySelector("td:last-child").textContent = "$" + data.line_total.toFixed(2);
-    })
-    .catch(err => console.error("Cart update failed", err));
-  }
+
+        if (row) {
+            row.querySelector(".cart-qty-input").value = data.quantity;
+            row.querySelector("td:last-child").textContent = "$" + data.line_total.toFixed(2);
+        }
+        })
+        .catch(err => console.error("Cart update failed", err));
+    }
 
   // Increase / Decrease / Remove
   document.querySelectorAll(".qty-increase").forEach(btn => {

@@ -10,6 +10,32 @@ from .models import Cart, CartItem, Customer
 from django.db import IntegrityError
 from django.core.paginator import Paginator
 
+
+def order_history(request):
+    # only logged-in customer
+    if 'user_id' not in request.session or request.session.get('user_type') != 'customer':
+        messages.error(request, "Please log in as a customer to view order history.")
+        login_url = f"{reverse('login')}?next={reverse('customer:order_history')}"
+        return redirect(login_url)
+
+    customer = get_object_or_404(Customer, pk=request.session['user_id'])
+
+    # Get all order items for this customer (join via order__customer)
+    items_qs = (OrderItem.objects
+                .filter(order__customer=customer)
+                .select_related('order', 'diamond', 'order__vendor')
+                .order_by('-order__created_at'))
+
+    paginator = Paginator(items_qs, 10)   # 10 items per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, "customer/order_history.html", {
+        "page_obj": page_obj,
+        "items": page_obj.object_list,
+    })
+
+    
 def add_to_cart(request, diamond_id): 
     diamond = get_object_or_404(Diamond, pk=diamond_id) 
     # Customer logged in 
@@ -97,6 +123,7 @@ def view_cart(request):
         "page_obj": page_obj,
         "paged_items": page_obj.object_list,
     })
+    
 def remove_from_cart(request, item_id):
     if request.session.get('user_type') == 'customer' and 'user_id' in request.session:
         # Customer cart
@@ -110,7 +137,7 @@ def remove_from_cart(request, item_id):
                 "success": True,
                 "item_id": item_id,
                 "removed": True,
-                "cart_empty": cart_empty,   # 👈 important
+                "cart_empty": cart_empty,   #  important
             })
         messages.success(request, "Item removed from your cart.")
 
@@ -127,7 +154,7 @@ def remove_from_cart(request, item_id):
                     "success": True,
                     "item_id": item_id,
                     "removed": True,
-                    "cart_empty": cart_empty,   # 👈 important
+                    "cart_empty": cart_empty,   #  important
                 })
             messages.success(request, "Item removed from your cart.")
         else:
@@ -179,20 +206,24 @@ def decrease_quantity(request, item_id):
             item.quantity -= 1
             item.save()
             if request.headers.get("x-requested-with") == "XMLHttpRequest":
+                cart_empty = not item.cart.items.exists()
                 return JsonResponse({
                     "success": True,
                     "item_id": item.id,
                     "quantity": item.quantity,
                     "line_total": float(item.line_total),
+                    "cart_empty": cart_empty 
                 })
             messages.success(request, f"Decreased quantity for {item.diamond.stock_id}.")
         else:
             item.delete()
             if request.headers.get("x-requested-with") == "XMLHttpRequest":
+                cart_empty = not item.cart.items.exists()
                 return JsonResponse({
                     "success": True,
                     "item_id": item_id,
                     "removed": True,
+                    "cart_empty": cart_empty
                 })
             messages.success(request, f"Removed {item.diamond.stock_id} from your cart.")
         return redirect('customer:view_cart')
@@ -206,20 +237,24 @@ def decrease_quantity(request, item_id):
                 if request.headers.get("x-requested-with") == "XMLHttpRequest":
                     diamond = get_object_or_404(Diamond, pk=item_id)
                     line_total = float(diamond.price_per_carat) * float(diamond.carat) * guest_cart[str(item_id)]
+                    cart_empty = len(guest_cart) == 0
                     return JsonResponse({
                         "success": True,
                         "item_id": item_id,
                         "quantity": guest_cart[str(item_id)],
                         "line_total": line_total,
+                        "cart_empty": cart_empty
                     })
                 messages.success(request, "Decreased quantity in your cart.")
             else:
                 del guest_cart[str(item_id)]
                 if request.headers.get("x-requested-with") == "XMLHttpRequest":
+                    cart_empty = len(guest_cart) == 0
                     return JsonResponse({
                         "success": True,
                         "item_id": item_id,
                         "removed": True,
+                        "cart_empty": cart_empty
                     })
                 messages.success(request, "Removed item from your cart.")
             request.session['guest_cart'] = guest_cart

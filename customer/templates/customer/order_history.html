@@ -1,0 +1,314 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Order History{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-2 px-md-4">
+
+<style>
+    .equal-button {
+    min-width: 70px !important;
+    height: 28px !important;
+    font-size: 0.8rem !important;
+    padding: 3px 8px;
+    white-space: nowrap;
+    background: rgb(11, 25, 55);   /* dark blue */
+    color: #fff !important;
+    border: none;
+    border-radius: 14px;
+    font-weight: 500;
+    box-shadow: 0 2px 6px rgba(11, 25, 55, 0.25);
+    transition: background 0.3s, color 0.3s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.equal-button:hover {
+    background: #fff;
+    color: rgb(11, 25, 55) !important;
+    border: 1px solid rgb(11, 25, 55);
+}
+
+.page-link {
+        min-width: 60px;
+        height: 28px;
+        border-radius: 14px !important;
+        font-size: 0.8rem;
+        font-weight: 500;
+        background: rgb(11, 25, 55);
+        color: white !important;
+        border: none;
+        margin: 0 2px;
+        box-shadow: 0 2px 6px rgba(11, 25, 55, 0.25);
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    .page-link:hover {
+        background: white !important;
+        color: rgb(11, 25, 55) !important;
+        border: 1px solid rgb(11, 25, 55);
+    }
+
+    .page-item.active .page-link {
+        background: rgb(11, 25, 55) !important;
+        color: white !important;
+        border: none;
+    }
+
+    .page-item {
+        list-style: none;
+    }    
+
+    .page-input {
+        height: 28px;
+        width: 50px;
+        font-size: 0.8rem;
+        text-align: center;
+        border-radius: 14px;
+        border: 1px solid #ccc;
+        padding: 2px;
+    }
+
+    .page-total {
+        font-size: 0.8rem;
+        line-height: 28px;
+        color: #6c757d;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .pagination .form-control-sm {
+        height: 36px;
+        padding: 0;
+    }
+
+.order-history-table {
+    color: #222;
+    background-color: #fff;
+    border-collapse: separate;
+    border-spacing: 0 5px;
+    width: 100%;
+    border-radius: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    overflow: hidden;
+    margin: 40px auto 0 auto;
+    min-width: 700px;
+    max-width: 1200px;
+}
+.order-history-table th, .order-history-table td {
+    padding: 12px;
+    text-align: center;
+    vertical-align: middle;
+    background-color: #fff;
+    border-bottom: 1px solid #e3e3e3;
+}
+.order-history-table th {
+    background-color: #e6f4fa;
+    color: rgb(11, 25, 55);
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    white-space: normal;
+    word-wrap: break-word;
+    font-size: 0.9rem;
+    border-bottom: 2px solid rgb(11, 25, 55);
+}
+
+/* product/item styling */
+.order-history-info {
+    text-align: left;
+    min-width: 120px;
+}
+.order-history-title {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #222;
+    display: block;
+}
+.shape-icon-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    padding: 6px 0;
+    border-radius: 12px;
+    transition: box-shadow 0.2s, border 0.2s;
+    border: 2px solid transparent;
+    background: #fff;
+    max-width: 60px;
+    font-size: 0.75rem;
+    margin-right: 12px;
+}
+.shape-icon-label .shape-svg {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.shape-label {
+    font-size: 0.75rem;
+    color: #222;
+    margin-top: 4px;
+    font-weight: 500;
+}
+
+.items-list {
+    margin: 8px 0 0 0;
+    padding: 0;
+    list-style-position: inside;
+    text-align: center;
+}
+.items-list li {
+    display: block;
+}
+
+/* Mobile view fix */
+@media (max-width: 768px) {
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    table.table {
+        font-size: 0.85rem;   /* small font for better fit */
+    }
+
+    table.table th,
+    table.table td {
+        white-space: nowrap;  /* stop text from breaking awkwardly */
+        vertical-align: middle;
+    }
+
+    /* Items details center in mobile */
+    .items-list {
+        text-align: left;   /* better readability in phone */
+        font-size: 0.8rem;
+    }  
+  
+   .page-link {
+            min-width: 60px;
+            font-size: 0.8rem;
+            padding: 4px 8px;
+        }
+}
+
+@media (max-width: 900px) {
+    .order-history-table {
+        min-width: 600px;
+    }
+}
+@media (max-width: 700px) {
+    .order-history-table {
+        min-width: 500px;
+    }
+    .order-history-info {
+        min-width: 100px;
+    }
+}
+@media (max-width: 576px) {
+    .order-history-table th, .order-history-table td {
+        padding: 6px 8px;
+        font-size: 0.75rem;
+    }
+    .order-history-table {
+        min-width: 400px;
+    }
+}
+
+</style>
+
+<div class="table-responsive" style="margin:0 auto; max-width:95%;">
+    <h4 class="mt-4 mb-3" style="color: rgb(11,25,55); text-align:left;">Order History</h4>
+
+    <table class="order-history-table">
+        <thead>
+            <tr>
+                <th>Order #</th>
+                <th>Items</th>
+                <th>Total</th>
+                <th>Placed On</th>
+            </tr>
+        </thead>
+        <tbody>
+    {% for it in items %}
+    <tr>
+        <!-- Order number -->
+        <td>{{ it.order.id }}</td>
+
+        <!-- Item info -->
+        <td>
+            <div style="display: flex; align-items: center; margin-bottom:6px;">
+                <div class="shape-icon-label">
+                    <span class="shape-svg">
+                                {% if item.diamond.shape == 'AS' %}
+                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651456/asscher_xwkvvy.svg" width="40" height="40" alt="Asscher Shape">
+                                {% elif item.diamond.shape == 'BG' %}
+                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651456/baguette_gryjpl.svg" width="32" height="40" alt="Baguette Shape">
+                                {% elif item.diamond.shape == 'CS' %}
+                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651456/cushion_mmnoab.svg" width="40" height="40" alt="Cushion Shape">
+                                {% elif item.diamond.shape == 'EM' %}
+                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651456/emerald_sr9e0f.svg" width="32" height="40" alt="Emerald Shape">
+                                {% elif item.diamond.shape == 'HT' %}
+                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651457/heart_piv4mu.svg" width="40" height="40" alt="Heart Shape">
+                                {% elif item.diamond.shape == 'MQ' %}
+                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651457/marquise_ljlq2v.svg" width="32" height="40" alt="Marquise Shape">
+                                {% elif item.diamond.shape == 'RD' %}
+                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651461/round_phykmr.svg" width="40" height="40" alt="Round Shape">
+                                {% elif item.diamond.shape == 'OLD' %}
+                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651458/old_vyq23i.svg" width="40" height="40" alt="Old Shape">
+                                {% elif item.diamond.shape == 'OVL' %}
+                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651458/oval_epynny.svg" width="32" height="40" alt="Oval Shape">
+                                {% elif item.diamond.shape == 'PR' %}
+                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651459/pear_vdpfgq.svg" width="32" height="40" alt="Pear Shape">
+                                {% elif item.diamond.shape == 'PRS' %}
+                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651459/princess_fh3oqx.svg" width="40" height="40" alt="Princess Shape">
+                                {% elif item.diamond.shape == 'RDNT' %}
+                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651460/radiant_jhgoyd.svg" width="32" height="40" alt="Radiant Shape">
+                                {% elif item.diamond.shape == 'SQ' %}
+                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651461/square_x76biu.svg" width="40" height="40" alt="Square Shape">
+                                {% elif item.diamond.shape == 'TP' %}
+                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651461/tapered_i6pqjb.svg" width="32" height="40" alt="Taper Shape">
+                                {% elif item.diamond.shape == 'TR' %}
+                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651462/trilliant_hwawud.svg" width="32" height="40" alt="Trillion Shape">
+                                {% else %}
+                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651458/other_n3otbi.svg" width="40" height="40" alt="Other Shape">
+                                {% endif %}
+                            </span>
+                </div>
+                <div class="cart-product-info" style="margin-left:8px;">
+                    <span class="cart-product-title">{{ it.diamond.stock_id }}</span><br>
+                    <span style="color:#444; font-size:0.85rem;">
+                        {{ it.diamond.get_shape_display }} | {{ it.diamond.carat }} ct | 
+                        {{ it.diamond.get_color_display }} | {{ it.diamond.get_clarity_display }} 
+                        — Qty {{ it.quantity }}
+                    </span>
+                </div>
+            </div>
+        </td>
+
+        <!-- Line total -->
+        <td>${{ it.line_total|floatformat:2 }}</td>
+
+        <!-- Placed on -->
+        <td>{{ it.order.created_at|date:"d M Y, h:i A" }}</td>
+    </tr>
+    {% endfor %}
+</tbody>
+    </table>
+<div class="mt-4 d-flex justify-content-center">
+    <a href="javascript:history.back()" class="btn equal-button">Back</a>
+</div>
+
+</div>
+{% endblock %}
