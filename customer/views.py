@@ -10,32 +10,6 @@ from .models import Cart, CartItem, Customer
 from django.db import IntegrityError
 from django.core.paginator import Paginator
 
-
-def order_history(request):
-    # only logged-in customer
-    if 'user_id' not in request.session or request.session.get('user_type') != 'customer':
-        messages.error(request, "Please log in as a customer to view order history.")
-        login_url = f"{reverse('login')}?next={reverse('customer:order_history')}"
-        return redirect(login_url)
-
-    customer = get_object_or_404(Customer, pk=request.session['user_id'])
-
-    # Get all order items for this customer (join via order__customer)
-    items_qs = (OrderItem.objects
-                .filter(order__customer=customer)
-                .select_related('order', 'diamond', 'order__vendor')
-                .order_by('-order__created_at'))
-
-    paginator = Paginator(items_qs, 10)   # 10 items per page
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-
-    return render(request, "customer/order_history.html", {
-        "page_obj": page_obj,
-        "items": page_obj.object_list,
-    })
-
-    
 def add_to_cart(request, diamond_id): 
     diamond = get_object_or_404(Diamond, pk=diamond_id) 
     # Customer logged in 
@@ -75,7 +49,7 @@ def add_to_cart(request, diamond_id):
             "level": "success" if success else "danger",
             "cart_count": cart_count
         })
-
+    
     # --- Normal redirect fallback --- 
     next_url = request.GET.get('next') or request.META.get('HTTP_REFERER') 
     if next_url: 
@@ -110,7 +84,7 @@ def view_cart(request):
 
     # AJAX request → return partials
     if request.headers.get("x-requested-with") == "XMLHttpRequest":
-        table_html = render_to_string("customer/cart_table.html", {"page_obj": page_obj, "paged_items": page_obj.object_list, "cart": cart, }, request=request)
+        table_html = render_to_string("customer/includes/cart_table.html", {"page_obj": page_obj, "paged_items": page_obj.object_list, "cart": cart, }, request=request)
         pagination_html = render_to_string("includes/pagination.html", {"page_obj": page_obj}, request=request)
 
         return JsonResponse({
@@ -311,3 +285,39 @@ def checkout(request):
 
     messages.success(request, "Order placed successfully!")
     return render(request, 'customer/order_confirmation.html')
+
+def order_history(request):
+    # only logged-in customer
+    if 'user_id' not in request.session or request.session.get('user_type') != 'customer':
+        messages.error(request, "Please log in as a customer to view order history.")
+        login_url = f"{reverse('login')}?next={reverse('customer:order_history')}"
+        return redirect(login_url)
+
+    customer = get_object_or_404(Customer, pk=request.session['user_id'])
+
+    # Get all order items for this customer (join via order__customer)
+    items_qs = (
+        OrderItem.objects
+        .filter(order__customer=customer)
+        .select_related('order', 'diamond', 'order__vendor')
+        .order_by('-order__created_at')
+    )
+
+    paginator = Paginator(items_qs, 10)  
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    # If AJAX request → return partial HTML only
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
+        table_html = render_to_string(
+            "customer/includes/order_history_table.html",  
+            {"page_obj": page_obj, "items": page_obj.object_list},
+            request=request
+        )
+        return JsonResponse({"table_html": table_html})
+
+    # Normal request → render full page
+    return render(request, "customer/order_history.html", {
+        "page_obj": page_obj,
+        "items": page_obj.object_list,
+    })

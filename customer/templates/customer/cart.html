@@ -19,13 +19,14 @@
     max-width: 1200px;
 }
 .cart-table th, .cart-table td {
-    padding: 12px;
+    padding: 2px;
     text-align: center;
     vertical-align: middle;
     background-color: #fff;
     border-bottom: 1px solid #e3e3e3;
 }
 .cart-table th {
+    padding: 8px;
     background-color: #e6f4fa;
     color: rgb(11, 25, 55);
     font-weight: 600;
@@ -84,7 +85,9 @@
 }
 .cart-product-info {
     text-align: left;
-    min-width: 120px;
+    display: inline-block;
+    width: auto;
+    min-width: unset;
 }
 .cart-remove {
     color: #222;
@@ -262,7 +265,7 @@
 
 <div id="cartTableWrapper">
     {% if paged_items %}
-        {% include "customer/cart_table.html" %}
+        {% include "customer/includes/cart_table.html" %}
     {% else %}
         <!-- EMPTY CART MESSAGE -->
         <div class="text-center mt-5">
@@ -276,10 +279,8 @@
 <div class="cart-footer" id="cart-footer">
    
     {% if request.session.user_type == "customer" %}
-        <a href="{% url 'customer:order_history' %}" class="btn equal-button">Order History</a>
         <a href="{% url 'customer:checkout' %}" class="btn equal-button">Proceed to Checkout</a>
     {% else %}
-        <a href="{% url 'login' %}?next={% url 'customer:order_history' %}" class="btn equal-button">Order History</a>
         <a href="{% url 'login' %}?next={{ request.get_full_path }}" class="btn equal-button">Proceed to Checkout</a>
     {% endif %}
     <a href="{% url 'dashboard' %}" class="btn equal-button">Continue Shopping</a>
@@ -298,11 +299,6 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="text-center mt-5">
                 <p class="mb-3">Your cart is empty.</p>
                 <a href="{% url 'dashboard' %}" class="btn equal-button">Browse Diamonds</a>
-                {% if request.session.user_type == "customer" %}
-                    <a href="{% url 'customer:order_history' %}" class="btn equal-button">Order History</a>
-                {% else %}
-                    <a href="{% url 'login' %}?next={% url 'customer:order_history' %}" class="btn equal-button">Order History</a>
-                {% endif %}
             </div>
         `;
         const pagination = document.getElementById("cart-pagination");

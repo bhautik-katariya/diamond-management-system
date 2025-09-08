@@ -105,13 +105,14 @@
     max-width: 1200px;
 }
 .order-history-table th, .order-history-table td {
-    padding: 12px;
+    padding: 2px;
     text-align: center;
     vertical-align: middle;
     background-color: #fff;
     border-bottom: 1px solid #e3e3e3;
 }
 .order-history-table th {
+    padding: 8px;
     background-color: #e6f4fa;
     color: rgb(11, 25, 55);
     font-weight: 600;
@@ -127,7 +128,9 @@
 /* product/item styling */
 .order-history-info {
     text-align: left;
-    min-width: 120px;
+    display: inline-block;
+    width: auto;
+    min-width: unset;
 }
 .order-history-title {
     font-size: 1.1rem;
@@ -228,87 +231,42 @@
 
 </style>
 
-<div class="table-responsive" style="margin:0 auto; max-width:95%;">
-    <h4 class="mt-4 mb-3" style="color: rgb(11,25,55); text-align:left;">Order History</h4>
-
-    <table class="order-history-table">
-        <thead>
-            <tr>
-                <th>Order #</th>
-                <th>Items</th>
-                <th>Total</th>
-                <th>Placed On</th>
-            </tr>
-        </thead>
-        <tbody>
-    {% for it in items %}
-    <tr>
-        <!-- Order number -->
-        <td>{{ it.order.id }}</td>
-
-        <!-- Item info -->
-        <td>
-            <div style="display: flex; align-items: center; margin-bottom:6px;">
-                <div class="shape-icon-label">
-                    <span class="shape-svg">
-                                {% if item.diamond.shape == 'AS' %}
-                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651456/asscher_xwkvvy.svg" width="40" height="40" alt="Asscher Shape">
-                                {% elif item.diamond.shape == 'BG' %}
-                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651456/baguette_gryjpl.svg" width="32" height="40" alt="Baguette Shape">
-                                {% elif item.diamond.shape == 'CS' %}
-                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651456/cushion_mmnoab.svg" width="40" height="40" alt="Cushion Shape">
-                                {% elif item.diamond.shape == 'EM' %}
-                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651456/emerald_sr9e0f.svg" width="32" height="40" alt="Emerald Shape">
-                                {% elif item.diamond.shape == 'HT' %}
-                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651457/heart_piv4mu.svg" width="40" height="40" alt="Heart Shape">
-                                {% elif item.diamond.shape == 'MQ' %}
-                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651457/marquise_ljlq2v.svg" width="32" height="40" alt="Marquise Shape">
-                                {% elif item.diamond.shape == 'RD' %}
-                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651461/round_phykmr.svg" width="40" height="40" alt="Round Shape">
-                                {% elif item.diamond.shape == 'OLD' %}
-                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651458/old_vyq23i.svg" width="40" height="40" alt="Old Shape">
-                                {% elif item.diamond.shape == 'OVL' %}
-                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651458/oval_epynny.svg" width="32" height="40" alt="Oval Shape">
-                                {% elif item.diamond.shape == 'PR' %}
-                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651459/pear_vdpfgq.svg" width="32" height="40" alt="Pear Shape">
-                                {% elif item.diamond.shape == 'PRS' %}
-                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651459/princess_fh3oqx.svg" width="40" height="40" alt="Princess Shape">
-                                {% elif item.diamond.shape == 'RDNT' %}
-                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651460/radiant_jhgoyd.svg" width="32" height="40" alt="Radiant Shape">
-                                {% elif item.diamond.shape == 'SQ' %}
-                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651461/square_x76biu.svg" width="40" height="40" alt="Square Shape">
-                                {% elif item.diamond.shape == 'TP' %}
-                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651461/tapered_i6pqjb.svg" width="32" height="40" alt="Taper Shape">
-                                {% elif item.diamond.shape == 'TR' %}
-                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651462/trilliant_hwawud.svg" width="32" height="40" alt="Trillion Shape">
-                                {% else %}
-                                    <img src="https://res.cloudinary.com/dsipxdqum/image/upload/v1754651458/other_n3otbi.svg" width="40" height="40" alt="Other Shape">
-                                {% endif %}
-                            </span>
-                </div>
-                <div class="cart-product-info" style="margin-left:8px;">
-                    <span class="cart-product-title">{{ it.diamond.stock_id }}</span><br>
-                    <span style="color:#444; font-size:0.85rem;">
-                        {{ it.diamond.get_shape_display }} | {{ it.diamond.carat }} ct | 
-                        {{ it.diamond.get_color_display }} | {{ it.diamond.get_clarity_display }} 
-                        — Qty {{ it.quantity }}
-                    </span>
-                </div>
-            </div>
-        </td>
-
-        <!-- Line total -->
-        <td>${{ it.line_total|floatformat:2 }}</td>
-
-        <!-- Placed on -->
-        <td>{{ it.order.created_at|date:"d M Y, h:i A" }}</td>
-    </tr>
-    {% endfor %}
-</tbody>
-    </table>
-<div class="mt-4 d-flex justify-content-center">
-    <a href="javascript:history.back()" class="btn equal-button">Back</a>
+<div id="orderHistoryWrapper">
+    {% if page_obj %}
+        {% include "customer/order_history_table.html" %}
+    {% else %}
+    <div class="text-center mt-5">
+        <p class="mb-3">You haven't placed any orders.</p>
+        <a href="{% url 'dashboard' %}" class="btn equal-button">Browse Diamonds</a>
+    </div>
+    {% endif %}
 </div>
-
-</div>
+<script src="{% static 'js/common.js' %}"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        function loadOrders(url) {
+            fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" }})
+            .then(resp => resp.json())
+            .then(data => {
+                document.getElementById("orderHistoryWrapper").innerHTML = data.table_html;
+                document.getElementById("order-pagination").innerHTML = data.pagination_html;
+                initPageInput("#order-pagination", loadOrders);
+                initSelectAllFeature("orderHistoryWrapper");
+                scrollToWrapper("orderHistoryWrapper");
+            })
+            .catch(err => console.error("Order load failed", err));
+        }
+        
+        document.addEventListener("click", e => {
+            const link = e.target.closest("a.ajax-link");
+            if (!link) return;
+            e.preventDefault();
+            loadOrders(link.href);
+            history.pushState({}, "", link.href);
+        });
+        
+        initPageInput("#order-pagination", loadOrders);
+        initSelectAllFeature("orderHistoryWrapper");
+        scrollToWrapper("orderHistoryWrapper");
+</script>
 {% endblock %}
