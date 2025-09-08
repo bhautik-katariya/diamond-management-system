@@ -270,21 +270,6 @@ def checkout(request):
                 line_total=item.line_total
             )
             item.delete()  # Remove from cart
-            
-    channel_layer = get_channel_layer()
-    pending_count = OrderItem.objects.filter(
-        order__vendor=order.vendor,
-        status="Pending",
-    ).count()
-
-    async_to_sync(channel_layer.group_send)(
-        f"vendor_{order.vendor.id}_orders",
-        {
-            "type": "send_order_count",
-            "count": pending_count
-        }
-    )
-
     messages.success(request, "Order placed successfully!")
     return render(request, 'customer/order_confirmation.html')
 

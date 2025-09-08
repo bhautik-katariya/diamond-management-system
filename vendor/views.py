@@ -127,7 +127,7 @@ def load_diamonds(request):
     page_obj = paginator.get_page(page_number)
 
     if request.headers.get("x-requested-with") == "XMLHttpRequest":
-        table_html = render_to_string("vendor/load_diamonds_table.html", {"diamonds": page_obj.object_list, "page_obj": page_obj, }, request=request)
+        table_html = render_to_string("vendor/includes/load_diamonds_table.html", {"diamonds": page_obj.object_list, "page_obj": page_obj, }, request=request)
         pagination_html = render_to_string("includes/pagination.html", {"page_obj": page_obj, }, request=request)
         return JsonResponse({"table_html": table_html, "pagination_html": pagination_html})
 
@@ -511,25 +511,11 @@ def view_orders(request):
     page_obj = paginator.get_page(page_number)
 
     if request.headers.get("x-requested-with") == "XMLHttpRequest":
-        table_html = render_to_string("vendor/order_table.html", {"page_obj": page_obj, }, request=request)
+        table_html = render_to_string("vendor/includes/order_table.html", {"page_obj": page_obj, }, request=request)
         pagination_html = render_to_string("includes/pagination.html", {"page_obj": page_obj, }, request=request)
         return JsonResponse({"table_html": table_html, "pagination_html": pagination_html})
 
     return render(request, "vendor/order.html", {"page_obj": page_obj})
-
-def pending_orders_count(request):
-    if request.session.get('user_type') != 'vendor' or 'user_id' not in request.session:
-        return redirect('login')
-
-    vendor_id = request.session.get("user_id")
-
-    # Count pending items
-    count = OrderItem.objects.filter(
-        order__vendor_id=vendor_id,
-        status="Pending"
-    ).count()
-
-    return JsonResponse({"count": count})
 
 @require_POST
 def process_order_item(request, item_id):
@@ -541,7 +527,7 @@ def process_order_item(request, item_id):
     item = get_object_or_404(OrderItem, id=item_id, order__vendor=vendor)
 
     if item.status == "Pending":
-        item.status = "Completed"
+        item.status = "Processed"
         item.save()
         if request.headers.get("x-requested-with") == "XMLHttpRequest":
             return JsonResponse({

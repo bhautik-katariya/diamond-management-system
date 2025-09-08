@@ -11,6 +11,5 @@ urlpatterns = [
     path('load-diamonds/', load_diamonds, name='load_diamonds'),
     path('delete-diamond/<int:id>/', delete_diamond, name='delete_diamond'),
     path('orders/', view_orders, name='view_orders'),
-    path('pending-orders-count/', pending_orders_count, name='pending_orders_count'),
     path('process-order-item/<int:item_id>/', process_order_item, name='process_order_item'),
 ]

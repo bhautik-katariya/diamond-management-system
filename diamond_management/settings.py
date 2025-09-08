@@ -93,10 +93,24 @@ TEMPLATES = [
 # Channels
 ASGI_APPLICATION = "diamond_management.asgi.application"
 
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",  
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+
+# Redis channel layer (works across multiple workers)
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer"
-    }
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [os.environ.get("REDIS_URL")] or [os.environ.get("REDIS_PUBLIC_URL")]
+        },
+    },
 }
 
 WSGI_APPLICATION = 'diamond_management.wsgi.application'
@@ -160,6 +174,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Session settings
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 SESSION_COOKIE_AGE = 5 * 60 * 60  # 5 hours
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+SESSION_CACHE_ALIAS = "default"
 
 # Request body size limits for large JSON uploads
 DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800  # 50MB
@@ -171,3 +187,5 @@ MESSAGE_TAGS = {
     messages.ERROR: 'danger',
 }
 
+CELERY_BROKER_URL = "redis://127.0.0.1:6379/0"
+CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/0"

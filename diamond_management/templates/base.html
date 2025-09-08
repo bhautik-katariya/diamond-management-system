@@ -198,22 +198,27 @@
             const vendorId = "{{ request.session.user_id }}";
             const badge = document.getElementById("orderBadge");
             const toggleBadge = document.getElementById("toggleBadge");
-        
+
             if (!vendorId || !badge || !toggleBadge) return;
-        
+
+            const wsScheme = window.location.protocol === "https:" ? "wss" : "ws";
             const socket = new WebSocket(
-                "ws://" + window.location.host + "/ws/vendor/orders/" + vendorId + "/"
+                `${wsScheme}://${window.location.host}/ws/orders/${vendorId}/`
             );
-        
+            socket.onopen = () => console.log("WS connected!");
+            socket.onerror = (e) => console.log("WS error:", e);
+            socket.onclose = () => console.log("WS closed!");
+
             socket.onmessage = function(e) {
+                console.log("WS message:", e.data);
                 const data = JSON.parse(e.data);
                 if (data.count > 0) {
                     badge.style.display = "inline-block";
-                    badge.textContent = (data.count > 9) ? "9+" : data.count;
-                    toggleBadge.style.display = "inline-block";   // show dot
+                    badge.textContent = data.count;  
+                    toggleBadge.style.display = "inline-block";
                 } else {
                     badge.style.display = "none";
-                    toggleBadge.style.display = "none";           // hide dot
+                    toggleBadge.style.display = "none";
                 }
             };
         });
@@ -238,7 +243,7 @@
                 if (!cartBadge) return;
                 if (count > 0) {
                 cartBadge.style.display = "inline-block";
-                cartBadge.textContent = (count > 9) ? "9+" : count;
+                cartBadge.textContent = count;
                 } else {
                 cartBadge.style.display = "none";
                 }

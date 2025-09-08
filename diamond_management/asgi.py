@@ -11,19 +11,17 @@ import os
 from django.core.asgi import get_asgi_application
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.auth import AuthMiddlewareStack
-import diamond_management.routing
+import vendor.routing
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'diamond_management.settings')
 
-# Initialize Django ASGI app first to ensure Django setup
-django_asgi_app = get_asgi_application()
-
 application = ProtocolTypeRouter({
-    "http": django_asgi_app,
+    "http": get_asgi_application(),
     "websocket": AuthMiddlewareStack(
         URLRouter(
-            diamond_management.routing.websocket_urlpatterns
+            vendor.routing.websocket_urlpatterns
         )
     ),
 })
+
 

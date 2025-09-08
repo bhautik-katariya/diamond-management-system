@@ -326,7 +326,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (cartBadge) {
                     if (data.cart_count > 0) {
                         cartBadge.style.display = "inline-block";
-                        cartBadge.textContent = (data.cart_count > 9) ? "9+" : data.cart_count;
+                        cartBadge.textContent = data.cart_count;
                     } else {
                         cartBadge.style.display = "none";  
                     }
