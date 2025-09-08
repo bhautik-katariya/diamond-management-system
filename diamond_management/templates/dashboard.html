@@ -587,8 +587,15 @@ document.addEventListener("DOMContentLoaded", () => {
         if (data.message) {
           showMessage(data.message, data.level);
         }
-        const cartCount = document.getElementById("cart-count");
-        if (cartCount) cartCount.textContent = data.cart_count;
+        const cartBadge = document.getElementById("cartBadge");
+        if (cartBadge) {
+          if (data.cart_count > 0) {
+            cartBadge.style.display = "inline-block";
+            cartBadge.textContent = (data.cart_count > 9) ? "9+" : data.cart_count;
+          } else {
+            cartBadge.style.display = "none";
+          }
+        }
       })
       .catch(err => {
         showMessage("Something went wrong!", "error");
@@ -609,12 +616,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // Auto-remove after 3 seconds
     setTimeout(() => div.remove(), 3000);
   }
-
-  {% comment %} // ------------------- Browser back/forward -------------------
-  window.addEventListener("popstate", () => {
-    const finalUrl = ensurePerPage(location.href);
-    loadTable(finalUrl);
-  }); {% endcomment %}
 
   initSelectAllFeature();
   syncPageInputs();

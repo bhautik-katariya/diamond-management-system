@@ -120,8 +120,12 @@
                         <li class="nav-item position-relative">
                             <a class="nav-link position-relative" href="{% url 'customer:view_cart' %}">
                               Cart
+                              <span id="cartBadge" class="badge-notify"
+                                    style="{% if cart_count == 0 %}display:none;{% endif %}">
+                                {{ cart_count }}
+                              </span>
                             </a>
-                        </li>
+                        </li>                       
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'customer:order_history' %}">
                               My Orders
@@ -137,8 +141,14 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'dashboard' %}">Home</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'customer:view_cart' %}">Cart</a>
+                        <li class="nav-item position-relative">
+                            <a class="nav-link position-relative" href="{% url 'customer:view_cart' %}">
+                                Cart
+                                <span id="cartBadge" class="badge-notify"
+                                      style="{% if cart_count == 0 %}display:none;{% endif %}">
+                                  {{ cart_count }}
+                                </span>
+                            </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'login' %}">Login</a>
@@ -206,14 +216,6 @@
                     toggleBadge.style.display = "none";           // hide dot
                 }
             };
-        
-            {% comment %} const ordersLink = document.querySelector("a[href='{% url 'vendor:view_orders' %}']");
-            if (ordersLink) {
-                ordersLink.addEventListener("click", function() {
-                    badge.style.display = "none";
-                    toggleBadge.style.display = "none";
-                });
-            } {% endcomment %}
         });
 
         document.addEventListener("click", function (event) {
@@ -227,6 +229,23 @@
                     new bootstrap.Collapse(navbar, { toggle: true });
                 }
             }
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const cartBadge = document.getElementById("cartBadge");
+
+            function updateCartBadge(count) {
+                if (!cartBadge) return;
+                if (count > 0) {
+                cartBadge.style.display = "inline-block";
+                cartBadge.textContent = (count > 9) ? "9+" : count;
+                } else {
+                cartBadge.style.display = "none";
+                }
+            }
+
+            // initialize with server-rendered count
+            updateCartBadge(parseInt(cartBadge?.textContent || "0"));
         });
 </script>
 

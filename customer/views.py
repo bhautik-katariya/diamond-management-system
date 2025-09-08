@@ -42,7 +42,7 @@ def add_to_cart(request, diamond_id):
         if request.session.get('user_type') == 'customer' and 'user_id' in request.session: 
             cart_count = CartItem.objects.filter(cart__customer=customer).count() 
         else: 
-            cart_count = sum(request.session.get('guest_cart', {}).values()) 
+            cart_count = len(request.session.get('guest_cart', {}))
         return JsonResponse({
             "success": success,
             "message": msg,
@@ -111,7 +111,8 @@ def remove_from_cart(request, item_id):
                 "success": True,
                 "item_id": item_id,
                 "removed": True,
-                "cart_empty": cart_empty,   #  important
+                "cart_empty": cart_empty,  
+                "cart_count": cart.items.count(),
             })
         messages.success(request, "Item removed from your cart.")
 
@@ -128,7 +129,8 @@ def remove_from_cart(request, item_id):
                     "success": True,
                     "item_id": item_id,
                     "removed": True,
-                    "cart_empty": cart_empty,   #  important
+                    "cart_empty": cart_empty,
+                    "cart_count": len(guest_cart),
                 })
             messages.success(request, "Item removed from your cart.")
         else:
@@ -197,7 +199,8 @@ def decrease_quantity(request, item_id):
                     "success": True,
                     "item_id": item_id,
                     "removed": True,
-                    "cart_empty": cart_empty
+                    "cart_empty": cart_empty,
+                    "cart_count": item.cart.items.count(),
                 })
             messages.success(request, f"Removed {item.diamond.stock_id} from your cart.")
         return redirect('customer:view_cart')
@@ -208,33 +211,32 @@ def decrease_quantity(request, item_id):
         if str(item_id) in guest_cart:
             if guest_cart[str(item_id)] > 1:
                 guest_cart[str(item_id)] -= 1
-                if request.headers.get("x-requested-with") == "XMLHttpRequest":
-                    diamond = get_object_or_404(Diamond, pk=item_id)
-                    line_total = float(diamond.price_per_carat) * float(diamond.carat) * guest_cart[str(item_id)]
-                    cart_empty = len(guest_cart) == 0
-                    return JsonResponse({
-                        "success": True,
-                        "item_id": item_id,
-                        "quantity": guest_cart[str(item_id)],
-                        "line_total": line_total,
-                        "cart_empty": cart_empty
-                    })
                 messages.success(request, "Decreased quantity in your cart.")
             else:
                 del guest_cart[str(item_id)]
-                if request.headers.get("x-requested-with") == "XMLHttpRequest":
-                    cart_empty = len(guest_cart) == 0
-                    return JsonResponse({
-                        "success": True,
-                        "item_id": item_id,
-                        "removed": True,
-                        "cart_empty": cart_empty
-                    })
                 messages.success(request, "Removed item from your cart.")
+
+            # Always update session
             request.session['guest_cart'] = guest_cart
+            request.session['cart_count'] = sum(guest_cart.values()) 
+
+            if request.headers.get("x-requested-with") == "XMLHttpRequest":
+                diamond = get_object_or_404(Diamond, pk=item_id)
+                line_total = float(diamond.price_per_carat) * float(diamond.carat) * guest_cart.get(str(item_id), 0)
+                cart_empty = len(guest_cart) == 0
+                return JsonResponse({
+                    "success": True,
+                    "item_id": item_id,
+                    "quantity": guest_cart.get(str(item_id), 0),
+                    "line_total": line_total,
+                    "cart_empty": cart_empty,
+                    "cart_count": request.session['cart_count'], 
+                    "removed": guest_cart.get(str(item_id)) is None
+                })
         else:
             messages.error(request, "Item not found in your cart.")
-        return redirect('customer:view_cart')
+
+    return redirect('customer:view_cart')
 
 
 def checkout(request):

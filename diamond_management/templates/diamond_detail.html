@@ -126,30 +126,37 @@
     document.addEventListener("click", function (e) {
         const link = e.target.closest(".ajax-add-to-cart");
         if (!link) return;
-      
+    
         e.preventDefault();
         const diamondId = link.dataset.id;
-      
+    
         fetch(`/customer/add-to-cart/${diamondId}/`, {
-          method: "POST",
-          headers: {
+        method: "POST",
+        headers: {
             "X-CSRFToken": "{{ csrf_token }}",
             "X-Requested-With": "XMLHttpRequest",
-          },
+        },
         })
-          .then(res => res.json())
-          .then(data => {
+        .then(res => res.json())
+        .then(data => {
             if (data.message) {
-              showMessage(data.message, data.level);
+            showMessage(data.message, data.level);
             }
-            const cartCount = document.getElementById("cart-count");
-            if (cartCount) cartCount.textContent = data.cart_count;
-          })
-          .catch(err => {
+            const cartBadge = document.getElementById("cartBadge");
+            if (cartBadge) {
+            if (data.cart_count > 0) {
+                cartBadge.style.display = "inline-block";
+                cartBadge.textContent = (data.cart_count > 9) ? "9+" : data.cart_count;
+            } else {
+                cartBadge.style.display = "none";
+            }
+            }
+        })
+        .catch(err => {
             showMessage("Something went wrong!", "error");
             console.error(err);
-          });
-      });
+        });
+    });
       
       function showMessage(msg, level) {
         const container = document.getElementById("message-container");

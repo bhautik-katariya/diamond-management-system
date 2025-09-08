@@ -83,7 +83,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                "vendor.context_processors.base_context", # for pre laoding order count
+                "vendor.context_processors.base_context", # vendor order count
+                "customer.context_processors.cart_count", # customer cart count
             ],
         },
     },
@@ -157,7 +158,7 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Session settings
-SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 SESSION_COOKIE_AGE = 5 * 60 * 60  # 5 hours
 
 # Request body size limits for large JSON uploads
