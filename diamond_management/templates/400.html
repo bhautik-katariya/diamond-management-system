@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Bad Request{% endblock %}
+
+{% block custom_nav %}
+    <li class="nav-item">
+        <a class="nav-link" href="#">Contact Us</a>
+    </li>
+{% endblock %}
+
+{% block content %}
+<style>
+.error-container { text-align: center; padding: 80px 20px; }
+.error-title {
+  font-size: 8rem; font-weight: 900;
+  background: linear-gradient(45deg, #0b1937, #1e90ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: float 3s ease-in-out infinite;
+}
+.error-subtitle { font-size: 2rem; font-weight: 600; color: #333; margin-top: 20px; }
+.error-text { font-size: 1.1rem; color: #666; max-width: 600px; margin: 20px auto; }
+.error-btn {
+  background: #0b1937; color: white; border-radius: 30px; padding: 12px 32px;
+  text-decoration: none; font-size: 1rem; font-weight: 600;
+  display: inline-block; margin-top: 30px; transition: all 0.3s ease;
+}
+.error-btn:hover {
+  background: white; color: #0b1937; border: 2px solid #0b1937;
+  transform: scale(1.05);
+}
+@keyframes float { 0%{transform:translateY(0)} 50%{transform:translateY(-15px)} 100%{transform:translateY(0)} }
+</style>
+
+<div class="container error-container">
+  <h1 class="error-title">400</h1>
+  <h2 class="error-subtitle">Bad Request</h2>
+  <p class="error-text">
+    The server could not understand your request.<br>
+    Please go back and try again.
+  </p>
+  <a href="{% url 'dashboard' %}" class="error-btn">Back to Dashboard</a>
+</div>
+{% endblock %}

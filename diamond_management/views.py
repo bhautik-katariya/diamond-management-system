@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.urls import reverse
 from django.contrib import messages
 from django.contrib.auth.hashers import make_password, check_password
 from django.shortcuts import get_object_or_404
@@ -66,6 +67,33 @@ def vendor_register(request):
         form = RegistrationForm(initial={'user_type': 'vendor'})
 
     return render(request, 'auth/register.html', {'form': form, 'is_vendor_register': True})
+
+def _google_start(request, role: str):
+    # Remember intended role + next across the OAuth dance
+    request.session["login_role"] = role
+    next_url = request.GET.get("next")
+    if next_url:
+        request.session["login_next"] = next_url
+    # Kick off the allauth Google flow
+    return redirect("/accounts/google/login/")  # allauth's built-in start URL
+
+def google_customer_start(request):
+    return _google_start(request, "customer")
+
+def google_vendor_start(request):
+    return _google_start(request, "vendor")
+
+def post_google_login(request):
+    # Prefer the next saved in session (set by our starter view)
+    next_url = request.session.pop("login_next", None)
+
+    if request.session.get("user_type") == "vendor":
+        return redirect(next_url or "vendor:load_diamonds")
+
+    if request.session.get("user_type") == "customer":
+        return redirect(next_url or "dashboard")
+
+    return redirect("login")
 
 def login(request):
     next_url = request.GET.get('next')  # Capture ?next param if present

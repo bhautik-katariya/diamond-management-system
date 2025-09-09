@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Sign in with Google</h2>
+<a href="{% provider_login_url 'google' %}" class="btn btn-danger">Continue with Google</a>
+{% endblock %}

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load socialaccount %}
 
 {% block title %}Login - Diamond Management{% endblock %}
 
@@ -49,6 +50,22 @@
                         <button type="submit" class="btn btn-primary">Sign In</button>
                     </div>
                 </form>
+            </div>
+            <div class="text-center my-3"><span class="text-muted">OR</span></div>
+            <div class="d-grid">
+                {% if is_vendor_login %}
+                    <a href="{% url 'google_vendor_start' %}{% if next %}?next={{ next|urlencode }}{% endif %}"
+                    class="btn btn-light border">
+                    <img src="https://fonts.gstatic.com/s/i/productlogos/googleg/v6/24px.svg" style="vertical-align:middle;margin-right:6px;">
+                    Continue with Google (Vendor)
+                    </a>
+                {% else %}
+                    <a href="{% url 'google_customer_start' %}{% if next %}?next={{ next|urlencode }}{% endif %}"
+                    class="btn btn-light border">
+                    <img src="https://fonts.gstatic.com/s/i/productlogos/googleg/v6/24px.svg" style="vertical-align:middle;margin-right:6px;">
+                    Continue with Google
+                    </a>
+                {% endif %}
             </div>
             <div class="card-footer text-center">
                 <p class="mb-2">Don't have an account? 

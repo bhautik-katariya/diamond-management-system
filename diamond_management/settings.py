@@ -26,7 +26,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("SECRET_KEY", "unsafe-secret-key")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("DEBUG", "True") == "True"
+# DEBUG = os.environ.get("DEBUG", "True") == "True"
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -47,9 +48,45 @@ EXTERNAL_APPS = [
     'widget_tweaks',
     'channels',
     'channels_postgres',
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
 ]
 
 INSTALLED_APPS += EXTERNAL_APPS 
+
+
+SITE_ID = 1
+
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+]
+
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        "APP": {
+            "client_id": os.getenv("CLIENT_ID"),
+            "secret": os.getenv("CLIENT_SECRET"),
+            "key": "",
+        },
+        "LOGIN_METHODS": ["oauth2"],  # Optional
+        "APPEND_SLASH": True,
+    }
+}
+
+SOCIALACCOUNT_LOGIN_ON_GET = True
+
+# Where to land after OAuth
+LOGIN_REDIRECT_URL = "post_google_login"
+LOGOUT_REDIRECT_URL = "login"
+
+# Optional (keeps signup simple)
+ACCOUNT_EMAIL_VERIFICATION = "none"
+ACCOUNT_LOGIN_METHODS = {"username", "email"}
+ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -57,6 +94,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',

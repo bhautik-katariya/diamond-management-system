@@ -21,6 +21,10 @@ from .views import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path("accounts/", include("allauth.urls")),              # allauth routes
+    path("oauth/google/customer/", google_customer_start, name="google_customer_start"),
+    path("oauth/google/vendor/", google_vendor_start, name="google_vendor_start"),
+    path("post_google_login/", post_google_login, name="post_google_login"),
     path('', dashboard, name='dashboard'),
     path('diamond-detail/<int:id>', diamond_detail, name='diamond_detail'),
     path('customer/', include(('customer.urls', 'customer'), namespace='customer')),
