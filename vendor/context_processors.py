@@ -1,6 +1,6 @@
 from .models import OrderItem
 
-def base_context(request):
+def order_count(request):
     vendor_id = request.session.get("user_id")
     pending_count = 0
     if request.session.get("user_type") == "vendor" and vendor_id:

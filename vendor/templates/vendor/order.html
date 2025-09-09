@@ -122,53 +122,66 @@
 
 <script src="{% static 'js/common.js' %}"></script>
 <script>
-document.addEventListener("DOMContentLoaded", () => {
-  const csrfToken = "{{ csrf_token }}";
-
-  document.querySelectorAll(".mark-processed").forEach(btn => {
-    btn.addEventListener("click", () => {
+  document.addEventListener("DOMContentLoaded", () => {
+    const csrfToken = "{{ csrf_token }}";
+  
+    // Delegated click handler for mark-processed buttons
+    document.addEventListener("click", e => {
+      const btn = e.target.closest(".mark-processed");
+      if (!btn) return; // not a process button click
+  
       const itemId = btn.dataset.id;
+  
       fetch(`/vendor/process-order-item/${itemId}/`, {
         method: "POST",
-        headers: { "X-CSRFToken": csrfToken, "X-Requested-With": "XMLHttpRequest" }
+        headers: {
+          "X-CSRFToken": csrfToken,
+          "X-Requested-With": "XMLHttpRequest"
+        }
       })
       .then(resp => resp.json())
       .then(data => {
         if (data.success) {
-          btn.outerHTML = `<span class="badge bg-success">${data.status}</span>`;
+          // Replace the entire <td> with a green badge
+          const cell = btn.closest("td");
+          cell.innerHTML = `<span class="badge bg-success">${data.status}</span>`;
         } else {
           alert("Already " + data.status);
         }
       })
       .catch(err => console.error("Error:", err));
     });
+  
+    // AJAX loader for pagination
+    function loadOrders(url) {
+      fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" }})
+        .then(resp => resp.json())
+        .then(data => {
+          document.querySelector("#ordersTableWrapper").innerHTML = data.table_html;
+          document.querySelector("#ordersPaginationWrapper").innerHTML = data.pagination_html;
+  
+          // re-init your helpers after replacing content
+          initPageInput("#ordersPaginationWrapper", loadOrders);
+          initSelectAllFeature("ordersTableWrapper");
+          scrollToWrapper("ordersTableWrapper");
+        })
+        .catch(err => console.error("Error:", err));
+    }
+  
+    // Pagination click handling
+    document.addEventListener("click", e => {
+      const link = e.target.closest("#ordersPaginationWrapper a.page-link");
+      if (!link) return;
+      e.preventDefault();
+      loadOrders(link.href);
+      history.pushState({}, "", link.href);
+    });
+  
+    // Initial helpers
+    initPageInput("#ordersPaginationWrapper", loadOrders);
+    initSelectAllFeature("ordersTableWrapper");
+    scrollToWrapper("ordersTableWrapper");
   });
-
-  function loadOrders(url) {
-    fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" }})
-      .then(resp => resp.json())
-      .then(data => {
-        document.querySelector("#ordersTableWrapper").innerHTML = data.table_html;
-        document.querySelector("#ordersPaginationWrapper").innerHTML = data.pagination_html;
-        initPageInput("#ordersPaginationWrapper", loadOrders);
-        initSelectAllFeature("ordersTableWrapper");
-        scrollToWrapper("ordersTableWrapper");
-      })
-      .catch(err => console.error("Error:", err));
-  }
-
-  document.addEventListener("click", e => {
-    const link = e.target.closest("#ordersPaginationWrapper a.page-link");
-    if (!link) return;
-    e.preventDefault();
-    loadOrders(link.href);
-    history.pushState({}, "", link.href);
-  });
-
-  initPageInput("#ordersPaginationWrapper", loadOrders);
-  initSelectAllFeature("ordersTableWrapper");
-  scrollToWrapper("ordersTableWrapper");
-});
 </script>
 {% endblock %}
 

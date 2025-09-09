@@ -14,7 +14,7 @@ def broadcast_pending_count(vendor_id):
     ).count()
 
     async_to_sync(channel_layer.group_send)(
-        f"vendor_{vendor_id}_orders",
+        f"orders_{vendor_id}",
         {
             "type": "send_order_count",
             "count": pending_count,  # exact number

@@ -83,7 +83,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                "vendor.context_processors.base_context", # vendor order count
+                "vendor.context_processors.order_count", # vendor order count
                 "customer.context_processors.cart_count", # customer cart count
             ],
         },
@@ -93,25 +93,24 @@ TEMPLATES = [
 # Channels
 ASGI_APPLICATION = "diamond_management.asgi.application"
 
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/1",  
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+DATABASE_URL = os.environ.get("DATABASE_URL")
+DATABASE_PUBLIC_URL = os.environ.get("DATABASE_PUBLIC_URL")
+
+if DATABASE_URL or DATABASE_PUBLIC_URL:
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels_postgres.core.PostgresChannelLayer",
+            "CONFIG": {
+                "dsn": DATABASE_URL or DATABASE_PUBLIC_URL,
+            },
         }
     }
-}
-
-# Redis channel layer (works across multiple workers)
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [os.environ.get("REDIS_URL")] or [os.environ.get("REDIS_PUBLIC_URL")]
-        },
-    },
-}
+else:
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels.layers.InMemoryChannelLayer",
+        }
+    }
 
 WSGI_APPLICATION = 'diamond_management.wsgi.application'
 
@@ -174,8 +173,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Session settings
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 SESSION_COOKIE_AGE = 5 * 60 * 60  # 5 hours
-SESSION_ENGINE = "django.contrib.sessions.backends.cache"
-SESSION_CACHE_ALIAS = "default"
 
 # Request body size limits for large JSON uploads
 DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800  # 50MB
@@ -186,6 +183,3 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = 10000   # Increase field limit for large JSON
 MESSAGE_TAGS = {
     messages.ERROR: 'danger',
 }
-
-CELERY_BROKER_URL = "redis://127.0.0.1:6379/0"
-CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/0"
